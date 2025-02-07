@@ -1,5 +1,13 @@
-const socket = io('http://127.0.0.1:5500');
+/*
+ * THIS FILE IS FOR CLIENT-SIDE LOGIC
+ * 
+ * Authors: Cole Welstead
+ * Credit to Dave Gray for the starting code and tutorial
+*/
 
+const socket = io('http://127.0.0.1:5500')
+
+// Constants for all relevant HTML elements on the page (for chat tutorial)
 const msgInput = document.querySelector('#message');
 const nameInput = document.querySelector('#name');
 const chatRoom = document.querySelector('#room');
@@ -7,6 +15,53 @@ const activity = document.querySelector('.activity');
 const usersList = document.querySelector('.user-list');
 const roomList = document.querySelector('.room-list');
 const chatDisplay = document.querySelector('.chat-display');
+
+// Constants for all relevant HTML element on the page (for lobbies)
+const privateCodeInput = document.querySelector('#private-lobby-code')
+
+// Methods related to lobbies
+function enterLobby(lobbyID) {
+    
+    socket.emit('lobby-connect', {
+        userID: "", // todo make connection details more detailed
+        lobbyID: lobbyID,
+    })
+}
+
+function enterPrivateLobby(e) {
+    e.preventDefault()
+    privateCodeInput.value = ""
+    if (!enterLobby(getPrivateLobby())) {
+        privateCodeInput.focus()
+    }
+}
+document.querySelector('.form-private-lobby').addEventListener('submit', enterPrivateLobby)
+
+function enterPublicLobby(e) {
+    e.preventDefault()
+    enterLobby("") // TODO: figure out a way to get the lobby ID
+}
+
+function getPrivateLobby() {
+    return privateCodeInput.value;
+}
+function getPublicLobby() {
+
+}
+
+/*
+ * RECEIVING MESSAGES FROM THE SERVER
+*/
+socket.on('lobby-join-success', (lobby) => {
+    // Step 1: Load lobby details for new view
+
+    // Step 2: Switch view to lobby screen
+})
+socket.on('lobby-join-fail', (lobbyID) => {
+    // Notify user of failure
+})
+
+// All below methods are from the chat room tutorial
 
 function sendMessage(e) {
     e.preventDefault();

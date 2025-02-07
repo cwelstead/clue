@@ -3,31 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>Kauffman Clue</title>
     <link href="style.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js" integrity="sha512-8ExARjWWkIllMlNzVg7JKq9RKWPlJABQUNq6YvAjE/HobctjH/NA+bSiDMDvouBVjp4Wwnf1VP1OEv7Zgjtuxw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script defer src="app.js"></script>
 </head>
 <body>
     <main>
-        <form class="form-join">
-            <input type="text" id="name" maxlength="12" placeholder="Username here" size="5" required>
-            <input type="text" id="room" placeholder="Chat room" size="5" required>
-            <button id="join" type="submit">Join</button>
-        </form>
+        <div class="flexbox-container" style="display:flex">
+            <div class="sidebar" style="flex:1;">
+                <form class="form-join">
+                    <input type="text" id="name" maxlength="12" placeholder="Username here" size="5" required>
+                    <input type="text" id="room" placeholder="Chat room" size="5" required>
+                    <button id="join" type="submit">Join</button>
+                </form>
 
-        <ul class="chat-display"></ul>
+                <ul class="chat-display"></ul>
 
-        <p class="user-list"></p>
+                <p class="user-list"></p>
 
-        <p class="room-list"></p>
+                <p class="room-list"></p>
 
-        <p class="activity"></p>
+                <p class="activity"></p>
 
-        <form class="form-msg">
-            <input type="text" id="message" placeholder="Type here..." required>
-            <button type="submit">Send</button>
-        </form>
+                <form class="form-msg">
+                    <input type="text" id="message" placeholder="Type here..." required>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+            <div class="main" style="flex:1;">
+                <h1>Private Lobby</h1>
+                <form class="form-private-lobby">
+                    <input type="text" id="private-lobby-code" maxlength="6" placeholder="Enter lobby code" required>
+                    <button type="submit">Join</button>
+                </form>
+                <button type="create-private-lobby">Create Private Lobby</button>
+                <h1>Public Lobby</h1>
+                <button type="create-public-lobby">Create Public Lobby</button>
+                <ul class="public-lobby-display">
+
+                </ul>
+            </div>
+        </table>
     </main>
 </body>
 </html>
