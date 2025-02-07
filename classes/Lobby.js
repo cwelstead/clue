@@ -1,4 +1,4 @@
-class Lobby {
+export class Lobby {
     constructor(name) {
         self._name = name
         self._id = generateID()

@@ -2,7 +2,7 @@ import express from 'express'
 import { Server } from 'socket.io'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { Lobby } from './classes/Lobby'
+import { Lobby } from './classes/Lobby.js'
 
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
