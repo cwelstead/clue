@@ -87,6 +87,7 @@ function createLobby(name) {
         ...LobbiesState.lobbies.filter(existingLobby => existingLobby.getID() !== lobby.getID()),
         lobby
     ])
+    return lobby
 }
 function destroyLobby(id) {
     LobbiesState.setLobbies(LobbiesState.lobbies.filter(lobby => lobby.getID !== id));
@@ -100,25 +101,51 @@ function destroyLobby(id) {
 io.on('connection', socket => {
     console.log(`User ${socket.id} connected`);
 
+    socket.on('lobby-create', ({name}) => {
+        console.log(`Creating lobby with name ${name}`)
+        const createdLobby = createLobby(name)
+        console.log(`Lobby created with name ${createdLobby.getName()} ID ${createdLobby.getID()}`)
+
+        socket.emit('lobby-create-success', {
+            id: createdLobby.getID(),
+        })
+    })
+
     socket.on('lobby-connect', ({userID, lobbyID}) => {
         let joinSuccess = true
         // Step 1: Find lobby, if it exists
-        lobbyToJoin = LobbiesState.lobbies.find(lobby => lobby.getID() === lobbyID)
+        const lobbyToJoin = LobbiesState.lobbies.find(lobby => lobby.getID() === lobbyID)
         // Step 2: Check if lobby has space for client
         if (!lobbyToJoin || lobbyToJoin.isFull()) {
             joinSuccess = false
         } else { // Step 3: Join lobby
             lobbyToJoin.addPlayer(userID)
+            socket.join(lobbyToJoin)
         }
         // Step 4: Notify client of success or failure
         if (joinSuccess) {
-            socket.emit('lobby-join-success', lobbyToJoin)
+            socket.emit('lobby-join-success', ({
+                name: lobbyToJoin.getName(), 
+                id: lobbyToJoin.getID()}))
         } else {
             socket.emit('lobby-join-fail', lobbyID)
         }
     })
 
+    socket.on('lobby-disconnect', ({userID, lobbyID}) => {
+        const lobbyToLeave = LobbiesState.lobbies.find(lobby => lobby.getID() === lobbyID)
+        socket.leave(lobbyToLeave)
+        lobbyToLeave.removePlayer(userID) // userID system is wack rn, once architecture is more solid this can be improved upon
+        if (lobbyToLeave.isEmpty()) {
+            lobbyToLeave.deactivateLobby()
+            destroyLobby(lobbyID)
+        }
+        socket.emit('lobby-disconnect-success', {})
+    })
+
+    //
     // All below methods are from the chat room tutorial
+    //
 
     // Upon connection - only to user
     socket.emit('message', buildMsg(ADMIN, "Welcome to Chat App"));

@@ -8,25 +8,49 @@
 const socket = io('http://127.0.0.1:5500')
 
 // Constants for all relevant HTML elements on the page (for chat tutorial)
-const msgInput = document.querySelector('#message');
-const nameInput = document.querySelector('#name');
-const chatRoom = document.querySelector('#room');
-const activity = document.querySelector('.activity');
-const usersList = document.querySelector('.user-list');
-const roomList = document.querySelector('.room-list');
-const chatDisplay = document.querySelector('.chat-display');
+const msgInput = document.querySelector('#message')
+const nameInput = document.querySelector('#name')
+const chatRoom = document.querySelector('#room')
+const activity = document.querySelector('.activity')
+const usersList = document.querySelector('.user-list')
+const roomList = document.querySelector('.room-list')
+const chatDisplay = document.querySelector('.chat-display')
 
 // Constants for all relevant HTML element on the page (for lobbies)
+const view1 = document.querySelector('#join-lobby-view')
+
 const privateCodeInput = document.querySelector('#private-lobby-code')
 
+const view2 = document.querySelector('#inside-lobby-view')
+view2.style.display = "none"
+const lobbyIDHeader = document.querySelector('#lobby-id')
+const lobbyNameHeader = document.querySelector('#lobby-name')
+
+// temp variable to keep track of lobby the user is in, should be replaced by something that follows best practices later
+let lastLobby = 0
+
 // Methods related to lobbies
+function createLobby(e) {
+    e.preventDefault()
+    socket.emit('lobby-create', {
+        name: "test",
+    })
+}
+document.querySelector('.create-private-lobby').addEventListener('click', createLobby)
 function enterLobby(lobbyID) {
-    
     socket.emit('lobby-connect', {
         userID: "", // todo make connection details more detailed
         lobbyID: lobbyID,
     })
 }
+function leaveLobby(e) {
+    e.preventDefault()
+    socket.emit('lobby-disconnect', {
+        userID: "",
+        lobbyID: lastLobby,
+    })
+}
+document.querySelector('.leave-lobby').addEventListener('click', leaveLobby)
 
 function enterPrivateLobby(e) {
     e.preventDefault()
@@ -52,13 +76,27 @@ function getPublicLobby() {
 /*
  * RECEIVING MESSAGES FROM THE SERVER
 */
-socket.on('lobby-join-success', (lobby) => {
+socket.on('lobby-create-success', ({id}) => {
+    enterLobby(id)
+})
+socket.on('lobby-join-success', ({name, id}) => { // TODO: we may need to import this as a Lobby object but it was bugging when I tried it
     // Step 1: Load lobby details for new view
-
+    lobbyNameHeader.textContent = `Lobby Name: ${name}`
+    lobbyIDHeader.textContent = `Lobby ID: ${id}`
     // Step 2: Switch view to lobby screen
+    view1.style.display = "none"
+    view2.style.display = "block"
+    // Step 3: Record current lobby as last joined
+    lastLobby = id
 })
 socket.on('lobby-join-fail', (lobbyID) => {
     // Notify user of failure
+    alert("fail... :(")
+})
+socket.on('lobby-disconnect-success', ({}) => {
+    // Switch view to lobby selection
+    view1.style.display = "block"
+    view2.style.display = "none"
 })
 
 // All below methods are from the chat room tutorial

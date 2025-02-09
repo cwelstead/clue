@@ -32,17 +32,24 @@
                 </form>
             </div>
             <div class="main" style="flex:1;">
-                <h1>Private Lobby</h1>
-                <form class="form-private-lobby">
-                    <input type="text" id="private-lobby-code" maxlength="6" placeholder="Enter lobby code" required>
-                    <button type="submit">Join</button>
-                </form>
-                <button type="create-private-lobby">Create Private Lobby</button>
-                <h1>Public Lobby</h1>
-                <button type="create-public-lobby">Create Public Lobby</button>
-                <ul class="public-lobby-display">
+                <section id="join-lobby-view">
+                    <h1>Private Lobby</h1>
+                    <form class="form-private-lobby">
+                        <input type="text" id="private-lobby-code" maxlength="6" placeholder="Enter lobby code" required>
+                        <button type="submit">Join</button>
+                    </form>
+                    <button class="create-private-lobby">Create Private Lobby</button>
+                    <h1>Public Lobby</h1>
+                    <button class="create-public-lobby">Create Public Lobby</button>
+                    <ul class="public-lobby-display">
 
-                </ul>
+                    </ul>
+                </section>
+                <section id="inside-lobby-view">
+                    <h1 id="lobby-name">lobby-name</h1>
+                    <h1 id="lobby-id">lobby-id</h1>
+                    <button class="leave-lobby">Leave Lobby</button>
+                </section>
             </div>
         </table>
     </main>
