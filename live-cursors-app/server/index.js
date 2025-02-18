@@ -1,13 +1,16 @@
-const http = require('http')
-const {WebSocketServer} = require('ws')
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import { WebSocketServer } from 'ws'
+import url from 'url'
+import { v4 } from 'uuid'
 
-const url = require('url')
-const uuidv4 = require("uuid").v4
-
-const server = http.createServer()
-
-const wsServer = new WebSocketServer( { server } )
-const port = 5000
+const server = createServer()
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173"
+    }
+})
+const port = 8000
 
 const connections = {}
 const users = {}
@@ -39,15 +42,14 @@ server.listen(port, () => {
     console.log(`WebSocket server is running on port ${port}`)
 })
 
-wsServer.on('connection', (connection, request) => {
-    const { username } = url.parse(request.url, true).query
-    const uuid = uuidv4()
+io.on('connection', socket => {
+    const uuid = v4()
 
-    console.log(`${username} connected`)
+    console.log(`${socket.id} connected`)
 
     connections[uuid] = connection
     users[uuid] = {
-        username: username,
+        username: socket.id,
         state: {
             x: 0,
             y: 0,

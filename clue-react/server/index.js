@@ -2,7 +2,8 @@ import express from 'express'
 import { Server } from 'socket.io'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { Lobby } from './classes/Lobby.js'
+import { User } from '../classes/User.js'
+import { Lobby } from '../../classes/Lobby.js'
 
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
@@ -16,25 +17,26 @@ import { Lobby } from './classes/Lobby.js'
 */
 
 // Controls what port the server should listen on
-const PORT = process.env.PORT || 5500;
-const ADMIN = "Admin";
+const PORT = process.env.PORT || 5000
+const ADMIN = "Admin"
 
 const app = express();
 
 // Directs the client to the "public" folder containing client-side code
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, "public")));
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+app.use(express.static(path.join(__dirname, "public")))
+
 
 // Starts the server
 const expressServer = app.listen(PORT, () => {
-    console.log(`Server is up and running! Listening on port ${PORT}`);
+    console.log(`Server is up and running! Listening with port ${PORT}`);
 });
 
 const io = new Server(expressServer, {
     cors: {
         origin: process.env.NODE_ENV === "production" ? false :
-        ["http://localhost:5500","http://127.0.0.1:5500"]
+        ["http://localhost:5000","http://127.0.0.1:5000", "http://localhost:5173"]
     }
 });
 
@@ -44,32 +46,6 @@ const UsersState = {
     setUsers: function(newUsersArray) {
         this.users = newUsersArray;
     },
-}
-
-// Functions that manage and update the UsersState
-function activateUser(id, name, room) {
-    const user = { id, name, room };
-    UsersState.setUsers([
-        ...UsersState.users.filter(user => user.id !== id),
-        user
-    ]);
-    return user;
-}
-
-function userLeavesApp(id) {
-    UsersState.setUsers(UsersState.users.filter(user => user.id !== id));
-}
-
-function getUser(id) {
-    return UsersState.users.find(user => user.id === id);
-}
-
-function getUsersInRoom(room) {
-    return UsersState.users.filter(user => user.room === room);
-}
-
-function getAllActiveRooms() {
-    return Array.from(new Set(UsersState.users.map(user => user.room)));
 }
 
 // Keeps track of lobbies that are active
@@ -100,6 +76,15 @@ function destroyLobby(id) {
 // Event that handles client connection and listens for messages sent by the client
 io.on('connection', socket => {
     console.log(`User ${socket.id} connected`);
+
+    socket.on('login', ({ name, id }) => {
+        const user = new User(name, id)
+        UsersState.setUsers([
+            ...UsersState.users.filter(existingUser => existingUser.getID() !== user.getID()),
+            user
+        ])
+        console.log(`User ${user.getID()} successfully logged in as ${user.getName()}`)
+    })
 
     socket.on('lobby-create', ({name}) => {
         console.log(`Creating lobby with name ${name}`)
@@ -143,12 +128,17 @@ io.on('connection', socket => {
         socket.emit('lobby-disconnect-success', {})
     })
 
+    // When user disconnects
+    socket.on('disconnect', () => {
+        UsersState.setUsers([
+            ...UsersState.users.filter(user => user.getID() !== socket.id),
+        ]);
+        console.log(`User ${socket.id} disconnected, leaving ${UsersState.users.length} active users`);
+    });
+
     //
     // All below methods are from the chat room tutorial
     //
-
-    // Upon connection - only to user
-    socket.emit('message', buildMsg(ADMIN, "Welcome to Chat App"));
 
     // Event that triggers when the client enters a room
     socket.on('enterRoom', ({ name, room }) => {
@@ -188,53 +178,4 @@ io.on('connection', socket => {
             rooms: getAllActiveRooms(),
         });
     });
-
-    // When user disconnects - to all others
-    socket.on('disconnect', () => {
-        const user = getUser(socket.id);
-        userLeavesApp(socket.id);
-
-        if (user) {
-            io.to(user.room).emit('message', buildMsg(ADMIN, `${user.name} has left the room`));
-
-            io.to(user.room).emit('userList', {
-                users: getUsersInRoom(user.room),
-            });
-
-            io.emit('roomList', {
-                rooms:getAllActiveRooms(),
-            });
-        }
-
-        console.log(`User ${socket.id} disconnected`);
-    });
-
-    // Listening for a message event
-    socket.on('message', ({ name, text }) => {
-        const room = getUser(socket.id)?.room;
-        if (room) {
-            io.to(room).emit('message', buildMsg(name, text));
-        }
-    });
-
-    // Listen for activity (client is typing)
-    socket.on('activity', (name) => {
-        const room = getUser(socket.id)?.room;
-        if (room) {
-            socket.broadcast.to(room).emit('activity', name);
-        }
-    });
 });
-
-// Builds a message. May be extraneous when lobby system is fully implemented.
-function buildMsg(name, text) {
-    return {
-        name,
-        text,
-        time: new Intl.DateTimeFormat('default', {
-            hour: 'numeric',
-            minute: 'numeric',
-            second: 'numeric'
-        }).format(new Date()),
-    };
-}

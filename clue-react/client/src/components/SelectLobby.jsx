@@ -1,22 +1,17 @@
 import { useState } from 'react'
-import useWebSocket from 'react-use-websocket'
+import { useSocketIO } from 'react-use-websocket'
 
-export function SelectLobby({ user }) {
-    const WS_URL = 'http://127.0.0.1:5500'
-    const { sendJsonMessage } = useWebSocket(WS_URL, {
-        share: true,
-    })
+export function SelectLobby({ user, onLobbyJoin }) {
+    const WS_URL = 'ws://127.0.0.1:5500'
+    const socket = useSocketIO(WS_URL)
 
     const [lobbyID, setLobbyID] = useState("")
-    const joinLobby = (lobbyID) => {
-
-    }
     const createLobby = () => {
         // Create the lobby
         const createdID = "123456"
 
         // Join the created lobby
-        joinLobby(createdID)
+        onLobbyJoin(createdID)
     }
 
     return (
@@ -25,7 +20,7 @@ export function SelectLobby({ user }) {
             <form
                 onSubmit={(e) => {
                     e.preventDefault()
-                    joinLobby(lobbyID)
+                    onLobbyJoin(lobbyID)
                 }}
             >
                 <input
