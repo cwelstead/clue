@@ -1,0 +1,24 @@
+/* Hover effects for buttons */
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  transition: all 0.2s ease-in-out;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* Input focus styles */
+input:focus {
+  outline: none;
+  border-color: #e1b530;
+  box-shadow: 0 0 0 2px rgba(225,181,48,0.2);
+}
+
+/* Input placeholder styles */
+input::placeholder {
+  color: #6e6e6e;
+  opacity: 0.8;
+}
+
