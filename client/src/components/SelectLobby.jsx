@@ -1,17 +1,13 @@
 import { useState } from 'react'
-import { useSocketIO } from 'react-use-websocket'
+import { socket } from '../socket.js'
 
 export function SelectLobby({ user, onLobbyJoin }) {
-    const WS_URL = 'ws://127.0.0.1:5500'
-    const socket = useSocketIO(WS_URL)
 
     const [lobbyID, setLobbyID] = useState("")
     const createLobby = () => {
-        // Create the lobby
-        const createdID = "123456"
-
-        // Join the created lobby
-        onLobbyJoin(createdID)
+        socket.emit('lobby-create', {
+            name: "test",
+        })
     }
 
     return (

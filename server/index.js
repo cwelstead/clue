@@ -63,10 +63,21 @@ function createLobby(name) {
         ...LobbiesState.lobbies.filter(existingLobby => existingLobby.getID() !== lobby.getID()),
         lobby
     ])
+    console.log(`Updated lobbies to include lobby ${lobby.getID()}`)
     return lobby
 }
 function destroyLobby(id) {
-    LobbiesState.setLobbies(LobbiesState.lobbies.filter(lobby => lobby.getID !== id));
+    LobbiesState.setLobbies(LobbiesState.lobbies.filter(lobby => lobby.getID() !== id));
+}
+function removeUserFromLobby(id) {
+    LobbiesState.lobbies.forEach(lobby => {
+        if (lobby.removePlayer(id)) {
+            if (lobby.isEmpty()) {
+                lobby.deactivateLobby()
+                destroyLobby(lobby.getID())
+            }
+        }
+    });
 }
 
 /*
@@ -77,13 +88,12 @@ function destroyLobby(id) {
 io.on('connection', socket => {
     console.log(`User ${socket.id} connected`);
 
-    socket.on('login', ({ name, id }) => {
-        const user = new User(name, id)
+    socket.on('login', (user) => {
         UsersState.setUsers([
-            ...UsersState.users.filter(existingUser => existingUser.getID() !== user.getID()),
+            ...UsersState.users.filter(existingUser => existingUser.id !== user.id),
             user
         ])
-        console.log(`User ${user.getID()} successfully logged in as ${user.getName()}`)
+        console.log(`User ${user.id} successfully logged in as ${user.name}`)
     })
 
     socket.on('lobby-create', ({name}) => {
@@ -91,49 +101,57 @@ io.on('connection', socket => {
         const createdLobby = createLobby(name)
         console.log(`Lobby created with name ${createdLobby.getName()} ID ${createdLobby.getID()}`)
 
-        socket.emit('lobby-create-success', {
-            id: createdLobby.getID(),
-        })
+        socket.emit('lobby-create-success', createdLobby.getID())
     })
 
-    socket.on('lobby-connect', ({userID, lobbyID}) => {
+    socket.on('lobby-connect', ({username, userID, lobbyID}) => {
         let joinSuccess = true
+        
         // Step 1: Find lobby, if it exists
-        const lobbyToJoin = LobbiesState.lobbies.find(lobby => lobby.getID() === lobbyID)
+        const lobbyToJoin = LobbiesState.lobbies.find((lobby) => lobby.getID() === lobbyID)
+        
         // Step 2: Check if lobby has space for client
         if (!lobbyToJoin || lobbyToJoin.isFull()) {
             joinSuccess = false
         } else { // Step 3: Join lobby
-            lobbyToJoin.addPlayer(userID)
-            socket.join(lobbyToJoin)
+            lobbyToJoin.addPlayer({name: username, id: userID})
+            socket.join(lobbyToJoin.getID())
         }
+
         // Step 4: Notify client of success or failure
         if (joinSuccess) {
-            socket.emit('lobby-join-success', ({
-                name: lobbyToJoin.getName(), 
-                id: lobbyToJoin.getID()}))
+            // Step 4a: Notify all in lobby of available role change
+            socket.broadcast.to(lobbyToJoin.getID()).emit('lobby-update', {
+                players: lobbyToJoin.getPlayers(),
+                takenRoles: lobbyToJoin.getTakenRoles(),
+            })
+            // Step 4b: Notify client of success
+            socket.emit('lobby-join-success', {
+                name: lobbyToJoin.getName(),
+                id: lobbyToJoin.getID(),
+                players: lobbyToJoin.getPlayers(),
+                takenRoles: lobbyToJoin.getTakenRoles(),
+            })
         } else {
             socket.emit('lobby-join-fail', lobbyID)
         }
     })
 
-    socket.on('lobby-disconnect', ({userID, lobbyID}) => {
-        const lobbyToLeave = LobbiesState.lobbies.find(lobby => lobby.getID() === lobbyID)
-        socket.leave(lobbyToLeave)
-        lobbyToLeave.removePlayer(userID) // userID system is wack rn, once architecture is more solid this can be improved upon
-        if (lobbyToLeave.isEmpty()) {
-            lobbyToLeave.deactivateLobby()
-            destroyLobby(lobbyID)
-        }
-        socket.emit('lobby-disconnect-success', {})
+    socket.on('lobby-disconnect', (userID) => {
+        removeUserFromLobby(userID)
+        console.log(`User ${socket.id} left a lobby, leaving ${UsersState.users.length} active users and ${LobbiesState.lobbies.length} active lobbies`);
     })
 
     // When user disconnects
     socket.on('disconnect', () => {
+        // Disconnect from lobby
+        removeUserFromLobby(socket.id)
+
+        // Remove from users list
         UsersState.setUsers([
-            ...UsersState.users.filter(user => user.getID() !== socket.id),
+            ...UsersState.users.filter(user => user.id !== socket.id),
         ]);
-        console.log(`User ${socket.id} disconnected, leaving ${UsersState.users.length} active users`);
+        console.log(`User ${socket.id} disconnected, leaving ${UsersState.users.length} active users and ${LobbiesState.lobbies.length} active lobbies`);
     });
 
     //
