@@ -16,7 +16,7 @@ function App() {
     console.log(`Attempting login with username ${username} and ID ${socket.id}`)
     socket.emit('login', {
       name: username,
-      id: socket.id
+      id: socket.id,
     })
     setUser({name: username, id: socket.id})
   }
@@ -28,6 +28,10 @@ function App() {
       userID: user.id,
       lobbyID: id,
     })
+  }
+
+  function readyToggle() {
+    socket.emit('ready-toggle')
   }
 
   function leaveLobby() {
@@ -65,7 +69,7 @@ function App() {
   if (user) {
     if (lobby) {
       return (
-        <InLobby lobby={lobby} onLeave={leaveLobby} />
+        <InLobby lobby={lobby} onReadyToggle={readyToggle} onLeave={leaveLobby} />
       )
     } else {
       return (

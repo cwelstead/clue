@@ -16,7 +16,7 @@ export class Lobby {
         this._name = name
         this._id = generateID()
         this._players = new Map()
-        this._takenRoles = []
+        this._takenRoles = new Set()
     }
 
 
@@ -30,25 +30,30 @@ export class Lobby {
 
     addPlayer(player) {
         if (player.id !== undefined && !this._players.has(player.id) && this._players.size < 6)  {
-            const firstRoleAvailable = Object.keys(Roles).filter(role => !this._takenRoles.includes(role))[0]
+            const firstRoleAvailable = Object.values(Roles).filter(role => !this._takenRoles.has(role))[0]
             this._players.set(player.id, {
                 username: player.name,
                 role: firstRoleAvailable,
                 ready: false,
             })
-            this._takenRoles.push(firstRoleAvailable)
+            this._takenRoles.add(firstRoleAvailable)
         } else {
             return false // might need to throw an error
         }
     }
     removePlayer(playerID) {
         if (this._players.has(playerID)) {
-            this._takenRoles.filter(role => role !== this._players.get(playerID).role)
+            console.log(`Removing ${this._players.get(playerID).role} from ${this._takenRoles}`)
+            this._takenRoles.delete(this._players.get(playerID).role)
             this._players.delete(playerID)
             return true
         } else {
             return false
         }
+    }
+
+    readyPlayer(id) {
+        this._players.get(id).ready = !this._players.get(id).ready
     }
 
     getName() {
