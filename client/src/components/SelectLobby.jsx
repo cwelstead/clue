@@ -6,7 +6,7 @@ export function SelectLobby({ user, onLobbyJoin }) {
     const [lobbyID, setLobbyID] = useState("")
     const createLobby = () => {
         socket.emit('lobby-create', {
-            name: "test",
+            name: "Test Lobby", // does a lobby need a name?
         })
     }
 

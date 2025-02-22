@@ -43,7 +43,6 @@ export class Lobby {
     }
     removePlayer(playerID) {
         if (this._players.has(playerID)) {
-            console.log(`Removing ${this._players.get(playerID).role} from ${this._takenRoles}`)
             this._takenRoles.delete(this._players.get(playerID).role)
             this._players.delete(playerID)
             return true
