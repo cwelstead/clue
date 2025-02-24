@@ -1,88 +1,94 @@
-let activeLobbies = []
+import { User } from "./User.js"
+
+let lobbyIDs = []
+
+const Roles = Object.freeze({
+    ADAM: "Adam",
+    STEVE: "Dr Cooper",
+    BOB: "Bob",
+    VAL: "Val",
+    FIRESTONE: "Firestone",
+    THERESA: "Theresa"
+})
 
 export class Lobby {
     constructor(name) {
         this._name = name
-        this._id = this.generateID()
-        this._players = []
-        this._playerRoles = {
-            adam: "",
-            steve: "",
-            bob: "",
-            val: "",
-            firestone: "",
-            theresa: "",
-        }
-        activeLobbies = [...activeLobbies.filter(lobby => lobby.getID !== this._id), this]
+        this._id = generateID()
+        this._players = new Map()
+        this._takenRoles = new Set()
     }
 
+
     isFull() {
-        return this._players.length >= 6
+        return this._players.size >= 6
     }
 
     isEmpty() {
-        return this._players.length === 0
+        return this._players.size === 0
     }
 
     addPlayer(player) {
-        if (this._players.length < 6)  {
-            this._players = [...this._players, player]
-
-            if (!this._playerRoles.adam) {
-                this._playerRoles.adam = player
-            } else if (!this._playerRoles.steve) {
-                this._playerRoles.steve = player
-            } else if (!this._playerRoles.bob) {
-                this._playerRoles.bob = player
-            } else if (!this._playerRoles.val) {
-                this._playerRoles.val = player
-            } else if (!this._playerRoles.firestone) {
-                this._playerRoles.firestone = player
-            } else if (!this._playerRoles.theresa) {
-                this._playerRoles.theresa = player
-            } else {
-                return false // might need to throw an error
-            }
-            return true
+        if (player.id !== undefined && !this._players.has(player.id) && this._players.size < 6)  {
+            const firstRoleAvailable = Object.values(Roles).filter(role => !this._takenRoles.has(role))[0]
+            this._players.set(player.id, {
+                username: player.name,
+                role: firstRoleAvailable,
+                ready: false,
+            })
+            this._takenRoles.add(firstRoleAvailable)
         } else {
             return false // might need to throw an error
         }
     }
-    removePlayer(player) { // i have no idea if this will work tbh
-        for (let role of Object.keys(this._playerRoles)) {
-            if (this._playerRoles.role === player) {
-                this._playerRoles.role === ""
-            }
+    removePlayer(playerID) {
+        if (this._players.has(playerID)) {
+            this._takenRoles.delete(this._players.get(playerID).role)
+            this._players.delete(playerID)
+            return true
+        } else {
+            return false
         }
-        this._players = this._players.filter(remainingPlayers => remainingPlayers !== player)
     }
 
-    getID() {
-        return this._id
+    readyPlayer(id) {
+        this._players.get(id).ready = !this._players.get(id).ready
     }
 
     getName() {
         return this._name
     }
 
+    getID() {
+        return this._id
+    }
+
+    getPlayers() {
+        return JSON.stringify(Array.from(this._players))
+    }
+
+    getTakenRoles() {
+        return this._takenRoles
+    }
+
     deactivateLobby() {
-        activeLobbies = activeLobbies.filter(lobby => lobby.getID !== this._id)
+        lobbyIDs = lobbyIDs.filter(lobbyID => lobbyID !== this._id)
     }
+}
 
-    generateID() {
-        let id = ""
-        let idUnique = false;
-        while (!idUnique) {
-            const idNum = Math.floor(Math.random() * 1000000)
-            id = ("000000" + idNum).substring(("000000" + idNum).length - 6)
+function generateID() {
+    let id = ""
+    let idUnique = false
+    while (!idUnique) {
+        const idNum = Math.floor(Math.random() * 1000000)
+        id = ("000000" + idNum).substring(("000000" + idNum).length - 6)
 
-            idUnique = true;
-            for (let i = 0; i < activeLobbies.length && idUnique; i++) {
-                if (id === activeLobbies[i].getID()) {
-                    idUnique = false
-                }
-            }
+        idUnique = true;
+        if (!lobbyIDs.includes(id)) {
+            lobbyIDs.push(id)
+        } else {
+            idUnique = false
         }
-        return id
     }
+    return id
 }
