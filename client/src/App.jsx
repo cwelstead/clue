@@ -5,6 +5,7 @@ import { InLobby } from './components/InLobby.jsx'
 import { Login } from './components/Login.jsx'
 import { socket } from './socket.js'
 import { useEffect } from 'react'
+import { Roles } from '../../classes/Lobby.js'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -42,6 +43,12 @@ function App() {
     function readyToggle() {
         socket.emit('ready-toggle')
     }
+    function switchRole(role) {
+        socket.emit('switch-role', ({
+            id: socket.id, 
+            role: role
+        }))
+    }
     function leaveLobby() {
         socket.emit('lobby-disconnect', socket.id)
         setLobby("")
@@ -58,18 +65,18 @@ function App() {
             name: name,
             id: id,
             players: new Map(JSON.parse(players)),
-            takenRoles: takenRoles,
+            takenRoles: new Set(JSON.parse(takenRoles)),
         })
         })
         socket.on('lobby-join-fail', (lobbyID) => {
-        alert(`Failed to join lobby ${lobbyID} :(`)
+        console.warn(`Failed to join lobby ${lobbyID}`)
         })
         socket.on('lobby-update', ({ players, takenRoles }) => {
         setLobby({
             name: lobby.name,
             id: lobby.id,
             players: new Map(JSON.parse(players)),
-            takenRoles: takenRoles,
+            takenRoles: new Set(JSON.parse(takenRoles)),
         })
         })
     })
@@ -78,7 +85,7 @@ function App() {
     if (user) {
         if (lobby) {
         return (
-            <InLobby lobby={lobby} onReadyToggle={readyToggle} onLeave={leaveLobby} />
+            <InLobby lobby={lobby} onReadyToggle={readyToggle} onSwitchRole={switchRole} onLeave={leaveLobby} />
         )
         } else {
         return (

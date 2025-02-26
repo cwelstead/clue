@@ -1,6 +1,6 @@
 import express from 'express'
 import { Server } from 'socket.io'
-import { Lobby } from '../classes/Lobby.js'
+import { Lobby, Roles } from '../classes/Lobby.js'
 
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
@@ -56,6 +56,19 @@ function createLobby(name) {
 }
 function destroyLobby(id) {
     LobbiesState.setLobbies(LobbiesState.lobbies.filter(lobby => lobby.getID() !== id));
+}
+
+// Abstraction to make getting a user's lobby easier
+function getLobbyFromUser(id) {
+    try {
+        const lobbyID = UsersState.users.find((user) => user.id === id).lobby
+        const lobby = LobbiesState.lobbies.find((lobby) => lobby.getID() === lobbyID)
+
+        return lobby
+    } catch (e) {
+        // Usually happens when id is undefined
+        console.log(`Could not get lobby from user ${id}`)
+    }
 }
 
 /*
@@ -127,14 +140,24 @@ io.on('connection', socket => {
         if (socket.id === undefined || UsersState.users.find((user) => user.id === socket.id) === undefined) {
             return false
         }
-        const lobbyID = UsersState.users.find((user) => user.id === socket.id).lobby
-        const lobby = LobbiesState.lobbies.find((lobby) => lobby.getID() === lobbyID)
+        
+        const lobby = getLobbyFromUser(socket.id)
         lobby.readyPlayer(socket.id)
         
-        io.to(lobbyID).emit('lobby-update', {
+        io.to(lobby.getID()).emit('lobby-update', {
             players: lobby.getPlayers(),
             takenRoles: lobby.getTakenRoles(),
         })
+    })
+
+    socket.on('switch-role', ({id, role}) => {
+        const lobby = getLobbyFromUser(id)
+        if (lobby.switchRole(id, role)) {
+            io.to(lobby.getID()).emit('lobby-update', {
+                players: lobby.getPlayers(),
+                takenRoles: lobby.getTakenRoles(),
+            })
+        }
     })
 
     function removeUserFromLobby(id) {
@@ -144,26 +167,23 @@ io.on('connection', socket => {
             return false
         }
 
-        const lobbyIDToLeave = UsersState.users.find((user) => user.id === id).lobby
-        if (lobbyIDToLeave) {
-            const lobbyToLeave = LobbiesState.lobbies.find((lobby) => lobby.getID() === lobbyIDToLeave)
-            if (lobbyToLeave !== undefined && lobbyToLeave.removePlayer(id)) {
-                UsersState.users.find((user) => user.id === id).lobby = ""
-                if (lobbyToLeave.isEmpty()) {
-                    lobbyToLeave.deactivateLobby()
-                    destroyLobby(lobbyToLeave.getID())
-                } else {
-                    socket.broadcast.to(lobbyToLeave.getID()).emit('lobby-update', {
-                        players: lobbyToLeave.getPlayers(),
-                        takenRoles: lobbyToLeave.getTakenRoles(),
-                    })
-                }
-                return true
+        const lobbyToLeave = getLobbyFromUser(id)
+        if (lobbyToLeave && lobbyToLeave.removePlayer(id)) {
+            UsersState.users.find((user) => user.id === id).lobby = ""
+            if (lobbyToLeave.isEmpty()) {
+                lobbyToLeave.deactivateLobby()
+                destroyLobby(lobbyToLeave.getID())
             } else {
-                // something happened, throw an error or fail gracefully
-                console.log(`Could not remove ${id} from lobby ID ${lobbyIDToLeave}`)
-                return false
+                socket.broadcast.to(lobbyToLeave.getID()).emit('lobby-update', {
+                    players: lobbyToLeave.getPlayers(),
+                    takenRoles: lobbyToLeave.getTakenRoles(),
+                })
             }
+            return true
+        } else {
+            // something happened, throw an error or fail gracefully
+            console.log(`Could not remove ${id} from lobby ID ${lobbyIDToLeave}`)
+            return false
         }
     }
 

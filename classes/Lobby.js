@@ -2,7 +2,7 @@ import { User } from "./User.js"
 
 let lobbyIDs = []
 
-const Roles = Object.freeze({
+export const Roles = Object.freeze({
     ADAM: "Adam",
     STEVE: "Dr Cooper",
     BOB: "Bob",
@@ -68,7 +68,24 @@ export class Lobby {
     }
 
     getTakenRoles() {
-        return this._takenRoles
+        return JSON.stringify(Array.from(this._takenRoles))
+    }
+
+    switchRole(id, role) {
+        if (this._takenRoles.has(role) || !Object.values(Roles).includes(role)) {
+            console.log("Role is taken or doesn't exist")
+            return false
+        } else if (!this._players.has(id)) {
+            return false
+        } else {
+            // Make role available
+            this._takenRoles.delete(this._players.get(id).role)
+            
+            // Assign role to player
+            this._takenRoles.add(role)
+            this._players.get(id).role = role
+            return true
+        }
     }
 
     deactivateLobby() {

@@ -1,6 +1,7 @@
 import { socket } from "../socket"
+import { Roles } from "../../../classes/Lobby"
 
-export function InLobby({ lobby, onReadyToggle, onLeave }) {
+export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave }) {
 
     return (
         <>
@@ -25,6 +26,20 @@ export function InLobby({ lobby, onReadyToggle, onLeave }) {
                     onLeave()
                 }}
             >Leave Lobby</button>
+
+            <br></br>
+            <br></br>
+            {Object.values(Roles).map((value, key) => (
+                <button
+                    key={key}
+                    disabled={lobby.takenRoles.has(value)}
+                    onClick={(e) => {
+                        e.preventDefault()
+                        onSwitchRole(value)
+                    }}>
+                    {value}
+                </button>
+            ))}
         </>
     )
 }
