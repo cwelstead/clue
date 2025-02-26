@@ -6,6 +6,7 @@ import { Login } from './components/Login.jsx'
 import { socket } from './socket.js'
 import { useEffect } from 'react'
 import { Roles } from '../../classes/Lobby.js'
+import { BetterLogin } from './components/BetterLogin.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -94,7 +95,8 @@ function App() {
         }
     } else {
         return (
-        <Login onLogin={loginWithUsername} />
+            <BetterLogin />
+        // <Login onLogin={loginWithUsername} />
         )
     }
 }
