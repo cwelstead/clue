@@ -182,7 +182,7 @@ io.on('connection', socket => {
             return true
         } else {
             // something happened, throw an error or fail gracefully
-            console.log(`Could not remove ${id} from lobby ID ${lobbyIDToLeave}`)
+            console.log(`Could not remove ${id} from lobby ${lobbyToLeave}`)
             return false
         }
     }

@@ -2,11 +2,10 @@ import { useState } from 'react'
 import './App.css'
 import { SelectLobby } from './components/SelectLobby.jsx'
 import { InLobby } from './components/InLobby.jsx'
-import { Login } from './components/Login.jsx'
 import { socket } from './socket.js'
 import { useEffect } from 'react'
 import { Roles } from '../../classes/Lobby.js'
-import { BetterLogin } from './components/BetterLogin.jsx'
+import { LoginPage } from './components/LoginPage.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -21,22 +20,26 @@ function App() {
     // const [gameState, setGameState]
 
     // Placeholder function until authentication is implemented
-    function loginWithUsername(username) {
+    function onLogin(username, password) {
         console.log(`Attempting login with username ${username} and ID ${socket.id}`)
         socket.emit('login', {
-        name: username,
-        id: socket.id,
+            name: username,
+            id: socket.id,
         })
         setUser({ name: username, id: socket.id })
+    }
+
+    function onSignUp() {
+        console.log("Sign up button clicked")
     }
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
         console.log(`Attempting to join lobby ${id}`)
         socket.emit('lobby-connect', {
-        username: user.name,
-        userID: user.id,
-        lobbyID: id,
+            username: user.name,
+            userID: user.id,
+            lobbyID: id,
         })
     }
 
@@ -58,45 +61,47 @@ function App() {
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
         socket.on('lobby-create-success', (id) => {
-        joinLobbyWithID(id)
+            joinLobbyWithID(id)
         })
+
         socket.on('lobby-join-success', ({ name, id, players, takenRoles }) => {
-        console.log(`Lobby joined: ${name} with ID ${id}`)
-        setLobby({
-            name: name,
-            id: id,
-            players: new Map(JSON.parse(players)),
-            takenRoles: new Set(JSON.parse(takenRoles)),
+            console.log(`Lobby joined: ${name} with ID ${id}`)
+            setLobby({
+                name: name,
+                id: id,
+                players: new Map(JSON.parse(players)),
+                takenRoles: new Set(JSON.parse(takenRoles)),
+            })
         })
-        })
+
         socket.on('lobby-join-fail', (lobbyID) => {
-        console.warn(`Failed to join lobby ${lobbyID}`)
+            console.warn(`Failed to join lobby ${lobbyID}`)
         })
+
         socket.on('lobby-update', ({ players, takenRoles }) => {
-        setLobby({
-            name: lobby.name,
-            id: lobby.id,
-            players: new Map(JSON.parse(players)),
-            takenRoles: new Set(JSON.parse(takenRoles)),
-        })
+            setLobby({
+                name: lobby.name,
+                id: lobby.id,
+                players: new Map(JSON.parse(players)),
+                takenRoles: new Set(JSON.parse(takenRoles)),
+            })
         })
     })
 
     // Front-end code, returns the correct screen based on gathered data
     if (user) {
         if (lobby) {
-        return (
-            <InLobby lobby={lobby} onReadyToggle={readyToggle} onSwitchRole={switchRole} onLeave={leaveLobby} />
-        )
+            return (
+                <InLobby lobby={lobby} onReadyToggle={readyToggle} onSwitchRole={switchRole} onLeave={leaveLobby} />
+            )
         } else {
-        return (
-            <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
-        )
+            return (
+                <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
+            )
         }
     } else {
         return (
-            <BetterLogin />
-        // <Login onLogin={loginWithUsername} />
+            <LoginPage handleLogin={onLogin} handleSignUp={onSignUp}/>
         )
     }
 }
