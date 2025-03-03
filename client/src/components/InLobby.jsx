@@ -1,10 +1,35 @@
+import { useState, useRef } from "react";
 import { socket } from "../socket"
 import { Roles } from "../../../classes/Lobby"
 
 export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave }) {
+    const [isPlaying, setIsPlaying] = useState(false); // State to track if music is playing
+    const audioRef = useRef(null); // Reference to the audio element
+
+    const toggleMusic = () => {
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play().catch(error => console.log("Playback error:", error));
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
 
     return (
         <>
+            {/* Background Music */}
+            <audio ref={audioRef} loop>
+                <source src="/ominous-music-background.mp3" type="audio/mp3" />
+                Your browser does not support the audio element.
+            </audio>
+
+            {/* Toggle Music Button */}
+            <button onClick={toggleMusic} style={{ position: "absolute", top: 10, right: 10 }}>
+                {isPlaying ? "Pause Music" : "Play Music"}
+            </button>
+
             <h1 id="lobby-name">{lobby.name}</h1>
             <h1 id="lobby-id">{lobby.id}</h1>
             <ul>
