@@ -1,6 +1,7 @@
 import express from 'express'
 import { Server } from 'socket.io'
 import { Lobby, Roles } from '../classes/Lobby.js'
+import { GameState } from '../classes/GameState.js'
 
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
@@ -70,6 +71,9 @@ function getLobbyFromUser(id) {
         console.log(`Could not get lobby from user ${id}`)
     }
 }
+
+// Keeps track of the GameState objects that are associated with lobbies
+const gameStates = new Map()
 
 /*
  * SERVER-SIDE EVENTS
@@ -160,6 +164,19 @@ io.on('connection', socket => {
                 takenRoles: lobby.getTakenRoles(),
                 readyToStart: lobby.readyToStart(),
             })
+        }
+    })
+
+    socket.on('game-start', () => {
+        const lobby = getLobbyFromUser(socket.id)
+
+        try {
+            if (lobby.readyToStart()) {
+                const game = gameStates.set(lobby.getID(), new GameState())
+                io.to(lobby.getID()).emit('game-start-success', (game))
+            }
+        } catch (e) {
+            console.log(`Error starting game: ${e}`)
         }
     })
 

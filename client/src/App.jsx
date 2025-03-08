@@ -58,6 +58,9 @@ function App() {
         socket.emit('lobby-disconnect', socket.id)
         setLobby("")
     }
+    function startGame() {
+        socket.emit('game-start')
+    }
 
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
@@ -89,6 +92,10 @@ function App() {
                 readyToStart: readyToStart,
             })
         })
+
+        socket.on('game-start-success', (game) => {
+            setGameState(game)
+        })
     })
 
     // Front-end code, returns the correct screen based on gathered data
@@ -100,7 +107,12 @@ function App() {
                 )
             } else {
                 return (
-                    <InLobby lobby={lobby} onReadyToggle={readyToggle} onSwitchRole={switchRole} onLeave={leaveLobby} />
+                    <InLobby
+                        lobby={lobby}
+                        onReadyToggle={readyToggle}
+                        onSwitchRole={switchRole}
+                        onLeave={leaveLobby}
+                        onGo={startGame} />
                 )
             }
         } else {
