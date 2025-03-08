@@ -6,6 +6,7 @@ import { socket } from './socket.js'
 import { useEffect } from 'react'
 import { Roles } from '../../classes/Lobby.js'
 import { LoginPage } from './components/LoginPage.jsx'
+import { InGame } from './components/InGame.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -89,6 +90,7 @@ function App() {
     })
 
     // Front-end code, returns the correct screen based on gathered data
+    return (<InGame />)
     if (user) {
         if (lobby) {
             return (
