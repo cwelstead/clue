@@ -65,6 +65,11 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave }) {
                     {value}
                 </button>
             ))}
+            <br></br>
+            <br></br>
+            <button
+                disabled={!lobby.readyToStart}
+            >Go</button>
         </>
     )
 }

@@ -1,5 +1,3 @@
-import { User } from "./User.js"
-
 let lobbyIDs = []
 
 export const Roles = Object.freeze({
@@ -53,6 +51,18 @@ export class Lobby {
 
     readyPlayer(id) {
         this._players.get(id).ready = !this._players.get(id).ready
+    }
+
+    readyToStart() {
+        if (this._players.length < 3) return false
+
+        let allPlayersReady = true
+        this._players.forEach(player => {
+            if (!player.ready) {
+                allPlayersReady = false
+            }
+        })
+        return allPlayersReady
     }
 
     getName() {

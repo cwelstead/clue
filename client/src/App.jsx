@@ -18,7 +18,7 @@ function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState("")
-    // const [gameState, setGameState]
+    const [gameState, setGameState] = useState(null)
 
     // Placeholder function until authentication is implemented
     function onLogin(username, password) {
@@ -72,6 +72,7 @@ function App() {
                 id: id,
                 players: new Map(JSON.parse(players)),
                 takenRoles: new Set(JSON.parse(takenRoles)),
+                readyToStart: false
             })
         })
 
@@ -79,23 +80,29 @@ function App() {
             console.warn(`Failed to join lobby ${lobbyID}`)
         })
 
-        socket.on('lobby-update', ({ players, takenRoles }) => {
+        socket.on('lobby-update', ({ players, takenRoles, readyToStart }) => {
             setLobby({
                 name: lobby.name,
                 id: lobby.id,
                 players: new Map(JSON.parse(players)),
                 takenRoles: new Set(JSON.parse(takenRoles)),
+                readyToStart: readyToStart,
             })
         })
     })
 
     // Front-end code, returns the correct screen based on gathered data
-    return (<InGame />)
     if (user) {
         if (lobby) {
-            return (
-                <InLobby lobby={lobby} onReadyToggle={readyToggle} onSwitchRole={switchRole} onLeave={leaveLobby} />
-            )
+            if (gameState) {
+                return (
+                    <InGame />
+                )
+            } else {
+                return (
+                    <InLobby lobby={lobby} onReadyToggle={readyToggle} onSwitchRole={switchRole} onLeave={leaveLobby} />
+                )
+            }
         } else {
             return (
                 <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />

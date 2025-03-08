@@ -122,6 +122,7 @@ io.on('connection', socket => {
             socket.broadcast.to(lobbyToJoin.getID()).emit('lobby-update', {
                 players: lobbyToJoin.getPlayers(),
                 takenRoles: lobbyToJoin.getTakenRoles(),
+                readyToStart: false
             })
             // Step 4b: Notify client of success
             socket.emit('lobby-join-success', {
@@ -147,6 +148,7 @@ io.on('connection', socket => {
         io.to(lobby.getID()).emit('lobby-update', {
             players: lobby.getPlayers(),
             takenRoles: lobby.getTakenRoles(),
+            readyToStart: lobby.readyToStart(),
         })
     })
 
@@ -156,6 +158,7 @@ io.on('connection', socket => {
             io.to(lobby.getID()).emit('lobby-update', {
                 players: lobby.getPlayers(),
                 takenRoles: lobby.getTakenRoles(),
+                readyToStart: lobby.readyToStart(),
             })
         }
     })
