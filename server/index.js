@@ -14,7 +14,7 @@ import { Lobby, Roles } from '../classes/Lobby.js'
 */
 
 // Controls what port the server should listen on
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8080
 const app = express();
 
 // Starts the server
@@ -24,10 +24,13 @@ const expressServer = app.listen(PORT, () => {
 
 const io = new Server(expressServer, {
     cors: {
-        origin: process.env.NODE_ENV === "production" ? false :
-        ["http://localhost:5000","http://127.0.0.1:5000", "http://localhost:5173"]
-    }
-});
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+      allowedHeaders: ["Content-Type"],
+      credentials: true,
+    },
+  });
+
 
 // Keeps track of users are currently connected
 const UsersState = {

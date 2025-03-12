@@ -1,8 +1,28 @@
-import { useState } from "react";
+import React, { useState } from "react"
+import { Form, Button, Card, Alert } from "react-bootstrap"
+import {useAuth} from "../authContext"
+import { useNavigate } from "react-router-dom"
 
-export function Login({ defaultUsername = '', defaultPassword = '', handleLogin, handleSignUp }) {
-    const [username, setUsername] = useState(defaultUsername);
-    const [password, setPassword] = useState(defaultPassword);
+
+export function Login() {
+    const { login } = useAuth()
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate();
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+    
+        try {
+          await login(email, password)
+          navigate("/")
+        } catch {
+          setError("Failed to log in")
+        }
+    
+        setLoading(false)
+      }
     
     return (
         <div style={{

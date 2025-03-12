@@ -6,6 +6,7 @@ import { socket } from './socket.js'
 import { useEffect } from 'react'
 import { Roles } from '../../classes/Lobby.js'
 import { LoginPage } from './components/LoginPage.jsx'
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -19,15 +20,45 @@ function App() {
     const [lobby, setLobby] = useState("")
     // const [gameState, setGameState]
 
-    // Placeholder function until authentication is implemented
     function onLogin(username, password) {
-        console.log(`Attempting login with username ${username} and ID ${socket.id}`)
-        socket.emit('login', {
-            name: username,
-            id: socket.id,
-        })
-        setUser({ name: username, id: socket.id })
+        console.log(`Attempting login with username ${username} and ID ${socket.id}`);
+    
+        const auth = getAuth();
+    
+        signInWithEmailAndPassword(auth, username, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+                const token = await user.getIdToken(); // Get Firebase token
+    
+                // Send token to backend for validation
+                fetch("http://localhost:5000/authenticate", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ userID: socket.id }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log("User authenticated with backend");
+                            socket.emit("login", {
+                                name: username,
+                                id: socket.id,
+                            });
+                            setUser({ name: username, id: socket.id });
+                        } else {
+                            console.error("Authentication failed on backend:", data.message);
+                        }
+                    })
+                    .catch(error => console.error("Error sending token to backend:", error));
+            })
+            .catch(error => {
+                console.error("Firebase login error:", error.message);
+            });
     }
+    
 
     function onSignUp() {
         console.log("Sign up button clicked")
