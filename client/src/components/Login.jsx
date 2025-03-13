@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 export function Login() {
     const { login } = useAuth()
-    const [username, setUsername] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
@@ -16,7 +16,7 @@ export function Login() {
         e.preventDefault()
     
         try {
-          await login(username, password)
+          await login(email, password)
           navigate("/")
         } catch {
           setError("Failed to log in")
@@ -24,6 +24,7 @@ export function Login() {
     
         setLoading(false)
       }
+
     
     return (
         <div style={{
@@ -52,9 +53,9 @@ export function Login() {
                 </label>
                 <input
                     type="text"
-                    placeholder="Enter your name, detective..."
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your email, detective..."
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     style={{
                         height: '50px',
                         background: '#F5E6D0',
@@ -103,7 +104,6 @@ export function Login() {
             {/* Login Button */}
             <button 
                 onClick={(e) => {
-                    e.preventDefault()
                     handleSubmit(e)
                     
                     //handleLogin(username, password)
@@ -127,10 +127,7 @@ export function Login() {
     
             {/* Sign Up Button */}
             <button 
-                onClick={(e) => {
-                    e.preventDefault()
-                    handleSignUp()
-                }}
+                onClick={() => navigate("/signup")}
                 style={{
                     width: '100%',
                     height: '55px',
