@@ -27,7 +27,7 @@ export function InGame() {
         >
             {/* Background Image */}
             <img 
-                src="src/assets/game-example.png"
+                src="src/assets/game-example.svg"
                 alt="background"
                 style={{
                     width: '100%',
