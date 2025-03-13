@@ -4,33 +4,33 @@ import React, { useEffect, useState } from 'react';
 const ClueInfoSheet = () => {
   // Hardcoded arrays for simplicity
   const suspects = [
-    { name: "Dr. Cooper", car: "src/assets/DrCooper.svg" },
-    { name: "Theresa", car: "src/assets/Theresa.svg" },
-    { name: "Bob", car: "src/assets/Bob.svg" },
-    { name: "Adam", car: "src/assets/Adam.svg" },
-    { name: "Val", car: "src/assets/Val.svg" },
-    { name: "Firestone", car: "src/assets/Firestone.svg" }
+    { name: "Dr. Cooper", car: "src/assets/suspectCards/DrCooper.svg" },
+    { name: "Theresa", car: "src/assets/suspectCards/Theresa.svg" },
+    { name: "Bob", car: "src/assets/suspectCards/Bob.svg" },
+    { name: "Adam", car: "src/assets/suspectCards/Adam.svg" },
+    { name: "Val", car: "src/assets/suspectCards/Val.svg" },
+    { name: "Firestone", car: "src/assets/suspectCards/Firestone.svg" }
   ];
 
   const weapons = [
-    { name: "Desk Chair", car: "src/assets/DESK_CHAIR.svg" },
-    { name: "Projector", car: "src/assets/PROJECTOR.svg" },
-    { name: "Scissors", car: "src/assets/SCISSOR.svg" },
-    { name: "Laptop Charger", car: "src/assets/LAPTOP_CHARGER.svg" },
-    { name: "Monitor", car: "src/assets/MONITOR.svg" },
-    { name: "Textbook", car: "src/assets/TEXTBOOK.svg" }
+    { name: "Desk Chair", car: "src/assets/weaponsCards/DESK_CHAIR.svg" },
+    { name: "Projector", car: "src/assets/weaponsCards/PROJECTOR.svg" },
+    { name: "Scissors", car: "src/assets/weaponsCards/SCISSOR.svg" },
+    { name: "Laptop Charger", car: "src/weaponsCards/assets/LAPTOP_CHARGER.svg" },
+    { name: "Monitor", car: "src/assets/weaponsCards/MONITOR.svg" },
+    { name: "Textbook", car: "src/assets/weaponsCards/TEXTBOOK.svg" }
   ];
 
   const rooms = [
-    { name: "Great Hall", car: "src/assets/GREAT_HALL.svg" },
-    { name: "Conference", car: "src/assets/CONFERENCE.svg" },
-    { name: "DS Room", car: "src/assets/DS_ROOM.svg" },
-    { name: "Mega Lounge", car: "src/assets/MEGA_LOUNGE.svg" },
-    { name: "Main Office", car: "src/assets/MAIN_OFFICE.svg" },
-    { name: "112", car: "src/assets/112.svg" },
-    { name: "Selleck", car: "src/assets/SELLECK.svg" },
-    { name: "110", car: "src/assets/110.svg" },
-    { name: "Study", car: "src/assets/STUDY.svg" }
+    { name: "Great Hall", car: "src/assets/roomCards/GREAT_HALL.svg" },
+    { name: "Conference", car: "src/assets/roomCards/CONFERENCE.svg" },
+    { name: "DS Room", car: "src/assets/roomCards/DS_ROOM.svg" },
+    { name: "Mega Lounge", car: "src/assets/roomCards/MEGA_LOUNGE.svg" },
+    { name: "Main Office", car: "src/assets/roomCards/MAIN_OFFICE.svg" },
+    { name: "112", car: "src/assets/roomCards/112.svg" },
+    { name: "Selleck", car: "src/assets/roomCards/SELLECK.svg" },
+    { name: "110", car: "src/assets/roomCards/110.svg" },
+    { name: "Study", car: "src/assets/roomCards/STUDY.svg" }
   ];
 
   // State to track which cards have been crossed off
