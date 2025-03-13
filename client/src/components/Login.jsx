@@ -11,11 +11,12 @@ export function Login() {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
+    
     const handleSubmit = async (e) => {
         e.preventDefault()
     
         try {
-          await login(email, password)
+          await login(username, password)
           navigate("/")
         } catch {
           setError("Failed to log in")
@@ -37,7 +38,8 @@ export function Login() {
             gap: '20px',
             overflow: 'hidden',
             }}>
-  
+                
+            {error && <Alert variant="danger">{error}</Alert>}
             {/* Username Field */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <label style={{
@@ -102,7 +104,9 @@ export function Login() {
             <button 
                 onClick={(e) => {
                     e.preventDefault()
-                    handleLogin(username, password)
+                    handleSubmit(e)
+                    
+                    //handleLogin(username, password)
                 }}
                 style={{
                     height: '55px',

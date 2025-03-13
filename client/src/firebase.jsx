@@ -3,7 +3,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 
 initializeApp({
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: "AIzaSyBopB6HB2TkRuiydzYIA1QT9nJeFNsy1wI",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -12,6 +12,7 @@ initializeApp({
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 })
 const auth = getAuth()
+
 
 const signup = async (email, password) => {
   try {
