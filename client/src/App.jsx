@@ -8,6 +8,7 @@ import { Roles } from '../../classes/Lobby.js'
 import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { InGame } from './components/InGame.jsx'
+import GameState from "./components/GameState/GameState.jsx"
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -173,7 +174,7 @@ function App() {
         if (lobby) {
             if (gameState) {
                 return (
-                    <InGame />
+                    <GameState />
                 )
             } else {
                 return (

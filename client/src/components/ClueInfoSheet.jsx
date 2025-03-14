@@ -1,7 +1,7 @@
 /* src/ClueInfoSheet.jsx */
 import React, { useEffect, useState } from 'react';
 
-const ClueInfoSheet = () => {
+const ClueInfoSheet = ({ onClose }) => { //Accept onClose prop
   // Hardcoded arrays for simplicity
   const suspects = [
     { name: "Dr. Cooper", car: "src/assets/suspectCards/DrCooper.svg" },
@@ -13,12 +13,12 @@ const ClueInfoSheet = () => {
   ];
 
   const weapons = [
-    { name: "Desk Chair", car: "src/assets/weaponsCards/DESK_CHAIR.svg" },
-    { name: "Projector", car: "src/assets/weaponsCards/PROJECTOR.svg" },
-    { name: "Scissors", car: "src/assets/weaponsCards/SCISSOR.svg" },
-    { name: "Laptop Charger", car: "src/weaponsCards/assets/LAPTOP_CHARGER.svg" },
-    { name: "Monitor", car: "src/assets/weaponsCards/MONITOR.svg" },
-    { name: "Textbook", car: "src/assets/weaponsCards/TEXTBOOK.svg" }
+    { name: "Desk Chair", car: "src/assets/weaponCards/DESK_CHAIR.svg" },
+    { name: "Projector", car: "src/assets/weaponCards/PROJECTOR.svg" },
+    { name: "Scissors", car: "src/assets/weaponCards/SCISSOR.svg" },
+    { name: "Laptop Charger", car: "src/assets/weaponCards/LAPTOP_CHARGER.svg" },
+    { name: "Monitor", car: "src/assets/weaponCards/MONITOR.svg" },
+    { name: "Textbook", car: "src/assets/weaponCards/TEXTBOOK.svg" }
   ];
 
   const rooms = [
@@ -110,12 +110,12 @@ const ClueInfoSheet = () => {
       position: 'fixed',
       top: 0,
       left: 0,
-      background: '#2A1A1A',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       overflowY: 'auto',
-      paddingBottom: '50px'
+      paddingBottom: '50px',
+      zIndex: 1000 // Ensure it's on top of everything
     }}>
       {/* Background Image Wrapper with Inner Shadow*/}
       <div
@@ -128,16 +128,6 @@ const ClueInfoSheet = () => {
           overflow: 'hidden'
         }}
       >
-        {/* Background Image */}
-        <img
-            src="src/assets/GAME_STATE.svg"
-            alt="background"
-            style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-            }}
-        />
         {/* Overlay with #2A1A1A at 57% opacity */}
         <div 
           style={{
@@ -257,6 +247,21 @@ const ClueInfoSheet = () => {
           </div>
         </div>
       </div>
+        {/*Add a button to close the component*/}
+        <button onClick={onClose} style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            padding: '10px',
+            background: '#7F1700',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            zIndex: '1001',
+        }}>
+            Close
+        </button>
     </div>
   );
 };

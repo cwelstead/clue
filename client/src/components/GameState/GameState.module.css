@@ -1,0 +1,25 @@
+/* GameState.module.css */
+.gameState {
+  background-color: #796c62;
+  width: 100vw;
+  height: 100vh;
+  display: flex; /* Make GameState a flex container */
+  position: fixed;
+  top: 0;
+  left: 0;
+  font-family: sans-serif;
+  overflow: hidden;
+  box-sizing: border-box;
+  padding: 2vh 2vw;
+}
+
+.rightSide {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  width: 40%;
+  box-sizing: border-box;
+  padding: 20px;
+  height: 100%;
+}
+
