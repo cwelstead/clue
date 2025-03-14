@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signup } from "../firebase";
 
 export default function Signup() {
@@ -9,7 +9,7 @@ export default function Signup() {
   const passwordConfirmRef = useRef();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -25,7 +25,7 @@ export default function Signup() {
       // Use the signup function from firebase.js
       await signup(emailRef.current.value, passwordRef.current.value);
 
-      history.push("/");
+      navigate.push("/");
     } catch (error) {
       setError("Failed to create an account");
     }

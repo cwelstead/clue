@@ -6,7 +6,7 @@ import { socket } from './socket.js'
 import { useEffect } from 'react'
 import { Roles } from '../../classes/Lobby.js'
 import { LoginPage } from './components/LoginPage.jsx'
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -20,12 +20,12 @@ function App() {
     const [lobby, setLobby] = useState("")
     // const [gameState, setGameState]
 
-    function onLogin(username, password) {
-        console.log(`Attempting login with username ${username} and ID ${socket.id}`);
+    function onLogin(email, password) {
+        console.log(`Attempting login with username ${email} and ID ${socket.id}`);
     
         const auth = getAuth();
     
-        signInWithEmailAndPassword(auth, username, password)
+        signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
                 const token = await user.getIdToken(); // Get Firebase token
@@ -44,10 +44,10 @@ function App() {
                         if (data.success) {
                             console.log("User authenticated with backend");
                             socket.emit("login", {
-                                name: username,
+                                name: email,
                                 id: socket.id,
                             });
-                            setUser({ name: username, id: socket.id });
+                            setUser({ name: email, id: socket.id });
                         } else {
                             console.error("Authentication failed on backend:", data.message);
                         }
@@ -60,9 +60,48 @@ function App() {
     }
     
 
-    function onSignUp() {
-        console.log("Sign up button clicked")
+    function onSignUp(email, password) {
+        console.log("sign up button clicked")
+        const auth = getAuth();
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+                const token = await user.getIdToken();
+                
+                // Register the new user with your backend
+                fetch("http://localhost:5000/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ 
+                        userID: socket.id,
+                        email: email 
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log("User registered with backend");
+                            socket.emit("login", {
+                                name: email,
+                                id: socket.id,
+                            });
+                            setUser({ name: email, id: socket.id });
+                        } else {
+                            console.error("Registration failed on backend:", data.message);
+                        }
+                    })
+                    .catch(error => console.error("Error registering with backend:", error));
+            })
+            .catch(error => {
+                console.error("Firebase signup error:", error.message);
+            });
     }
+
+    
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {

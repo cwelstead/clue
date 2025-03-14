@@ -1,10 +1,10 @@
 import React, { useState } from "react"
-import { Form, Button, Card, Alert } from "react-bootstrap"
+import { Alert } from "react-bootstrap"
 import {useAuth} from "../authContext"
 import { useNavigate } from "react-router-dom"
 
 
-export function Login() {
+export function Login({handleSignUp, handleLogin}) {
     const { login } = useAuth()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -127,7 +127,7 @@ export function Login() {
     
             {/* Sign Up Button */}
             <button 
-                onClick={() => navigate("/signup")}
+                onClick={() => handleSignUp(email,password)}
                 style={{
                     width: '100%',
                     height: '55px',
