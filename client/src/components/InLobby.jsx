@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { socket } from "../socket"
 import { Roles } from "../../../classes/Lobby"
 
-export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave }) {
+export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
     const [isPlaying, setIsPlaying] = useState(false); // State to track if music is playing
     const audioRef = useRef(null); // Reference to the audio element
 
@@ -65,6 +65,15 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave }) {
                     {value}
                 </button>
             ))}
+            <br></br>
+            <br></br>
+            <button
+                disabled={!lobby.readyToStart}
+                onClick={(e) => {
+                    e.preventDefault()
+                    onGo()
+                }}
+            >Go</button>
         </>
     )
 }

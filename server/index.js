@@ -2,6 +2,7 @@ import express from 'express'
 import { Server } from 'socket.io'
 import { Lobby, Roles } from '../classes/Lobby.js'
 import cors from 'cors'
+import { GameState } from '../classes/GameState.js'
 
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
@@ -89,6 +90,9 @@ function getLobbyFromUser(id) {
     }
 }
 
+// Keeps track of the GameState objects that are associated with lobbies
+const gameStates = new Map()
+
 /*
  * SERVER-SIDE EVENTS
 */
@@ -140,6 +144,7 @@ io.on('connection', socket => {
             socket.broadcast.to(lobbyToJoin.getID()).emit('lobby-update', {
                 players: lobbyToJoin.getPlayers(),
                 takenRoles: lobbyToJoin.getTakenRoles(),
+                readyToStart: false
             })
             // Step 4b: Notify client of success
             socket.emit('lobby-join-success', {
@@ -165,6 +170,7 @@ io.on('connection', socket => {
         io.to(lobby.getID()).emit('lobby-update', {
             players: lobby.getPlayers(),
             takenRoles: lobby.getTakenRoles(),
+            readyToStart: lobby.readyToStart(),
         })
     })
 
@@ -174,7 +180,21 @@ io.on('connection', socket => {
             io.to(lobby.getID()).emit('lobby-update', {
                 players: lobby.getPlayers(),
                 takenRoles: lobby.getTakenRoles(),
+                readyToStart: lobby.readyToStart(),
             })
+        }
+    })
+
+    socket.on('game-start', () => {
+        const lobby = getLobbyFromUser(socket.id)
+
+        try {
+            if (lobby.readyToStart()) {
+                const game = gameStates.set(lobby.getID(), new GameState())
+                io.to(lobby.getID()).emit('game-start-success', (game))
+            }
+        } catch (e) {
+            console.log(`Error starting game: ${e}`)
         }
     })
 
