@@ -1,6 +1,7 @@
 import express from 'express'
 import { Server } from 'socket.io'
 import { Lobby, Roles } from '../classes/Lobby.js'
+import cors from 'cors'
 import { GameState } from '../classes/GameState.js'
 
 /*
@@ -18,6 +19,20 @@ import { GameState } from '../classes/GameState.js'
 const PORT = process.env.PORT || 8080
 const app = express();
 
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
+
+app.post('/authenticate', (req, res) => {
+    console.log("Received authentication request");
+    res.json({ success: true, message: "Authenticated successfully" });
+});
+// Rest of your server code...
+
 // Starts the server
 const expressServer = app.listen(PORT, () => {
     console.log(`Server is up and running! Listening with port ${PORT}`);
@@ -25,10 +40,13 @@ const expressServer = app.listen(PORT, () => {
 
 const io = new Server(expressServer, {
     cors: {
-        origin: process.env.NODE_ENV === "production" ? false :
-        ["http://localhost:5000","http://127.0.0.1:5000", "http://localhost:5173"]
-    }
-});
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    },
+  });
+
 
 // Keeps track of users are currently connected
 const UsersState = {
