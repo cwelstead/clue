@@ -16,6 +16,17 @@ import { Lobby, Roles } from '../classes/Lobby.js'
 // Controls what port the server should listen on
 const PORT = process.env.PORT || 8080
 const app = express();
+const express = require('express');
+const cors = require('cors');
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Rest of your server code...
 
 // Starts the server
 const expressServer = app.listen(PORT, () => {
