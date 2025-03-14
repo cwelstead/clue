@@ -26,6 +26,10 @@ app.use(cors({
   credentials: true,
 }));
 
+app.post('/authenticate', (req, res) => {
+    console.log("Received authentication request");
+    res.json({ success: true, message: "Authenticated successfully" });
+});
 // Rest of your server code...
 
 // Starts the server
