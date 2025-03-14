@@ -37,8 +37,9 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
                 position: 'fixed',
                 top: 0,
                 left: 0,
-                background: `url('../assets/lobby.png') no-repeat center center fixed`,
-                backgroundSize: 'cover',
+                backgroundImage: `url(src/assets/lobby.png)`, // Use backgroundImage and the imported image
+                backgroundPosition: 'center',   // Ensure it's centered
+                backgroundSize: 'cover',         // Cover the entire area
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -179,9 +180,7 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
                             cursor: 'pointer',
                             transition: 'opacity 0.2s',
                         }}
-                    >START GAME</button>
-
-                    {/* Role Selection */}
+                    >START GAME</button>... {/* Role Selection */}
                     <div style={{
                         display: 'flex',
                         flexWrap: 'wrap',
