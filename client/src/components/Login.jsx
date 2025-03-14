@@ -16,7 +16,7 @@ export function Login({handleSignUp, handleLogin}) {
         e.preventDefault()
     
         try {
-          await login(email, password)
+          await handleLogin(email, password)
           navigate("/")
         } catch {
           setError("Failed to log in")
@@ -103,11 +103,7 @@ export function Login({handleSignUp, handleLogin}) {
 
             {/* Login Button */}
             <button 
-                onClick={(e) => {
-                    handleSubmit(e)
-                    
-                    //handleLogin(username, password)
-                }}
+                onClick={handleSubmit}
                 style={{
                     height: '55px',
                     background: 'linear-gradient(180deg, rgba(225,181,48,1) 0%, rgba(212,160,23,1) 100%)',

@@ -1,6 +1,7 @@
 import express from 'express'
 import { Server } from 'socket.io'
 import { Lobby, Roles } from '../classes/Lobby.js'
+import cors from 'cors'
 
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
@@ -14,16 +15,15 @@ import { Lobby, Roles } from '../classes/Lobby.js'
 */
 
 // Controls what port the server should listen on
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 5000
 const app = express();
-const express = require('express');
-const cors = require('cors');
 
 // Enable CORS for all routes
 app.use(cors({
   origin: 'http://localhost:5173', // Your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
 
 // Rest of your server code...
@@ -37,7 +37,7 @@ const io = new Server(expressServer, {
     cors: {
       origin: "http://localhost:5173",
       methods: ["GET", "POST"],
-      allowedHeaders: ["Content-Type"],
+      allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,
     },
   });
