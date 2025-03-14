@@ -15,7 +15,7 @@ import cors from 'cors'
 */
 
 // Controls what port the server should listen on
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8080
 const app = express();
 
 // Enable CORS for all routes

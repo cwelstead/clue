@@ -31,7 +31,7 @@ function App() {
                 const token = await user.getIdToken(); // Get Firebase token
     
                 // Send token to backend for validation
-                fetch("http://localhost:5000/authenticate", {
+                fetch("http://localhost:8080/authenticate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ function App() {
                 const token = await user.getIdToken();
                 
                 // Register the new user with your backend
-                fetch("http://localhost:5000/register", {
+                fetch("http://localhost:8080/register", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
