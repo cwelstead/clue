@@ -1,6 +1,8 @@
 import express from 'express'
 import { Server } from 'socket.io'
 import { Lobby, Roles } from '../classes/Lobby.js'
+import cors from 'cors'
+import { GameState } from '../classes/GameState.js'
 
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
@@ -14,8 +16,22 @@ import { Lobby, Roles } from '../classes/Lobby.js'
 */
 
 // Controls what port the server should listen on
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 8080
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:5173', // Your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+}));
+
+app.post('/authenticate', (req, res) => {
+    console.log("Received authentication request");
+    res.json({ success: true, message: "Authenticated successfully" });
+});
+// Rest of your server code...
 
 // Starts the server
 const expressServer = app.listen(PORT, () => {
@@ -24,10 +40,13 @@ const expressServer = app.listen(PORT, () => {
 
 const io = new Server(expressServer, {
     cors: {
-        origin: process.env.NODE_ENV === "production" ? false :
-        ["http://localhost:5000","http://127.0.0.1:5000", "http://localhost:5173"]
-    }
-});
+      origin: "http://localhost:5173",
+      methods: ["GET", "POST"],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+    },
+  });
+
 
 // Keeps track of users are currently connected
 const UsersState = {
@@ -70,6 +89,9 @@ function getLobbyFromUser(id) {
         console.log(`Could not get lobby from user ${id}`)
     }
 }
+
+// Keeps track of the GameState objects that are associated with lobbies
+const gameStates = new Map()
 
 /*
  * SERVER-SIDE EVENTS
@@ -122,6 +144,7 @@ io.on('connection', socket => {
             socket.broadcast.to(lobbyToJoin.getID()).emit('lobby-update', {
                 players: lobbyToJoin.getPlayers(),
                 takenRoles: lobbyToJoin.getTakenRoles(),
+                readyToStart: false
             })
             // Step 4b: Notify client of success
             socket.emit('lobby-join-success', {
@@ -147,6 +170,7 @@ io.on('connection', socket => {
         io.to(lobby.getID()).emit('lobby-update', {
             players: lobby.getPlayers(),
             takenRoles: lobby.getTakenRoles(),
+            readyToStart: lobby.readyToStart(),
         })
     })
 
@@ -156,7 +180,21 @@ io.on('connection', socket => {
             io.to(lobby.getID()).emit('lobby-update', {
                 players: lobby.getPlayers(),
                 takenRoles: lobby.getTakenRoles(),
+                readyToStart: lobby.readyToStart(),
             })
+        }
+    })
+
+    socket.on('game-start', () => {
+        const lobby = getLobbyFromUser(socket.id)
+
+        try {
+            if (lobby.readyToStart()) {
+                const game = gameStates.set(lobby.getID(), new GameState())
+                io.to(lobby.getID()).emit('game-start-success', (game))
+            }
+        } catch (e) {
+            console.log(`Error starting game: ${e}`)
         }
     })
 

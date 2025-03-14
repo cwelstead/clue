@@ -3,7 +3,21 @@ import { socket } from "../socket"
 import { Roles } from "../../../classes/Lobby"
 import { MusicPlayer } from "./MusicPlayer";
 
-export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave }) {
+export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
+    const [isPlaying, setIsPlaying] = useState(false); // State to track if music is playing
+    const audioRef = useRef(null); // Reference to the audio element
+
+    const toggleMusic = () => {
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play().catch(error => console.log("Playback error:", error));
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
+
     return (
         <>
             {/* Music Player Button - Positioned at the top right */}
@@ -182,6 +196,15 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave }) {
                     </div>
                 </div>
             </div>
+            <br></br>
+            <br></br>
+            <button
+                disabled={!lobby.readyToStart}
+                onClick={(e) => {
+                    e.preventDefault()
+                    onGo()
+                }}
+            >Go</button>
         </>
     );
 }
