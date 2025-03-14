@@ -158,6 +158,28 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
                     >
                         LEAVE LOBBY
                     </button>
+                    
+                    <button
+                        disabled={!lobby.readyToStart}
+                        onClick={(e) => {
+                            e.preventDefault()
+                            onGo()
+                        }}
+                        style={{
+                            height: '50px',
+                            width: '100%',
+                            background: lobby.readyToStart? 'linear-gradient(180deg, rgb(70, 200, 65) 0%, rgb(50, 170, 45) 100%)' : '#ccc',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontFamily: 'Courier New',
+                            fontSize: '18px',
+                            fontWeight: 700,
+                            letterSpacing: '0.09em',
+                            color: lobby.readyToStart? '#2A1A1A' : '#666',
+                            cursor: 'pointer',
+                            transition: 'opacity 0.2s',
+                        }}
+                    >START GAME</button>
 
                     {/* Role Selection */}
                     <div style={{
@@ -196,15 +218,6 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
                     </div>
                 </div>
             </div>
-            <br></br>
-            <br></br>
-            <button
-                disabled={!lobby.readyToStart}
-                onClick={(e) => {
-                    e.preventDefault()
-                    onGo()
-                }}
-            >Go</button>
         </>
     );
 }
