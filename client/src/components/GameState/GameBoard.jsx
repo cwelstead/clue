@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const GameBoard = () => {
   const [playerPosition, setPlayerPosition] = useState({x: 9, y: 0, place:""})
-  const placeScale = 1.2
+  const placeScale = 1.18
   const cellSize = 24
 
   function movePlayerToCell(destX, destY) {
@@ -34,7 +34,6 @@ const GameBoard = () => {
     Board.PLACES.forEach(place => {
       if (destPlace == place.key) {
         place.adjacentSpaces.forEach(exit => {
-          console.log(`Exit: ${exit.x},${exit.y} Location: ${playerPosition.x},${playerPosition.y}`)
           if (exit.x == playerPosition.x && exit.y == playerPosition.y) {
             setPlayerPosition({x: -1, y: -1, place: destPlace})
             console.log("Moving player to place: " + place.key)
@@ -53,6 +52,25 @@ const GameBoard = () => {
 
       {/* Grid */}
       <div style={{position: "absolute", top: "54px"}}>
+
+        {/* Places */}
+        {Board.PLACES.map(place =>
+          <img key={place.key} style={{
+            position: "absolute",
+            left: place.xPos * cellSize * 1.165, // TODO: replace all magic numbers with dynamic variables
+            top: place.yPos * cellSize * 1.165,
+            maxWidth: place.width * placeScale * cellSize,
+            maxHeight: place.height * placeScale * cellSize,
+          }}
+            src={place.img}
+            onClick={(e) => {
+              e.preventDefault()
+              movePlayerToPlace(place.key)
+            }}
+          ></img>
+        )}
+
+        {/* Cells */}
         {Board.BOARD.map((row, rowKey) => (
           <div key={rowKey} style={{display: "flex", flexDirection: "row"}}>
             {row.map((cell, colKey) => (
@@ -78,21 +96,6 @@ const GameBoard = () => {
             ))}
           </div>
         ))}
-        {Board.PLACES.map(place =>
-          <img key={place.key} style={{
-            position: "absolute",
-            left: place.xPos * cellSize, // TODO: replace all magic numbers with dynamic variables
-            top: place.yPos * cellSize,
-            maxWidth: place.width * placeScale * cellSize,
-            maxHeight: place.height * placeScale * cellSize,
-          }}
-            src={place.img}
-            onClick={(e) => {
-              e.preventDefault()
-              movePlayerToPlace(place.key)
-            }}
-          ></img>
-        )}
       </div>
     </div>
   );
