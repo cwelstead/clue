@@ -34,8 +34,10 @@ export class Board {
             key: "112",
             xPos: 0,
             yPos: 1,
-            adjacentSpaces: [{x: 7, y: 4}],
-            img: ""
+            width: 6,
+            height: 6,
+            adjacentSpaces: [{x: 4, y: 7}],
+            img: './src/assets/rooms/112.png' // images are relative to the 'client' folder
         }
     ]
 }
