@@ -6,8 +6,9 @@ import { useState } from 'react';
 
 const GameBoard = () => {
   const [playerPosition, setPlayerPosition] = useState({x: 9, y: 0, place:""})
-  const placeScale = 1.18
-  const cellSize = 24
+  const cellSize = 27
+  const cellBorder = 1
+  const placeScale = cellSize + 2 * cellBorder
 
   function movePlayerToCell(destX, destY) {
     if (playerPosition.x >= 0 && playerPosition.y >= 0) {
@@ -20,7 +21,6 @@ const GameBoard = () => {
           place.adjacentSpaces.forEach(exit => {
             if (exit.x == destX && exit.y == destY) {
               setPlayerPosition({x: destX, y: destY, place: ""})
-              console.log("Leaving place: " + place.key)
             }
           })
         }
@@ -36,7 +36,6 @@ const GameBoard = () => {
         place.adjacentSpaces.forEach(exit => {
           if (exit.x == playerPosition.x && exit.y == playerPosition.y) {
             setPlayerPosition({x: -1, y: -1, place: destPlace})
-            console.log("Moving player to place: " + place.key)
           }
         })
       }
@@ -44,7 +43,7 @@ const GameBoard = () => {
   }
 
   return (
-    <div className={styles.gameBoard}>
+    <div className={styles.gameBoard} style={{position: 'relative',}}>
       {/* Background Image */}
       <img src= "src/assets/board.svg" alt="Game Board" className={styles.boardImage} style={{
         position: "relative",
@@ -55,19 +54,40 @@ const GameBoard = () => {
 
         {/* Places */}
         {Board.PLACES.map(place =>
-          <img key={place.key} style={{
+          <div key={place.key} style={{
             position: "absolute",
-            left: place.xPos * cellSize * 1.165, // TODO: replace all magic numbers with dynamic variables
-            top: place.yPos * cellSize * 1.165,
-            maxWidth: place.width * placeScale * cellSize,
-            maxHeight: place.height * placeScale * cellSize,
-          }}
-            src={place.img}
-            onClick={(e) => {
-              e.preventDefault()
-              movePlayerToPlace(place.key)
+            left: place.xPos * placeScale,
+            top: place.yPos * placeScale,
+            width: place.width * placeScale,
+            height: place.height * placeScale,
+            boxSizing: 'border-box',
+            alignContent: 'center',
+          }}>
+            <img src={place.img} style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: '100%',
+              height: '100%',
             }}
-          ></img>
+                onClick={(e) => {
+                e.preventDefault()
+                movePlayerToPlace(place.key)
+              }}
+            ></img>
+            
+            {/* List of tokens in a room (just the player for now) */}
+            {playerPosition.place == place.key && (
+              <img
+                style={{
+                  height: cellSize,
+                  position: "relative",
+                  margin: 'auto',
+                }}
+                src='./src/assets//pieceIcons/piece-purple.png'>
+              </img>
+            )}
+          </div>
         )}
 
         {/* Cells */}
@@ -76,22 +96,30 @@ const GameBoard = () => {
             {row.map((cell, colKey) => (
               <div key={colKey} style={{
                 position: "relative",
-                width: "24px",
-                height: "24px",
-                backgroundColor: (playerPosition.y === rowKey
-                                && playerPosition.x === colKey)
-                                ? "#a0f" : "#fff", // visual representation of player
-                borderWidth: "2px",
-                borderColor: "#000",
+                width: `${cellSize}px`,
+                height: `${cellSize}px`,
+                backgroundColor: "#dbd8c6",
+                borderWidth: `${cellBorder}px`,
+                borderColor: "#7e7f82",
                 borderStyle: "solid",
                 fontSize: "8px",
-                visibility: cell? "visible" : "hidden"
+                visibility: cell? "visible" : "hidden",
+                objectFit: 'contain'
               }}
                 onClick={(e) => {
                   e.preventDefault()
                   movePlayerToCell(colKey, rowKey)
                 }}>
-                  {colKey},{rowKey}
+                  {playerPosition.y === rowKey
+                  && playerPosition.x === colKey &&
+                    <img
+                      style={{
+                        height: cellSize,
+                        objectFit: 'contain'
+                      }}
+                      src='./src/assets//pieceIcons/piece-purple.png'>
+                    </img>
+                  }
                 </div>
             ))}
           </div>
