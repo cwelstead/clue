@@ -1,6 +1,6 @@
 
 
-export class Board {
+export default class Board {
     // 24 width, 25 height
     static BOARD = [
         [0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0],

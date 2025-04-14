@@ -12,21 +12,20 @@ import GameState from "./components/GameState/GameState.jsx"
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
- * 
- * Authors: Cole Welstead
 */
 
 function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState("")
-    const [gameState, setGameState] = useState(null)
+    const [playerPositions, setPlayerPositions] = useState(null)
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
     
         const auth = getAuth();
     
+        // Functions to handle user authentication
         signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
@@ -60,7 +59,6 @@ function App() {
                 console.error("Firebase login error:", error.message);
             });
     }
-    
 
     function onSignUp(email, password) {
         console.log("sign up button clicked")
@@ -78,7 +76,7 @@ function App() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         userID: socket.id,
                         email: email 
                     }),
@@ -103,7 +101,6 @@ function App() {
             });
     }
 
-    
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
@@ -132,6 +129,9 @@ function App() {
     function startGame() {
         socket.emit('game-start')
     }
+
+    // Functions to manipulate GameState
+
 
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
@@ -164,17 +164,18 @@ function App() {
             })
         })
 
-        socket.on('game-start-success', (game) => {
-            setGameState(game)
+        socket.on('game-start-success', (playerPositions) => {
+            setPlayerPositions(new Map(JSON.parse(playerPositions)))
+            console.log(`Player positions: ${playerPositions}`)
         })
     })
 
     // Front-end code, returns the correct screen based on gathered data
     if (user) {
         if (lobby) {
-            if (gameState) {
+            if (playerPositions) {
                 return (
-                    <GameState />
+                    <GameState playerPositions={playerPositions} />
                 )
             } else {
                 return (

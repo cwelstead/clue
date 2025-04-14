@@ -190,11 +190,13 @@ io.on('connection', socket => {
 
         try {
             if (lobby.readyToStart()) {
-                const game = gameStates.set(lobby.getID(), new GameState())
-                io.to(lobby.getID()).emit('game-start-success', (game))
+                const game = new GameState(lobby)
+                gameStates.set(lobby.getID(), game)
+                io.to(lobby.getID()).emit('game-start-success', (game.getPlayerPositions()))
             }
         } catch (e) {
             console.log(`Error starting game: ${e}`)
+            console.log(e.stack)
         }
     })
 

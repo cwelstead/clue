@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { socket } from "../socket"
 import { Roles } from "../../../classes/Lobby"
 
 export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
