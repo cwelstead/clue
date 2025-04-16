@@ -78,6 +78,7 @@ function destroyLobby(id) {
 }
 
 // Abstraction to make getting a user's lobby easier
+// Returns a Lobby object
 function getLobbyFromUser(id) {
     try {
         const lobbyID = UsersState.users.find((user) => user.id === id).lobby
@@ -101,6 +102,7 @@ const gameStates = new Map()
 io.on('connection', socket => {
     console.log(`User ${socket.id} connected`);
 
+    // Login and authentication
     socket.on('login', ({ name, id }) => {
         UsersState.setUsers([
             ...UsersState.users.filter(existingUser => existingUser.id !== id),
@@ -113,6 +115,7 @@ io.on('connection', socket => {
         console.log(`User ${id} successfully logged in as ${name}`)
     })
 
+    // Lobby manipulation
     socket.on('lobby-create', ({name}) => {
         const createdLobby = createLobby(name)
         console.log(`Lobby created with name ${createdLobby.getName()} ID ${createdLobby.getID()}`)
@@ -230,6 +233,23 @@ io.on('connection', socket => {
     socket.on('lobby-disconnect', (userID) => {
         removeUserFromLobby(userID)
         console.log(`User ${socket.id} left a lobby, leaving ${UsersState.users.length} active users and ${LobbiesState.lobbies.length} active lobbies`);
+    })
+
+    // GameState functions
+    socket.on('move-place', ({id, destPlace}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        gameState.movePlayerToPlace(player, destPlace)
+    })
+
+    socket.on('move-cell', ({id, destX, destY}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        gameState.movePlayerToCell(player, destX, destY)
     })
 
     // When user disconnects

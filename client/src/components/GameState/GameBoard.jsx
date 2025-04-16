@@ -2,9 +2,18 @@ import React from 'react';
 import styles from './GameBoard.module.css';
 import Board from '../../../../classes/Board.js';
 
-const GameBoard = ({ playerPositions }) => {
-  const cellSize = 27 // TODO make these adjust dynamically
-  const cellBorder = 1
+const roleColors = new Map([
+  ['ADAM', 'red'],
+  ['STEVE', 'green'],
+  ['BOB', 'purple'],
+  ['VAL', 'blue'],
+  ['FIRESTONE', 'yellow'],
+  ['THERESA', 'white']
+])
+
+const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
+  const cellSize = 21 // TODO make these adjust dynamically
+  const cellBorder = .5
   const placeScale = cellSize + 2 * cellBorder
 
   return (
@@ -37,12 +46,12 @@ const GameBoard = ({ playerPositions }) => {
             }}
                 onClick={(e) => {
                 e.preventDefault()
-                // movePlayerToPlace(place.key)
+                movePlayerToPlace(place.key)
               }}
             ></img>
             
             {/* List of tokens in a room (just the player for now) */}
-            {Array.from(playerPositions, (position) =>  (
+            {Array.from(playerPositions, ([role, position]) =>  (
               position.place === place.key &&
               <img
                 style={{
@@ -50,7 +59,7 @@ const GameBoard = ({ playerPositions }) => {
                   position: "relative",
                   margin: 'auto',
                 }}
-                src='./src/assets//pieceIcons/piece-purple.png'>
+                src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}>
               </img>
             ))}
           </div>
@@ -74,17 +83,17 @@ const GameBoard = ({ playerPositions }) => {
               }}
                 onClick={(e) => {
                   e.preventDefault()
-                  // movePlayerToCell(colKey, rowKey)
+                  movePlayerToCell(colKey, rowKey)
                 }}>
                   {/* {`${colKey}, ${rowKey}`} */}
-                  {Array.from(playerPositions, (position) => (
+                  {Array.from(playerPositions, ([role, position]) => (
                     position.x === colKey && position.y === rowKey &&
                     <img
                       style={{
                         height: cellSize,
                         objectFit: 'contain'
                       }}
-                      src='./src/assets//pieceIcons/piece-purple.png'>
+                      src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}>
                     </img>
                   ))}
                 </div>

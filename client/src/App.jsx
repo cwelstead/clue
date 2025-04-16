@@ -19,6 +19,7 @@ function App() {
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState("")
     const [playerPositions, setPlayerPositions] = useState(null)
+    const [role, setRole] = useState("")
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -131,7 +132,17 @@ function App() {
     }
 
     // Functions to manipulate GameState
+    function movePlayerToPlace(place) {
+        socket.emit('move-place', ({id: user.id, destPlace: place}))
+    }
 
+    function movePlayerToCell(x, y) {
+        socket.emit('move-cell', ({
+            id: user.id,
+            destX: x,
+            destY: y,
+        }))
+    }
 
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
@@ -166,7 +177,6 @@ function App() {
 
         socket.on('game-start-success', (playerPositions) => {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
-            console.log(`Player positions: ${playerPositions}`)
         })
     })
 
@@ -175,7 +185,10 @@ function App() {
         if (lobby) {
             if (playerPositions) {
                 return (
-                    <GameState playerPositions={playerPositions} />
+                    <GameState
+                        playerPositions={playerPositions}
+                        movePlayerToPlace={movePlayerToPlace}
+                        movePlayerToCell={movePlayerToCell} />
                 )
             } else {
                 return (
