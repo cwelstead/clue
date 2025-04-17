@@ -1,10 +1,10 @@
 import React, { useState } from "react"
 import { Alert } from "react-bootstrap"
-import {useAuth} from "../authContext"
+import { useAuth } from "../authContext"
 import { useNavigate } from "react-router-dom"
 
 
-export function Login({handleSignUp, handleLogin}) {
+export function Login({ handleLogin, navigateToSignUp }) {
     const { login } = useAuth()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -14,6 +14,7 @@ export function Login({handleSignUp, handleLogin}) {
     
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setLoading(true)
     
         try {
           await handleLogin(email, password)
@@ -23,8 +24,7 @@ export function Login({handleSignUp, handleLogin}) {
         }
     
         setLoading(false)
-      }
-
+    }
     
     return (
         <div style={{
@@ -104,6 +104,7 @@ export function Login({handleSignUp, handleLogin}) {
             {/* Login Button */}
             <button 
                 onClick={handleSubmit}
+                disabled={loading}
                 style={{
                     height: '55px',
                     background: 'linear-gradient(180deg, rgba(225,181,48,1) 0%, rgba(212,160,23,1) 100%)',
@@ -118,12 +119,12 @@ export function Login({handleSignUp, handleLogin}) {
                     transition: 'opacity 0.2s',
                 }}
             >
-            LOGIN
+                {loading ? "LOGGING IN..." : "LOGIN"}
             </button>
     
             {/* Sign Up Button */}
             <button 
-                onClick={() => handleSignUp(email,password)}
+                onClick={navigateToSignUp}
                 style={{
                     width: '100%',
                     height: '55px',

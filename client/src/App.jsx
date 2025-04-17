@@ -6,20 +6,18 @@ import { socket } from './socket.js'
 import { useEffect } from 'react'
 import { Roles } from '../../classes/Lobby.js'
 import { LoginPage } from './components/LoginPage.jsx'
+import { SignUp } from './components/SignUp.jsx' // Make sure to import SignUp
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { InGame } from './components/InGame.jsx'
 
-/*
- * THIS FILE IS FOR CLIENT-SIDE LOGIC
- * 
- * Authors: Cole Welstead
-*/
 
 function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState("")
     const [gameState, setGameState] = useState(null)
+    // Add a new state to track which auth page to display
+    const [authPage, setAuthPage] = useState("login") // can be "login" or "signup"
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -60,7 +58,6 @@ function App() {
             });
     }
     
-
     function onSignUp(email, password) {
         console.log("sign up button clicked")
         const auth = getAuth();
@@ -102,7 +99,15 @@ function App() {
             });
     }
 
+    // Functions to switch between login and signup pages
+    function navigateToSignUp() {
+        setAuthPage("signup");
+        console.log("oh yeah")
+    }
     
+    function navigateToLogin() {
+        setAuthPage("login");
+    }
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
@@ -191,9 +196,21 @@ function App() {
             )
         }
     } else {
-        return (
-            <LoginPage handleLogin={onLogin} handleSignUp={onSignUp}/>
-        )
+        // Return different auth components based on authPage state
+        if (authPage === "login") {
+            console.log("trying something here")
+            return (
+                <LoginPage 
+                    handleLogin={onLogin} 
+                    navigateToSignUp={navigateToSignUp} />
+            )
+        } else {
+            return (
+                <SignUp 
+                    handleSignUp={onSignUp}
+                    navigateToLogin={navigateToLogin} />
+            )
+        }
     }
 }
 
