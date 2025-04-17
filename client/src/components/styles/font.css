@@ -1,0 +1,89 @@
+@font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/PlayfairDisplayBold.ttf");
+    font-family: "Playfair Display";
+    font-weight: 700;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/InterMedium.ttf");
+    font-family: "Inter";
+    font-weight: 500;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/BowlbyOneRegular.ttf");
+    font-family: "Bowlby One";
+    font-weight: 400;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/IBMPlexMonoLight.ttf");
+    font-family: "IBM Plex Mono";
+    font-weight: 300;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/InterBold.ttf");
+    font-family: "Inter";
+    font-weight: 700;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/IBMPlexMonoMedium.ttf");
+    font-family: "IBM Plex Mono";
+    font-weight: 500;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/InterRegular.ttf");
+    font-family: "Inter";
+    font-weight: 400;
+  }
+
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/HubballiRegular.ttf");
+    font-family: "Hubballi";
+    font-weight: 400;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/IBMPlexMonoRegular.ttf");
+    font-family: "IBM Plex Mono";
+    font-weight: 400;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/BricolageGrotesqueSemiBold.ttf");
+    font-family: "Bricolage Grotesque";
+    font-weight: 600;
+  }
+  
+  @font-face {
+    font-display: swap;
+    font-style: normal;
+    src: url("/fonts/BricolageGrotesqueMedium.ttf");
+    font-family: "Bricolage Grotesque";
+    font-weight: 500;
+  }
+  
+  

@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+       /* ------Color variables------ */
+        --black_900: #000000;
+        --black_900_19: #00000019;
+        --black_900_3f: #0000003f;
+        --blue_gray_100: #d9d9d9;
+        --blue_gray_100_01: #d1d1d1;
+        --blue_gray_900: #373029;
+        --blue_gray_900_01: #2c2c2c;
+        --blue_gray_900_b2: #373029b2;
+        --gray_600: #7a7a7a;
+        --gray_600_01: #727272;
+        --gray_600_02: #6e6e6e;
+        --gray_600_3a: #7979793a;
+        --gray_800: #464039;
+        --gray_800_01: #4d4844;
+        --gray_800_02: #4d4843;
+        --gray_800_03: #423c35;
+        --gray_800_04: #4b4641;
+        --gray_800_05: #453f38;
+        --gray_900_01: #5a1a1a;
+        --gray_900_33: #2a1a1a33;
+        --gray_900_77: #2a1a1a77;
+        --gray_900_91: #2a1a1a91;
+        --green_900: #005400;
+        --lime_100: #f5e6d0;
+        --lime_50: #f8f5e3;
+        --pink_900: #702023;
+        --red_300: #c19a6b;
+        --red_900: #7f1700;
+        --red_900_01: #7f0000;
+        --red_a700: #ce0000;
+        --white_a700: #ffffff;
+        --yellow_700: #e1b530;
+        --yellow_800: #d4a017;
+
+    /* ------Shadow variables------ */
+        --shadow-xs: 0 3.82px 3px 0 #0000003f;
+        --shadow-bs: inset 0 0 100px 100px #00000019;
+        --shadow-bs1: inset 0 0 100px 100px #0000003f;
+
+    /* ------Border radius variables------ */
+        --radius-xs: 1px;
+        --radius-sm: 8px;
+        --radius-md: 18px;
+        --radius-lg: 20px;
+        --radius-xl: 22px;
+
+    /* ------Spacing variables------ */
+        --space-xs: 6px;
+        --space-sm: 8px;
+        --space-md: 12px;
+    }
+
+    [type="text"],
+    input:where(:not([type])),
+    [type="email"],
+    [type="url"],
+    [type="password"],
+    [type="number"],
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="search"],
+    [type="tel"],
+    [type="time"],
+    [type="week"],
+    [multiple],
+    textarea,
+    select {
+        appearance: none;
+        background-color: transparent;
+        border-color: unset;
+        border-width: 0;
+        border-radius: unset;
+        padding: unset;
+        font-size: unset;
+        line-height: unset;
+    }
+
+    /* Override default focus colors for tailwindcss-forms */
+    [type="text"]:focus,
+    [type="email"]:focus,
+    [type="url"]:focus,
+    [type="password"]:focus,
+    [type="number"]:focus,
+    [type="date"]:focus,
+    [type="search"]:focus,
+    [multiple]:focus,
+    textarea:focus,
+    select:focus {
+        --tw-ring-color: transparent;
+        border-color: transparent;
+    }
+
+    [type="radio"]:focus,
+    [type="checkbox"]:focus {
+        --tw-ring-color: transparent;
+    }
+}
