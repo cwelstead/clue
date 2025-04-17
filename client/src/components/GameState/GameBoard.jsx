@@ -53,7 +53,7 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
             {/* List of tokens in a room (just the player for now) */}
             {Array.from(playerPositions, ([role, position]) =>  (
               position.place === place.key &&
-              <img
+              <img key={role}
                 style={{
                   height: cellSize,
                   position: "relative",
@@ -88,7 +88,7 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
                   {/* {`${colKey}, ${rowKey}`} */}
                   {Array.from(playerPositions, ([role, position]) => (
                     position.x === colKey && position.y === rowKey &&
-                    <img
+                    <img key={role}
                       style={{
                         height: cellSize,
                         objectFit: 'contain'

@@ -1,12 +1,12 @@
 import Board from "./Board.js"
 
 const startingPositions = {
-    ADAM: {x: 7, y: 24, place: ""},
-    STEVE: {x: 14, y: 0, place: ""},
-    BOB: {x: 23, y: 19, place: ""},
-    VAL: {x: 23, y: 6, place: ""},
-    FIRESTONE: {x: 0, y: 17, place: ""},
-    THERESA: {x: 9, y: 0, place: ""}
+    "Adam": {x: 7, y: 24, place: ""},
+    "Dr Cooper": {x: 14, y: 0, place: ""},
+    "Bob": {x: 23, y: 19, place: ""},
+    "Val": {x: 23, y: 6, place: ""},
+    "Firestone": {x: 0, y: 17, place: ""},
+    "Theresa": {x: 9, y: 0, place: ""}
 }
 
 export class GameState {
@@ -18,10 +18,10 @@ export class GameState {
     }
 
     movePlayerToCell(player, destX, destY) {
-        playerPosition = this._playerPositions.get(player.role)
-        currX = playerPosition.x
-        currY = playerPosition.y
-        currPlace = playerPosition.place
+        const playerPosition = this._playerPositions.get(player.role)
+        const currX = playerPosition.x
+        const currY = playerPosition.y
+        const currPlace = playerPosition.place
 
         if (currX >= 0 && currY >= 0) {
             if (Math.abs(playerPosition.x - destX) + Math.abs(playerPosition.y - destY) <= 1) {
@@ -43,13 +43,13 @@ export class GameState {
     }
 
     movePlayerToPlace(player, destPlace) {
-        playerPosition = this._playerPositions.get(player.role)
+        const playerPosition = this._playerPositions.get(player.role)
 
         Board.PLACES.forEach(place => {
             if (destPlace == place.key) {
                 place.adjacentSpaces.forEach(exit => {
                     if (exit.x == playerPosition.x && exit.y == playerPosition.y) {
-                        setPlayerPosition({x: -1, y: -1, place: destPlace})
+                        this._playerPositions.set(player.role, {x: -1, y: -1, place: destPlace})
                     }
                 })
             }

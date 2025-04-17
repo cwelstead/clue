@@ -242,6 +242,7 @@ io.on('connection', socket => {
         const gameState = gameStates.get(lobby.getID())
 
         gameState.movePlayerToPlace(player, destPlace)
+        io.to(lobby.getID()).emit('player-position-update', (gameState.getPlayerPositions()))
     })
 
     socket.on('move-cell', ({id, destX, destY}) => {
@@ -250,6 +251,7 @@ io.on('connection', socket => {
         const gameState = gameStates.get(lobby.getID())
 
         gameState.movePlayerToCell(player, destX, destY)
+        io.to(lobby.getID()).emit('player-position-update', (gameState.getPlayerPositions()))
     })
 
     // When user disconnects

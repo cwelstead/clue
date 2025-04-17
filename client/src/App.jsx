@@ -178,6 +178,10 @@ function App() {
         socket.on('game-start-success', (playerPositions) => {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
         })
+
+        socket.on('player-position-update', (playerPositions) => {
+            setPlayerPositions(new Map(JSON.parse(playerPositions)))
+        })
     })
 
     // Front-end code, returns the correct screen based on gathered data
