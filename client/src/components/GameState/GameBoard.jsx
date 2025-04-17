@@ -3,12 +3,12 @@ import styles from './GameBoard.module.css';
 import Board from '../../../../classes/Board.js';
 
 const roleColors = new Map([
-  ['ADAM', 'red'],
-  ['STEVE', 'green'],
-  ['BOB', 'purple'],
-  ['VAL', 'blue'],
-  ['FIRESTONE', 'yellow'],
-  ['THERESA', 'white']
+  ['Adam', 'red'],
+  ['Dr Cooper', 'green'],
+  ['Bob', 'purple'],
+  ['Val', 'blue'],
+  ['Firestone', 'yellow'],
+  ['Theresa', 'white']
 ])
 
 const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
