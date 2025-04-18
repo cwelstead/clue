@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import styles from './GameBoard.module.css';
 import Board from '../../../../classes/Board.js';
 
@@ -12,27 +12,22 @@ const roleColors = new Map([
 ])
 
 const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
-  const cellSize = 21 // TODO make these adjust dynamically
-  const cellBorder = .5
+  const cellSize = 24 // TODO make these adjust dynamically
+  const cellBorder = 1
   const placeScale = cellSize + 2 * cellBorder
 
   return (
-    <div className={styles.gameBoard} style={{position: 'relative',}}>
-      {/* Background Image */}
-      <img src= "src/assets/board.svg" alt="Game Board" className={styles.boardImage} style={{
-        position: "relative",
-      }}/>
-
+    <div className={styles.gameBoard} style={{display: 'flex', alignItems: 'stretch', position: 'relative', flex: '1'}}>
       {/* Grid */}
-      <div style={{position: "absolute", top: "54px"}}>
+      <div style={{flex: '1'}}>
 
         {/* Places */}
         {Board.PLACES.map(place =>
           <div key={place.key} style={{
             position: "absolute",
-            left: place.xPos * placeScale,
-            top: place.yPos * placeScale,
-            width: place.width * placeScale,
+            left: `${place.xPos * placeScale}%`,
+            top: '',
+            width: '',
             height: place.height * placeScale,
             boxSizing: 'border-box',
             alignContent: 'center',
@@ -64,22 +59,24 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
             ))}
           </div>
         )}
-
+        <div style={{display: 'flex', flex: '1', flexDirection: 'column', alignContent: 'stretch', height: '100vh', maxWidth: '100%', maxHeight: '100%'}}>
         {/* Cells */}
         {Board.BOARD.map((row, rowKey) => (
-          <div key={rowKey} style={{display: "flex", flexDirection: "row"}}>
+          <div key={rowKey} style={{display: 'flex', flex: '1 1 100%', flexDirection: 'row', alignContent: 'stretch', maxWidth: '100%', maxHeight: '100%'}}>
             {row.map((cell, colKey) => (
               <div key={`${colKey},${rowKey}`} style={{
                 position: "relative",
-                width: `${cellSize}px`,
-                height: `${cellSize}px`,
+                flex: '1',
+                maxWidth: '100%',
+                maxHeight: '100%',
                 backgroundColor: "#dbd8c6",
-                borderWidth: `${cellBorder}px`,
+                borderWidth: '1px',//`${cellBorder}px`,
                 borderColor: "#7e7f82",
                 borderStyle: "solid",
                 fontSize: "8px",
                 visibility: cell? "visible" : "hidden",
-                objectFit: 'contain'
+                objectFit: 'contain',
+                alignItems: 'center',
               }}
                 onClick={(e) => {
                   e.preventDefault()
@@ -90,8 +87,11 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
                     position.x === colKey && position.y === rowKey &&
                     <img key={role}
                       style={{
-                        height: cellSize,
-                        objectFit: 'contain'
+                        objectFit: 'contain',
+                        maxWidth: '60%',
+                        maxHeight: '100%',
+                        alignSelf: 'center',
+                        margin: 'auto',
                       }}
                       src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}>
                     </img>
@@ -100,6 +100,7 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
             ))}
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
