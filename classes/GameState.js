@@ -25,7 +25,16 @@ export class GameState {
 
         if (currX >= 0 && currY >= 0) {
             if (Math.abs(playerPosition.x - destX) + Math.abs(playerPosition.y - destY) <= 1) {
-                this._playerPositions.set(player.role, {x: destX, y: destY, place: ""})
+                let destOccupied = false
+                this._playerPositions.forEach((position) => {
+                    if (position.x == destX && position.y == destY) {
+                        destOccupied = true
+                    }
+                })
+                if (!destOccupied) {
+                    this._playerPositions.set(player.role, {x: destX, y: destY, place: ""})
+                    return true
+                }
             }
         } else if (currPlace) {
             Board.PLACES.forEach(place => {
@@ -33,6 +42,7 @@ export class GameState {
                     place.adjacentSpaces.forEach(exit => {
                         if (exit.x == destX && exit.y == destY) {
                             this._playerPositions.set(player.role, {x: destX, y: destY, place: ""})
+                            return true
                         }
                     })
                 }
@@ -40,6 +50,8 @@ export class GameState {
         } else {
             console.warn("Player didn't have a valid position, nor was it in a place. Might be in limbo?")
         }
+
+        return false
     }
 
     movePlayerToPlace(player, destPlace) {

@@ -107,7 +107,7 @@ export default class Board {
             xPos: 9,
             yPos: 18,
             width: 6,
-            height: 7.7,
+            height: 7.6,
             adjacentSpaces: [{x: 11, y: 17}, {x: 12, y: 17}, {x: 15, y: 20}],
             img: './src/assets/rooms/main-office.png'
         },
