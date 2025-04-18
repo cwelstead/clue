@@ -12,23 +12,24 @@ const roleColors = new Map([
 ])
 
 const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
-  const cellSize = 24 // TODO make these adjust dynamically
-  const cellBorder = 1
-  const placeScale = cellSize + 2 * cellBorder
+  const placePositionScale = 3.93
+  const placeSizeScale = 3.9
+  const placeXOffset = 2.5
+  const placeYOffset = 2.1
 
   return (
-    <div className={styles.gameBoard} style={{display: 'flex', alignItems: 'stretch', position: 'relative', flex: '1'}}>
+    <div className={styles.gameBoard} style={{display: 'flex', position: 'relative', flex: '1', aspectRatio: '1'}}>
       {/* Grid */}
-      <div style={{flex: '1'}}>
+      <div style={{flex: '1', aspectRatio: '1'}}>
 
         {/* Places */}
         {Board.PLACES.map(place =>
           <div key={place.key} style={{
             position: "absolute",
-            left: `${place.xPos * placeScale}%`,
-            top: '',
-            width: '',
-            height: place.height * placeScale,
+            left: `${place.xPos * placePositionScale + placeXOffset}%`,
+            top: `${place.yPos * placePositionScale + placeYOffset}%`,
+            width: 0,//`${place.width * placeSizeScale}%`,
+            height: `${place.height * placeSizeScale}%`,
             boxSizing: 'border-box',
             alignContent: 'center',
           }}>
@@ -66,16 +67,14 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
             {row.map((cell, colKey) => (
               <div key={`${colKey},${rowKey}`} style={{
                 position: "relative",
-                flex: '1',
-                maxWidth: '100%',
-                maxHeight: '100%',
+                flex: '-1',
+                aspectRatio: '1/1',
                 backgroundColor: "#dbd8c6",
-                borderWidth: '1px',//`${cellBorder}px`,
+                borderWidth: '1px',
                 borderColor: "#7e7f82",
                 borderStyle: "solid",
                 fontSize: "8px",
                 visibility: cell? "visible" : "hidden",
-                objectFit: 'contain',
                 alignItems: 'center',
               }}
                 onClick={(e) => {
@@ -87,11 +86,12 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
                     position.x === colKey && position.y === rowKey &&
                     <img key={role}
                       style={{
-                        objectFit: 'contain',
-                        maxWidth: '60%',
-                        maxHeight: '100%',
+                        minHeight: '100%',
+                        height: '0',
                         alignSelf: 'center',
-                        margin: 'auto',
+                        margin: '0',
+                        flex: '1',
+                        
                       }}
                       src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}>
                     </img>
