@@ -12,24 +12,21 @@ const roleColors = new Map([
 ])
 
 const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
-  const placePositionScale = 3.93
-  const placeSizeScale = 3.9
-  const placeXOffset = 2.5
-  const placeYOffset = 2.1
+  const placeScale = 4
 
   return (
     <div className={styles.gameBoard} style={{display: 'flex', position: 'relative', flex: '1', aspectRatio: '1'}}>
       {/* Grid */}
-      <div style={{flex: '1', aspectRatio: '1'}}>
+      <div style={{flex: '1', aspectRatio: '1', position: 'relative'}}>
 
         {/* Places */}
         {Board.PLACES.map(place =>
           <div key={place.key} style={{
             position: "absolute",
-            left: `${place.xPos * placePositionScale + placeXOffset}%`,
-            top: `${place.yPos * placePositionScale + placeYOffset}%`,
-            width: 0,//`${place.width * placeSizeScale}%`,
-            height: `${place.height * placeSizeScale}%`,
+            left: `${place.xPos * placeScale}%`,
+            top: `${place.yPos * placeScale}%`,
+            width: `${place.width * placeScale}%`,
+            height: `${place.height * placeScale}%`,
             boxSizing: 'border-box',
             alignContent: 'center',
           }}>
@@ -51,7 +48,7 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
               position.place === place.key &&
               <img key={role}
                 style={{
-                  height: cellSize,
+                  height: '20%',
                   position: "relative",
                   margin: 'auto',
                 }}
