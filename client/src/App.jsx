@@ -9,7 +9,7 @@ import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { SignUpPage } from './components/SignUpPage.jsx'
 
 /*

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-export function SignupPage({ handleSignUp }) {
+export function SignUpPage({ handleSignUp }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
