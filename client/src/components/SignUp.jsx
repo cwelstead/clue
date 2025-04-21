@@ -1,66 +1,155 @@
-import React, { useRef, useState } from "react";
-import { Form, Button, Card, Alert } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { signup } from "../firebase";
+import React, { useState } from "react"
+import { Alert } from "react-bootstrap"
+import {useAuth} from "../authContext"
+import { useNavigate } from "react-router-dom"
 
-export default function Signup() {
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const passwordConfirmRef = useRef();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+export function SignUp({handleSignUp}) {
+    const { signup } = useAuth()
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate();
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+    
+        try {
+          await handleSignUp(email, password)
+          navigate("/")
+        } catch {
+          setError("Failed to log in")
+        }
+    
+        setLoading(false)
+      }
 
-    if (passwordRef.current.value !== passwordConfirmRef.current.value) {
-      return setError("Passwords do not match");
-    }
+    
+    return (
+        <div style={{
+            padding: '20px',
+            position: 'relative',
+            backgroundColor: 'rgba(234, 215, 183, 1)',
+            backgroundBlendMode: 'overlay',
+            borderRadius: '8px',
+            border: '2px solid #C19A6B',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+            overflow: 'hidden',
+            }}>
+                
+            {error && <Alert variant="danger">{error}</Alert>}
+            {/* Username Field */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{
+                    fontFamily: 'Courier New',
+                    fontSize: '16px',
+                    letterSpacing: '0.08em',
+                    color: '#2C2C2C',
+                }}>
+                Username
+                </label>
+                <input
+                    type="text"
+                    placeholder="Enter your username, detective..."
+                    value={email}
+                    onChange={(e) => setUsername(e.target.value)}
+                    style={{
+                        height: '50px',
+                        background: '#F5E6D0',
+                        border: '1px solid #000000',
+                        borderRadius: '8px',
+                        padding: '0 15px',
+                        fontFamily: 'IBM Plex Mono',
+                        fontSize: '14px',
+                        fontWeight: 300,
+                        letterSpacing: '0.07em',
+                        color: '#6E6E6E',
+                    }}
+                />
+            </div>
 
-    try {
-      setError("");
-      setLoading(true);
-
-      // Use the signup function from firebase.js
-      await signup(emailRef.current.value, passwordRef.current.value);
-
-      navigate.push("/");
-    } catch (error) {
-      setError("Failed to create an account");
-    }
-
-    setLoading(false);
-  }
-
-  return (
-    <>
-      <Card>
-        <Card.Body>
-          <h2 className="text-center mb-4">Sign Up</h2>
-          {error && <Alert variant="danger">{error}</Alert>}
-          <Form onSubmit={handleSubmit}>
-            <Form.Group id="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} required />
-            </Form.Group>
-            <Form.Group id="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" ref={passwordRef} required />
-            </Form.Group>
-            <Form.Group id="password-confirm">
-              <Form.Label>Password Confirmation</Form.Label>
-              <Form.Control type="password" ref={passwordConfirmRef} required />
-            </Form.Group>
-            <Button disabled={loading} className="w-100" type="submit">
-              Sign Up
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
-      <div className="w-100 text-center mt-2">
-        Already have an account? <Link to="/login">Log In</Link>
-      </div>
-    </>
-  );
-}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{
+                    fontFamily: 'Courier New',
+                    fontSize: '16px',
+                    letterSpacing: '0.08em',
+                    color: '#2C2C2C',
+                }}>
+                Email
+                </label>
+                <input
+                    type="text"
+                    placeholder="Enter your email, detective..."
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                        height: '50px',
+                        background: '#F5E6D0',
+                        border: '1px solid #000000',
+                        borderRadius: '8px',
+                        padding: '0 15px',
+                        fontFamily: 'IBM Plex Mono',
+                        fontSize: '14px',
+                        fontWeight: 300,
+                        letterSpacing: '0.07em',
+                        color: '#6E6E6E',
+                    }}
+                />
+            </div>
+    
+            {/* Password Field */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{
+                    fontFamily: 'Courier New',
+                    fontSize: '16px',
+                    letterSpacing: '0.08em',
+                    color: '#2C2C2C',
+                }}>
+                    Password
+                </label>
+                <input
+                    type="password"
+                    placeholder="Secret Code..."
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{
+                    height: '50px',
+                    background: '#F5E6D0',
+                    border: '1px solid #000000',
+                    borderRadius: '8px',
+                    padding: '0 15px',
+                    fontFamily: 'IBM Plex Mono',
+                    fontSize: '14px',
+                    fontWeight: 300,
+                    letterSpacing: '0.07em',
+                    color: '#6E6E6E',
+                    }}
+                />
+            </div>
+    
+            {/* Sign Up Button */}
+            <button 
+                onClick={() => handleSignUp()}
+                style={{
+                    width: '100%',
+                    height: '55px',
+                    background: '#7F1700',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontFamily: 'Courier New',
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    color: '#E1B530',
+                    cursor: 'pointer',
+                    transition: 'opacity 0.2s',
+                }}
+            >
+                SIGN UP
+            </button>
+        </div>
+    );
+};

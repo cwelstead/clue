@@ -123,7 +123,7 @@ export function Login({handleSignUp, handleLogin}) {
     
             {/* Sign Up Button */}
             <button 
-                onClick={() => handleSignUp(email,password)}
+                onClick={() => handleSignUp()}
                 style={{
                     width: '100%',
                     height: '55px',

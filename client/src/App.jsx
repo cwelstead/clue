@@ -9,6 +9,8 @@ import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
+import { useNavigate, Routes, Route, Navigate } from "react-router-dom";
+import { SignupPage } from './components/SignUpPage.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -21,6 +23,7 @@ function App() {
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState("")
     const [gameState, setGameState] = useState(null)
+    const navigate = useNavigate();
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -50,6 +53,7 @@ function App() {
                                 id: socket.id,
                             });
                             setUser({ name: email, id: socket.id });
+                            navigate("/"); // Navigate to home after successful login
                         } else {
                             console.error("Authentication failed on backend:", data.message);
                         }
@@ -61,7 +65,6 @@ function App() {
             });
     }
     
-
     function onSignUp(email, password) {
         console.log("sign up button clicked")
         const auth = getAuth();
@@ -92,6 +95,7 @@ function App() {
                                 id: socket.id,
                             });
                             setUser({ name: email, id: socket.id });
+                            navigate("/"); // Navigate to home after successful signup
                         } else {
                             console.error("Registration failed on backend:", data.message);
                         }
@@ -103,7 +107,9 @@ function App() {
             });
     }
 
-    
+    function redirectToSignup() {
+        navigate("/signup");
+    }
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
@@ -167,35 +173,31 @@ function App() {
         socket.on('game-start-success', (game) => {
             setGameState(game)
         })
-    })
+    }, [lobby]); // Added dependency array to prevent re-attaching listeners
 
-    // Front-end code, returns the correct screen based on gathered data
-    if (user) {
-        if (lobby) {
-            if (gameState) {
-                return (
-                    <GameState />
-                )
-            } else {
-                return (
-                    <InLobby
-                        lobby={lobby}
-                        onReadyToggle={readyToggle}
-                        onSwitchRole={switchRole}
-                        onLeave={leaveLobby}
-                        onGo={startGame} />
-                )
-            }
-        } else {
-            return (
-                <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
-            )
-        }
-    } else {
-        return (
-            <LoginPage handleLogin={onLogin} handleSignUp={onSignUp}/>
-        )
-    }
+    // Routes setup for React Router
+    return (
+        <Routes>
+            <Route path="/login" element={
+                !user ? <LoginPage handleLogin={onLogin} handleSignUp={redirectToSignup} /> : <Navigate to="/" />
+            } />
+            <Route path="/signup" element={
+                !user ? <SignupPage handleSignUp={onSignUp} /> : <Navigate to="/" />
+            } />
+            <Route path="/" element={
+                user ? (
+                    lobby ? (
+                        gameState ? <GameState /> : <InLobby
+                            lobby={lobby}
+                            onReadyToggle={readyToggle}
+                            onSwitchRole={switchRole}
+                            onLeave={leaveLobby}
+                            onGo={startGame} />
+                    ) : <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
+                ) : <Navigate to="/login" />
+            } />
+        </Routes>
+    );
 }
 
 export default App
