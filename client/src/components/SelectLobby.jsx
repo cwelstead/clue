@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { socket } from '../socket.js';
 
-export function SelectLobby({ user, onLobbyJoin }) {
+export function SelectLobby({ user, onLobbyJoin, setNavState }) {
     const [lobbyID, setLobbyID] = useState("");
     
     useEffect(() => {
@@ -157,6 +157,17 @@ export function SelectLobby({ user, onLobbyJoin }) {
                     }}
                 >
                     CREATE LOBBY
+                </button>
+                <button
+                    onClick={(e) => {
+                        e.preventDefault()
+                        setNavState("")
+                    }}
+                    style={{
+                        // TODO: Style this button pretty please
+                    }}
+                >
+                    BACK
                 </button>
             </div>
         </div>

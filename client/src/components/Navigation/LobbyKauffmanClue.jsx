@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "./LobbyComponents";
 import { SelectLobby } from "../SelectLobby";
 
-export default function LobbyKauffmanClue({ backgroundImage }) {
+export default function LobbyKauffmanClue({ backgroundImage, setNavState }) {
   return (
     <div
       className="lobby-wrapper"
@@ -81,7 +81,7 @@ export default function LobbyKauffmanClue({ backgroundImage }) {
             gap: '1rem',
             width: '100%',
           }}>
-            <Button
+            <button
               className="btn-dark"
               style={{
                 backgroundColor: 'rgba(43, 43, 43, 0.95)',
@@ -93,11 +93,15 @@ export default function LobbyKauffmanClue({ backgroundImage }) {
                 marginBottom: '12px',
                 width: '100%',
                 color: 'white',
+              }}
+              onClick={(e) => {
+                e.preventDefault()
+                // setNavState("instructions")
               }}
             >
               Instructions
-            </Button>
-            <Button
+            </button>
+            <button
               className="btn-dark"
               style={{
                 backgroundColor: 'rgba(43, 43, 43, 0.95)',
@@ -110,10 +114,14 @@ export default function LobbyKauffmanClue({ backgroundImage }) {
                 width: '100%',
                 color: 'white',
               }}
+              onClick={(e) => {
+                e.preventDefault()
+                // setNavState("player-profile")
+              }}
             >
               Player Profile
-            </Button>
-            <Button
+            </button>
+            <button
               className="btn-yellow"
               style={{
                 backgroundColor: '#d4a017',
@@ -125,9 +133,13 @@ export default function LobbyKauffmanClue({ backgroundImage }) {
                 width: '100%',
                 color: 'white',
               }}
+              onClick={(e) => {
+                e.preventDefault()
+                setNavState("lobby-select")
+              }}
             >
               Solve A Case
-            </Button>
+            </button>
           </div>
         </div>
       </div>
