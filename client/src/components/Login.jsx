@@ -124,11 +124,8 @@ export function Login({ handleLogin }) {
     
             {/* Sign Up Button */}
             <button 
-<<<<<<< Updated upstream
-                onClick={() => handleSignUp()}
-=======
+
                 onClick={() => redirectToSignup}
->>>>>>> Stashed changes
                 style={{
                     width: '100%',
                     height: '55px',

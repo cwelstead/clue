@@ -2,11 +2,8 @@ import React, { useState } from "react";
 import { Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-<<<<<<< Updated upstream
 export function SignupPage({ handleSignUp }) {
-=======
-export function SignUpPage({ handleSignUp }) {
->>>>>>> Stashed changes
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -257,9 +254,5 @@ export function SignUpPage({ handleSignUp }) {
                 }}
             />
         </div>
-<<<<<<< Updated upstream
     );
 }
-=======
-    );}
->>>>>>> Stashed changes

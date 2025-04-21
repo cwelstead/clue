@@ -9,13 +9,8 @@ import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
-<<<<<<< Updated upstream
-import { useNavigate, Routes, Route, Navigate } from "react-router-dom";
-import { SignupPage } from './components/SignUpPage.jsx'
-=======
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { SignUpPage } from './components/SignUpPage.jsx'
->>>>>>> Stashed changes
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -180,16 +175,6 @@ function App() {
         })
     }, [lobby]); // Added dependency array to prevent re-attaching listeners
 
-<<<<<<< Updated upstream
-    // Routes setup for React Router
-    return (
-        <Routes>
-            <Route path="/login" element={
-                !user ? <LoginPage handleLogin={onLogin} handleSignUp={redirectToSignup} /> : <Navigate to="/" />
-            } />
-            <Route path="/signup" element={
-                !user ? <SignupPage handleSignUp={onSignUp} /> : <Navigate to="/" />
-=======
     // Front-end code, returns the correct screen based on gathered data
     if (user) {
         if (lobby) {
@@ -220,7 +205,6 @@ function App() {
             } />
             <Route path="/signup" element={
                 !user ? <SignUpPage handleSignUp={onSignUp} /> : <Navigate to="/" />
->>>>>>> Stashed changes
             } />
             <Route path="/" element={
                 user ? (
@@ -235,12 +219,8 @@ function App() {
                 ) : <Navigate to="/login" />
             } />
         </Routes>
-<<<<<<< Updated upstream
-    );
-=======
         )
     }
->>>>>>> Stashed changes
 }
 
 export default App
