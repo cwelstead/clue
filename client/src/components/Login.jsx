@@ -4,7 +4,7 @@ import {useAuth} from "../authContext"
 import { useNavigate } from "react-router-dom"
 
 
-export function Login({handleSignUp, handleLogin}) {
+export function Login({ handleLogin }) {
     const { login } = useAuth()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -24,6 +24,7 @@ export function Login({handleSignUp, handleLogin}) {
     
         setLoading(false)
       }
+      
 
     
     return (
@@ -123,7 +124,11 @@ export function Login({handleSignUp, handleLogin}) {
     
             {/* Sign Up Button */}
             <button 
+<<<<<<< Updated upstream
                 onClick={() => handleSignUp()}
+=======
+                onClick={() => redirectToSignup}
+>>>>>>> Stashed changes
                 style={{
                     width: '100%',
                     height: '55px',
