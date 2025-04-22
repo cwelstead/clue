@@ -164,7 +164,22 @@ export function SelectLobby({ user, onLobbyJoin, setNavState }) {
                         setNavState("")
                     }}
                     style={{
-                        // TODO: Style this button pretty please
+                        width: '100%',
+                        height: '35px',
+                        background: 'transparent',
+                        border: '1px solid #7F1700',
+                        borderRadius: '4px',
+                        fontFamily: 'Courier New',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        letterSpacing: '0.05em',
+                        color: '#7F1700',
+                        cursor: 'pointer',
+                        padding: '0 15px',
+                        transition: 'background-color 0.2s',
+                        marginRight: '10px',
+                        display: 'block',  // Make it a block element
+                        margin: '0 auto',  // Center it horizontally
                     }}
                 >
                     BACK
