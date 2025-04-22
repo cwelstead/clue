@@ -19,7 +19,6 @@ function App() {
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState("")
     const [playerPositions, setPlayerPositions] = useState(null)
-    const [role, setRole] = useState("")
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -175,11 +174,12 @@ function App() {
             })
         })
 
-        socket.on('game-start-success', (playerPositions) => {
+        socket.on('game-start-success', ({playerPositions, currentPlayer, spacesToMove}) => {
+            console.log("Game start success!")
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
         })
 
-        socket.on('player-position-update', (playerPositions) => {
+        socket.on('gamestate-update', ({playerPositions, currentPlayer, spacesToMove}) => {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
         })
     })

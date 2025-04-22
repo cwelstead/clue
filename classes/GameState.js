@@ -30,10 +30,26 @@ export class GameState {
     // Increments the turn counter and returns whose turn is up next.
     nextTurn() {
         this._turnIdx = (this._turnIdx + 1) % this._turnOrder.length
-        return this.getCurrentPlayer()
+
+        // TEMPORARY: Set spacesToMove to 3, placeholder for rolling
+        this._spacesToMove = 3
+
+        console.log("Next player!")
+    }
+
+    getSpacesToMove() {
+        return this._spacesToMove
+    }
+
+    spaceMoved() {
+        this._spacesToMove -= 1
+        return this._spacesToMove
     }
 
     movePlayerToCell(player, destX, destY) {
+        if (this._spacesToMove <= 0) return false
+
+        let moveSuccessful = false
         const playerPosition = this._playerPositions.get(player.role)
         const currX = playerPosition.x
         const currY = playerPosition.y
@@ -49,7 +65,7 @@ export class GameState {
                 })
                 if (!destOccupied) {
                     this._playerPositions.set(player.role, {x: destX, y: destY, place: ""})
-                    return true
+                    moveSuccessful = true
                 }
             }
         } else if (currPlace) {
@@ -57,8 +73,16 @@ export class GameState {
                 if (currPlace == place.key) {
                     place.adjacentSpaces.forEach(exit => {
                         if (exit.x == destX && exit.y == destY) {
-                            this._playerPositions.set(player.role, {x: destX, y: destY, place: ""})
-                            return true
+                            let destOccupied = false
+                            this._playerPositions.forEach((position) => {
+                                if (position.x == destX && position.y == destY) {
+                                    destOccupied = true
+                                }
+                            })
+                            if (!destOccupied) {
+                                this._playerPositions.set(player.role, {x: destX, y: destY, place: ""})
+                                moveSuccessful = true
+                            }
                         }
                     })
                 }
@@ -67,10 +91,13 @@ export class GameState {
             console.warn("Player didn't have a valid position, nor was it in a place. Might be in limbo?")
         }
 
-        return false
+        return moveSuccessful
     }
 
     movePlayerToPlace(player, destPlace) {
+        if (this._spacesToMove <= 0) return false
+
+        let moveSuccessful = false
         const playerPosition = this._playerPositions.get(player.role)
 
         Board.PLACES.forEach(place => {
@@ -78,10 +105,13 @@ export class GameState {
                 place.adjacentSpaces.forEach(exit => {
                     if (exit.x == playerPosition.x && exit.y == playerPosition.y) {
                         this._playerPositions.set(player.role, {x: -1, y: -1, place: destPlace})
+                        moveSuccessful = true
                     }
                 })
             }
         })
+
+        return moveSuccessful
     }
 
     getPlayerPositions() {
@@ -89,11 +119,13 @@ export class GameState {
     }
 
     determineTurnOrder(players) {
+        // may not work as intended, but doesn't break so not a concern rn
         let playerIDs = JSON.parse(players).map(row => row[0])
         let turnOrder = []
         
-        while (playerIDs) {
-            turnOrder.push = playerIDs.splice(Math.floor(Math.random() * playerIDs.length), 1)
+        while (playerIDs.length > 0) {
+            console.log(`Shuffling turn order... ${playerIDs.length} roles left`)
+            turnOrder.push(playerIDs.splice(Math.floor(Math.random() * playerIDs.length), 1))
         }
 
         return turnOrder

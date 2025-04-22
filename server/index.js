@@ -193,9 +193,15 @@ io.on('connection', socket => {
 
         try {
             if (lobby.readyToStart()) {
-                const game = new GameState(lobby)
-                gameStates.set(lobby.getID(), game)
-                io.to(lobby.getID()).emit('game-start-success', (game.getPlayerPositions()))
+                console.log(`Starting game for lobby ${lobby.getID()}`)
+                const gameState = new GameState(lobby)
+                gameStates.set(lobby.getID(), gameState)
+                gameState.nextTurn()
+                io.to(lobby.getID()).emit('game-start-success', ({
+                    playerPositions: gameState.getPlayerPositions(),
+                    currentPlayer: gameState.nextTurn(),
+                    spacesToMove: gameState.getSpacesToMove()
+                }))
             }
         } catch (e) {
             console.log(`Error starting game: ${e}`)
@@ -241,8 +247,16 @@ io.on('connection', socket => {
         const player = lobby.getPlayer(id)
         const gameState = gameStates.get(lobby.getID())
 
-        gameState.movePlayerToPlace(player, destPlace)
-        io.to(lobby.getID()).emit('player-position-update', (gameState.getPlayerPositions()))
+        // Step 1: Move the player
+        if (id == gameState.getCurrentPlayer() && gameState.movePlayerToPlace(player, destPlace)) {
+            // Step 2: Moving to a place ends turn
+            gameState.nextTurn()
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayer(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
     })
 
     socket.on('move-cell', ({id, destX, destY}) => {
@@ -250,8 +264,18 @@ io.on('connection', socket => {
         const player = lobby.getPlayer(id)
         const gameState = gameStates.get(lobby.getID())
 
-        gameState.movePlayerToCell(player, destX, destY)
-        io.to(lobby.getID()).emit('player-position-update', (gameState.getPlayerPositions()))
+        if (id == gameState.getCurrentPlayer() && gameState.movePlayerToCell(player, destX, destY)) {
+            // If out of spaces to move, end turn
+            if (gameState.spaceMoved() === 0) {
+                gameState.nextTurn()
+            }
+
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayer(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
     })
 
     // When user disconnects
