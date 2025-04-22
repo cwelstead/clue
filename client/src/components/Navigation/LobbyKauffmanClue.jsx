@@ -1,6 +1,7 @@
 import React from "react";
 import { Button } from "./LobbyComponents";
 import { SelectLobby } from "../SelectLobby";
+import KauffmanClueInstructions from "../KauffmanClueInstructions";
 
 export default function LobbyKauffmanClue({ backgroundImage, setNavState }) {
   return (
@@ -81,26 +82,7 @@ export default function LobbyKauffmanClue({ backgroundImage, setNavState }) {
             gap: '1rem',
             width: '100%',
           }}>
-            <button
-              className="btn-dark"
-              style={{
-                backgroundColor: 'rgba(43, 43, 43, 0.95)',
-                border: '2px solid white',
-                borderRadius: '10px',
-                height: '82px',
-                fontSize: '23px',
-                fontWeight: '400',
-                marginBottom: '12px',
-                width: '100%',
-                color: 'white',
-              }}
-              onClick={(e) => {
-                e.preventDefault()
-                // setNavState("instructions")
-              }}
-            >
-              Instructions
-            </button>
+            <KauffmanClueInstructions/>
             <button
               className="btn-dark"
               style={{

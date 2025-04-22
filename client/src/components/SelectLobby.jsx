@@ -41,7 +41,7 @@ export function SelectLobby({ user, onLobbyJoin, setNavState }) {
                 }}
             >
                 <img 
-                    src="src/assets/kauffman-building.png"
+                    src="/src/assets/KauffmanLobby.png"
                     alt="background"
                     style={{
                         width: '100%',

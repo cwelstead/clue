@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import LobbyKauffmanClue from "./LobbyKauffmanClue";
-import backgroundImage from "/KauffmanLobby.png";
+import backgroundImage from "../../assets/kauffman-building.png";
 import { SelectLobby } from "../SelectLobby";
 
 export default function LOBBYPage({ user, onLobbyJoin }) {
