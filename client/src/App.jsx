@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import './index.css'
 import { SelectLobby } from './components/SelectLobby.jsx'
 import { InLobby } from './components/InLobby.jsx'
 import { socket } from './socket.js'
@@ -9,6 +10,7 @@ import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
+import LOBBYPage from "./components/Navigation/index.jsx"
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -188,7 +190,7 @@ function App() {
             }
         } else {
             return (
-                <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
+                <LOBBYPage solveACase={SelectLobby}/>
             )
         }
     } else {
