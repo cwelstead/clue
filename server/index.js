@@ -199,7 +199,7 @@ io.on('connection', socket => {
                 gameState.nextTurn()
                 io.to(lobby.getID()).emit('game-start-success', ({
                     playerPositions: gameState.getPlayerPositions(),
-                    currentPlayer: gameState.nextTurn(),
+                    currentPlayer: gameState.getCurrentPlayerRole(),
                     spacesToMove: gameState.getSpacesToMove()
                 }))
             }
@@ -253,7 +253,7 @@ io.on('connection', socket => {
             gameState.nextTurn()
             io.to(lobby.getID()).emit('gamestate-update', ({
                 playerPositions: gameState.getPlayerPositions(),
-                currentPlayer: gameState.getCurrentPlayer(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
                 spacesToMove: gameState.getSpacesToMove()
             }))
         }
@@ -272,7 +272,7 @@ io.on('connection', socket => {
 
             io.to(lobby.getID()).emit('gamestate-update', ({
                 playerPositions: gameState.getPlayerPositions(),
-                currentPlayer: gameState.getCurrentPlayer(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
                 spacesToMove: gameState.getSpacesToMove()
             }))
         }

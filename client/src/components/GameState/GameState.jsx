@@ -6,7 +6,7 @@ import Controls from './Controls';
 import CurrentPlayer from './CurrentPlayer';
 import ClueInfoSheet from '../ClueInfoSheet'; // Import the ClueInfoSheet component
 
-const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
+const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, currentPlayer, spacesToMove }) => {
   const [isNotesOpen, setIsNotesOpen] = useState(false); // State for overlay visibility
 
   const handleNotesClick = () => {
@@ -26,7 +26,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
       <div className={styles.rightSide}>
         <div className={styles.topRight}>
           <Controls onNotesClick={handleNotesClick} />
-          <CurrentPlayer />
+          <CurrentPlayer currentPlayer={currentPlayer} />
         </div>
       </div>
       {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} />} {/* Conditionally render the ClueInfoSheet component */}

@@ -17,8 +17,10 @@ import GameState from "./components/GameState/GameState.jsx"
 function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
-    const [lobby, setLobby] = useState("")
+    const [lobby, setLobby] = useState({})
     const [playerPositions, setPlayerPositions] = useState(null)
+    const [currentPlayer, setCurrentPlayer] = useState("")
+    const [spacesToMove, setSpacesToMove] = useState(-1)
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -151,13 +153,16 @@ function App() {
 
         socket.on('lobby-join-success', ({ name, id, players, takenRoles }) => {
             console.log(`Lobby joined: ${name} with ID ${id}`)
-            setLobby({
+            setLobby(lobby => ({
+                ...lobby,
+                ...{
                 name: name,
                 id: id,
                 players: new Map(JSON.parse(players)),
                 takenRoles: new Set(JSON.parse(takenRoles)),
                 readyToStart: false
-            })
+                }
+            }))
         })
 
         socket.on('lobby-join-fail', (lobbyID) => {
@@ -165,34 +170,41 @@ function App() {
         })
 
         socket.on('lobby-update', ({ players, takenRoles, readyToStart }) => {
-            setLobby({
-                name: lobby.name,
-                id: lobby.id,
+            setLobby(lobby => ({
+                ...lobby,
+                ...{
                 players: new Map(JSON.parse(players)),
                 takenRoles: new Set(JSON.parse(takenRoles)),
-                readyToStart: readyToStart,
-            })
+                readyToStart: readyToStart
+                }
+            }))
         })
 
         socket.on('game-start-success', ({playerPositions, currentPlayer, spacesToMove}) => {
             console.log("Game start success!")
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
+            setCurrentPlayer(currentPlayer)
+            setSpacesToMove(spacesToMove)
         })
 
         socket.on('gamestate-update', ({playerPositions, currentPlayer, spacesToMove}) => {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
+            setCurrentPlayer(currentPlayer)
+            setSpacesToMove(spacesToMove)
         })
     })
 
     // Front-end code, returns the correct screen based on gathered data
     if (user) {
-        if (lobby) {
+        if (lobby.id) {
             if (playerPositions) {
                 return (
                     <GameState
                         playerPositions={playerPositions}
                         movePlayerToPlace={movePlayerToPlace}
-                        movePlayerToCell={movePlayerToCell} />
+                        movePlayerToCell={movePlayerToCell}
+                        currentPlayer={currentPlayer}
+                        spacesToMove={spacesToMove} />
                 )
             } else {
                 return (

@@ -12,9 +12,10 @@ const startingPositions = {
 export class GameState {
     constructor(lobby) {
         // Used by the backend
-        this._lobby = lobby
+        this._lobbyID = lobby.getID()
+        this._players = new Map(JSON.parse(lobby.getPlayers()))
         this._piecePositions = {} // we don't even have to keep pieces on the board if we don't want to
-        this._turnOrder = this.determineTurnOrder(lobby.getPlayers()) // random for now
+        this._turnOrder = this.determineTurnOrder(this._players) // random for now
 
         // Sent to the players as updates
         this._playerPositions = new Map(Object.entries(startingPositions))
@@ -27,14 +28,21 @@ export class GameState {
         return this._turnOrder[this._turnIdx]
     }
 
+    getCurrentPlayerRole() {
+        const player = this._players.get(this.getCurrentPlayer())
+        if (player) {
+            return player.role
+        } else {
+            return ""
+        }
+    }
+
     // Increments the turn counter and returns whose turn is up next.
     nextTurn() {
         this._turnIdx = (this._turnIdx + 1) % this._turnOrder.length
 
         // TEMPORARY: Set spacesToMove to 3, placeholder for rolling
         this._spacesToMove = 3
-
-        console.log("Next player!")
     }
 
     getSpacesToMove() {
@@ -120,12 +128,11 @@ export class GameState {
 
     determineTurnOrder(players) {
         // may not work as intended, but doesn't break so not a concern rn
-        let playerIDs = JSON.parse(players).map(row => row[0])
+        let playerIDs = Array.from(players.keys())
         let turnOrder = []
         
         while (playerIDs.length > 0) {
-            console.log(`Shuffling turn order... ${playerIDs.length} roles left`)
-            turnOrder.push(playerIDs.splice(Math.floor(Math.random() * playerIDs.length), 1))
+            turnOrder.push(playerIDs.splice(Math.floor(Math.random() * playerIDs.length), 1)[0])
         }
 
         return turnOrder
