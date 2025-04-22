@@ -7,10 +7,10 @@
 }
 
 .button {
-  background-color: #ffffff;
+  background-color: "#dbd8c6";
   width: 255px;
   height: 41px;
-  color: rgb(0, 0, 0);
+  color: "#dbd8c6";
   border: none;
   border-radius: 8px; /* tag shape */
   padding: 10px 10px; /* Adjust as needed */
@@ -21,15 +21,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.indicator {
-  display: inline-block;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background-color: #9255a0;
-  margin-left: 30px;
 }
 
 /* Media query to move CurrentPlayer below Controls */

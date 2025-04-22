@@ -78,6 +78,7 @@ function destroyLobby(id) {
 }
 
 // Abstraction to make getting a user's lobby easier
+// Returns a Lobby object
 function getLobbyFromUser(id) {
     try {
         const lobbyID = UsersState.users.find((user) => user.id === id).lobby
@@ -101,6 +102,7 @@ const gameStates = new Map()
 io.on('connection', socket => {
     console.log(`User ${socket.id} connected`);
 
+    // Login and authentication
     socket.on('login', ({ name, id }) => {
         UsersState.setUsers([
             ...UsersState.users.filter(existingUser => existingUser.id !== id),
@@ -113,6 +115,7 @@ io.on('connection', socket => {
         console.log(`User ${id} successfully logged in as ${name}`)
     })
 
+    // Lobby manipulation
     socket.on('lobby-create', ({name}) => {
         const createdLobby = createLobby(name)
         console.log(`Lobby created with name ${createdLobby.getName()} ID ${createdLobby.getID()}`)
@@ -190,11 +193,19 @@ io.on('connection', socket => {
 
         try {
             if (lobby.readyToStart()) {
-                const game = gameStates.set(lobby.getID(), new GameState())
-                io.to(lobby.getID()).emit('game-start-success', (game))
+                console.log(`Starting game for lobby ${lobby.getID()}`)
+                const gameState = new GameState(lobby)
+                gameStates.set(lobby.getID(), gameState)
+                gameState.nextTurn()
+                io.to(lobby.getID()).emit('game-start-success', ({
+                    playerPositions: gameState.getPlayerPositions(),
+                    currentPlayer: gameState.getCurrentPlayerRole(),
+                    spacesToMove: gameState.getSpacesToMove()
+                }))
             }
         } catch (e) {
             console.log(`Error starting game: ${e}`)
+            console.log(e.stack)
         }
     })
 
@@ -228,6 +239,43 @@ io.on('connection', socket => {
     socket.on('lobby-disconnect', (userID) => {
         removeUserFromLobby(userID)
         console.log(`User ${socket.id} left a lobby, leaving ${UsersState.users.length} active users and ${LobbiesState.lobbies.length} active lobbies`);
+    })
+
+    // GameState functions
+    socket.on('move-place', ({id, destPlace}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        // Step 1: Move the player
+        if (id == gameState.getCurrentPlayer() && gameState.movePlayerToPlace(player, destPlace)) {
+            // Step 2: Moving to a place ends turn
+            gameState.nextTurn()
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
+    })
+
+    socket.on('move-cell', ({id, destX, destY}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        if (id == gameState.getCurrentPlayer() && gameState.movePlayerToCell(player, destX, destY)) {
+            // If out of spaces to move, end turn
+            if (gameState.spaceMoved() === 0) {
+                gameState.nextTurn()
+            }
+
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
     })
 
     // When user disconnects

@@ -1,5 +1,4 @@
 import { useState, useRef } from "react";
-import { socket } from "../socket"
 import { Roles } from "../../../classes/Lobby"
 import { MusicPlayer } from "./MusicPlayer";
 

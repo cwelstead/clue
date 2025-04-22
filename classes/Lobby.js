@@ -39,6 +39,9 @@ export class Lobby {
             return false // might need to throw an error
         }
     }
+    getPlayer(playerID) {
+        return this._players.get(playerID)
+    }
     removePlayer(playerID) {
         if (this._players.has(playerID)) {
             this._takenRoles.delete(this._players.get(playerID).role)

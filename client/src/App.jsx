@@ -14,21 +14,22 @@ import LOBBYPage from "./components/Navigation/index.jsx"
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
- * 
- * Authors: Cole Welstead
 */
 
 function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
-    const [lobby, setLobby] = useState("")
-    const [gameState, setGameState] = useState(null)
+    const [lobby, setLobby] = useState({})
+    const [playerPositions, setPlayerPositions] = useState(null)
+    const [currentPlayer, setCurrentPlayer] = useState("")
+    const [spacesToMove, setSpacesToMove] = useState(-1)
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
     
         const auth = getAuth();
     
+        // Functions to handle user authentication
         signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
@@ -62,7 +63,6 @@ function App() {
                 console.error("Firebase login error:", error.message);
             });
     }
-    
 
     function onSignUp(email, password) {
         console.log("sign up button clicked")
@@ -80,7 +80,7 @@ function App() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         userID: socket.id,
                         email: email 
                     }),
@@ -105,7 +105,6 @@ function App() {
             });
     }
 
-    
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
@@ -135,6 +134,19 @@ function App() {
         socket.emit('game-start')
     }
 
+    // Functions to manipulate GameState
+    function movePlayerToPlace(place) {
+        socket.emit('move-place', ({id: user.id, destPlace: place}))
+    }
+
+    function movePlayerToCell(x, y) {
+        socket.emit('move-cell', ({
+            id: user.id,
+            destX: x,
+            destY: y,
+        }))
+    }
+
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
         socket.on('lobby-create-success', (id) => {
@@ -143,13 +155,16 @@ function App() {
 
         socket.on('lobby-join-success', ({ name, id, players, takenRoles }) => {
             console.log(`Lobby joined: ${name} with ID ${id}`)
-            setLobby({
+            setLobby(lobby => ({
+                ...lobby,
+                ...{
                 name: name,
                 id: id,
                 players: new Map(JSON.parse(players)),
                 takenRoles: new Set(JSON.parse(takenRoles)),
                 readyToStart: false
-            })
+                }
+            }))
         })
 
         socket.on('lobby-join-fail', (lobbyID) => {
@@ -157,26 +172,41 @@ function App() {
         })
 
         socket.on('lobby-update', ({ players, takenRoles, readyToStart }) => {
-            setLobby({
-                name: lobby.name,
-                id: lobby.id,
+            setLobby(lobby => ({
+                ...lobby,
+                ...{
                 players: new Map(JSON.parse(players)),
                 takenRoles: new Set(JSON.parse(takenRoles)),
-                readyToStart: readyToStart,
-            })
+                readyToStart: readyToStart
+                }
+            }))
         })
 
-        socket.on('game-start-success', (game) => {
-            setGameState(game)
+        socket.on('game-start-success', ({playerPositions, currentPlayer, spacesToMove}) => {
+            console.log("Game start success!")
+            setPlayerPositions(new Map(JSON.parse(playerPositions)))
+            setCurrentPlayer(currentPlayer)
+            setSpacesToMove(spacesToMove)
+        })
+
+        socket.on('gamestate-update', ({playerPositions, currentPlayer, spacesToMove}) => {
+            setPlayerPositions(new Map(JSON.parse(playerPositions)))
+            setCurrentPlayer(currentPlayer)
+            setSpacesToMove(spacesToMove)
         })
     })
 
     // Front-end code, returns the correct screen based on gathered data
     if (user) {
-        if (lobby) {
-            if (gameState) {
+        if (lobby.id) {
+            if (playerPositions) {
                 return (
-                    <GameState />
+                    <GameState
+                        playerPositions={playerPositions}
+                        movePlayerToPlace={movePlayerToPlace}
+                        movePlayerToCell={movePlayerToCell}
+                        currentPlayer={currentPlayer}
+                        spacesToMove={spacesToMove} />
                 )
             } else {
                 return (
