@@ -27,16 +27,15 @@ function App() {
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
-    
+        
         const auth = getAuth();
-    
-        signInWithEmailAndPassword(auth, email, password)
+        
+        return signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
-                const token = await user.getIdToken(); // Get Firebase token
-    
-                // Send token to backend for validation
-                fetch("http://localhost:8080/authenticate", {
+                const token = await user.getIdToken();
+                
+                return fetch("http://localhost:8080/authenticate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -44,24 +43,26 @@ function App() {
                     },
                     body: JSON.stringify({ userID: socket.id }),
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("User authenticated with backend");
-                            socket.emit("login", {
-                                name: email,
-                                id: socket.id,
-                            });
-                            setUser({ name: email, id: socket.id });
-                            navigate("/"); // Navigate to home after successful login
-                        } else {
-                            console.error("Authentication failed on backend:", data.message);
-                        }
-                    })
-                    .catch(error => console.error("Error sending token to backend:", error));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("User authenticated with backend");
+                        socket.emit("login", {
+                            name: email,
+                            id: socket.id,
+                        });
+                        setUser({ name: email, id: socket.id });
+                        navigate("/");
+                        return true;
+                    } else {
+                        console.error("Authentication failed on backend:", data.message);
+                        throw new Error(data.message || "Authentication failed on backend");
+                    }
+                });
             })
             .catch(error => {
                 console.error("Firebase login error:", error.message);
+                throw error; // Re-throw to be caught by the Login component
             });
     }
     
