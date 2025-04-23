@@ -2,7 +2,7 @@
 import React from 'react';
 import styles from './Controls.module.css';
 
-const Controls = ({ buttons, spacesToMove }) => {
+const Controls = ({ buttons, spacesToMove, isUserTurn }) => {
 
   return (
     <div className={styles.controls}>
@@ -16,7 +16,7 @@ const Controls = ({ buttons, spacesToMove }) => {
           {label}
         </button>
       ))}
-      {spacesToMove > 0 &&
+      {(isUserTurn && spacesToMove > 0) &&
         <p style={{
           textAlign: 'left'
         }}

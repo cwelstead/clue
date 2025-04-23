@@ -160,9 +160,9 @@ function App() {
 
     const buttons = [
         {label: 'PASSAGE', onClick: null, disabledCondition: true},
-        {label: 'ROLL', onClick: rollDice, disabledCondition: false},
-        {label: 'SUGGEST', onClick: null, disabledCondition: true},
-        {label: 'ACCUSE', onClick: null, disabledCondition: true},
+        {label: 'ROLL', onClick: rollDice, disabledCondition: spacesToMove > 0 || role != currentPlayer},
+        {label: 'SUGGEST', onClick: null, disabledCondition: (playerPositions && !playerPositions.get(role).place) || role != currentPlayer},
+        {label: 'ACCUSE', onClick: null, disabledCondition: (playerPositions && playerPositions.get(role).place != "Kauffman Clue") || role != currentPlayer},
     ];
 
     // Essential functions go here, such as receiving socket messages
@@ -252,7 +252,7 @@ function App() {
             }
         } else {
             return (
-                <LOBBYPage solveACase={SelectLobby}/>
+                <LOBBYPage solveACase={SelectLobby} onLobbyJoin={joinLobbyWithID}/>
             )
         }
     } else {

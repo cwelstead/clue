@@ -30,7 +30,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
         movePlayerToCell={movePlayerToCell} />
       <div className={styles.rightSide}>
         <div className={styles.topRight}>
-          <Controls buttons={buttonsWithNotes} spacesToMove={spacesToMove} />
+          <Controls buttons={buttonsWithNotes} spacesToMove={spacesToMove} isUserTurn={role == currentPlayer} />
           <CurrentPlayer currentPlayer={currentPlayer} role={role} />
         </div>
       </div>
