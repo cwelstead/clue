@@ -89,7 +89,7 @@ export function LoginPage({handleLogin}) {
                 zIndex: 1,
                 position: 'relative',
             }}>
-                <Login handleLogin={handleLogin} />
+                <Login handleLogin={handleLogin} redirectToSignup={redirectToSignup} />
             </div>
 
             {/* Seal Image */}

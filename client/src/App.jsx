@@ -108,6 +108,7 @@ function App() {
     }
 
     function redirectToSignup() {
+        console.log("being used")
         navigate("/signup");
     }
 
@@ -201,7 +202,7 @@ function App() {
         return (
             <Routes>
             <Route path="/login" element={
-                !user ? <LoginPage handleLogin={onLogin}  /> : <Navigate to="/" />
+                !user ? <LoginPage handleLogin={onLogin} redirectToSignup = {redirectToSignup}  /> : <Navigate to="/" />
             } />
             <Route path="/signup" element={
                 !user ? <SignUpPage handleSignUp={onSignUp} /> : <Navigate to="/" />

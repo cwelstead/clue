@@ -4,7 +4,7 @@ import {useAuth} from "../authContext"
 import { useNavigate } from "react-router-dom"
 
 
-export function Login({ handleLogin }) {
+export function Login({ handleLogin, redirectToSignup }) {
     const { login } = useAuth()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -125,7 +125,7 @@ export function Login({ handleLogin }) {
             {/* Sign Up Button */}
             <button 
 
-                onClick={() => redirectToSignup}
+                onClick={redirectToSignup}
                 style={{
                     width: '100%',
                     height: '55px',
