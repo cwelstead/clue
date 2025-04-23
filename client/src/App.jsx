@@ -23,6 +23,7 @@ function App() {
     const [playerPositions, setPlayerPositions] = useState(null)
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(-1)
+    const [role, setRole] = useState("")
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -147,6 +148,23 @@ function App() {
         }))
     }
 
+    function rollDice() {
+        // Show something to the player...
+        console.log("Rolling the dice!")
+
+        // Calculate the roll
+        const roll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)
+
+        socket.emit('roll-dice', ({id: user.id, number: roll}))
+    }
+
+    const buttons = [
+        {label: 'PASSAGE', onClick: null, disabledCondition: true},
+        {label: 'ROLL', onClick: rollDice, disabledCondition: false},
+        {label: 'SUGGEST', onClick: null, disabledCondition: true},
+        {label: 'ACCUSE', onClick: null, disabledCondition: true},
+    ];
+
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
         socket.on('lobby-create-success', (id) => {
@@ -155,16 +173,22 @@ function App() {
 
         socket.on('lobby-join-success', ({ name, id, players, takenRoles }) => {
             console.log(`Lobby joined: ${name} with ID ${id}`)
+            const playersMap = new Map(JSON.parse(players))
+            
             setLobby(lobby => ({
                 ...lobby,
                 ...{
                 name: name,
                 id: id,
-                players: new Map(JSON.parse(players)),
+                players: playersMap,
                 takenRoles: new Set(JSON.parse(takenRoles)),
                 readyToStart: false
                 }
             }))
+            const userPlayer = playersMap.get(user.id)
+            if (userPlayer) {
+                setRole(userPlayer.role)
+            }
         })
 
         socket.on('lobby-join-fail', (lobbyID) => {
@@ -172,14 +196,20 @@ function App() {
         })
 
         socket.on('lobby-update', ({ players, takenRoles, readyToStart }) => {
+            const playersMap = new Map(JSON.parse(players))
+
             setLobby(lobby => ({
                 ...lobby,
                 ...{
-                players: new Map(JSON.parse(players)),
+                players: playersMap,
                 takenRoles: new Set(JSON.parse(takenRoles)),
                 readyToStart: readyToStart
                 }
             }))
+            const userPlayer = playersMap.get(user.id)
+            if (userPlayer) {
+                setRole(userPlayer.role)
+            }
         })
 
         socket.on('game-start-success', ({playerPositions, currentPlayer, spacesToMove}) => {
@@ -205,7 +235,9 @@ function App() {
                         playerPositions={playerPositions}
                         movePlayerToPlace={movePlayerToPlace}
                         movePlayerToCell={movePlayerToCell}
+                        role={role}
                         currentPlayer={currentPlayer}
+                        buttons={buttons}
                         spacesToMove={spacesToMove} />
                 )
             } else {

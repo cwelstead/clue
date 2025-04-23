@@ -179,7 +179,9 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
                             cursor: 'pointer',
                             transition: 'opacity 0.2s',
                         }}
-                    >START GAME</button>... {/* Role Selection */}
+                    >START GAME</button>
+                    
+                    {/* Role Selection */}
                     <div style={{
                         display: 'flex',
                         flexWrap: 'wrap',

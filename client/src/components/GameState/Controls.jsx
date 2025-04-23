@@ -2,20 +2,28 @@
 import React from 'react';
 import styles from './Controls.module.css';
 
-const Controls = ({ onNotesClick }) => {
-  const buttons = ['NOTES', 'PASSAGE', 'ROLL', 'ACCUSE', 'GUESS'];
+const Controls = ({ buttons, spacesToMove }) => {
 
   return (
     <div className={styles.controls}>
-      {buttons.map((label, index) => (
+      {buttons.map(({ label, onClick, disabledCondition }) => (
         <button
-          key={index}
+          key={label}
           className={styles.button}
-          onClick={label === 'NOTES' ? onNotesClick : null}
+          onClick={onClick}
+          disabled={disabledCondition}
         >
           {label}
         </button>
       ))}
+      {spacesToMove > 0 &&
+        <p style={{
+          textAlign: 'left'
+        }}
+        >
+          {spacesToMove} spaces left to move!
+        </p>
+      }
     </div>
   );
 };

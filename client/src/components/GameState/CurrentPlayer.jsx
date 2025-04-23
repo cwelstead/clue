@@ -11,20 +11,26 @@ const roleColors = new Map([
   ['Theresa', 'white']
 ])
 
-const CurrentPlayer = ({ currentPlayer }) => {
+const CurrentPlayer = ({ currentPlayer, role }) => {
   return (
     <div className={styles.currentPlayer}>
+      {currentPlayer == role &&
       <button className={styles.button}>
-        {/* TODO: Say "It's your turn!" when currentPlayer is you */}
-        Current Player:
-        <img
-          style={{
-            margin: '0 5%',
-            height: '150%',
-          }}
-          src={`./src/assets/pieceIcons/piece-${roleColors.get(currentPlayer)}.png`}>
-        </img>
+        It's your turn!
       </button>
+      }
+      {currentPlayer != role &&
+        <button className={styles.button}>
+          Current Player:
+          <img
+            style={{
+              margin: '0 5%',
+              height: '150%',
+            }}
+            src={`./src/assets/pieceIcons/piece-${roleColors.get(currentPlayer)}.png`}>
+          </img>
+        </button>
+      }
     </div>
   );
 };

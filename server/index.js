@@ -278,6 +278,21 @@ io.on('connection', socket => {
         }
     })
 
+    socket.on('roll-dice', ({id, number}) => {
+        const lobby = getLobbyFromUser(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        if (id == gameState.getCurrentPlayer()) {
+            gameState.setSpacesToMove(number)
+
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
+    })
+
     // When user disconnects
     socket.on('disconnect', () => {
         // Disconnect from lobby

@@ -40,13 +40,15 @@ export class GameState {
     // Increments the turn counter and returns whose turn is up next.
     nextTurn() {
         this._turnIdx = (this._turnIdx + 1) % this._turnOrder.length
-
-        // TEMPORARY: Set spacesToMove to 3, placeholder for rolling
-        this._spacesToMove = 3
+        this._spacesToMove = -1
     }
 
     getSpacesToMove() {
         return this._spacesToMove
+    }
+
+    setSpacesToMove(number) {
+        this._spacesToMove = number
     }
 
     spaceMoved() {
