@@ -19,7 +19,7 @@ export function Login({ handleLogin, redirectToSignup }) {
           await handleLogin(email, password)
           navigate("/")
         } catch {
-          setError("Failed to log in")
+          setError("Invalid password or username")
         }
     
         setLoading(false)

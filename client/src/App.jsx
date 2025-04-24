@@ -105,6 +105,11 @@ function App() {
             })
             .catch(error => {
                 console.error("Firebase signup error:", error.message);
+                if (error.code === 'auth/email-already-in-use') {
+                    throw new Error("This email is already registered. Please try logging in instead.");
+                } else {
+                    throw error; // Re-throw other errors
+                }
             });
     }
 

@@ -10,6 +10,7 @@ export function SignUpPage({ handleSignUp }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const [success, setSuccess] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -17,14 +18,19 @@ export function SignUpPage({ handleSignUp }) {
         if (password !== confirmPassword) {
             setError("Passwords do not match");
             return;
-        }
-        
-        try {
+        }try {
             setLoading(true);
+            setError(""); // Clear any previous errors
             await handleSignUp(email, password);
-            // Navigation will be handled in the App component after successful signup
+            setSuccess("Account created successfully! Redirecting to login...");
+            // Add a timeout to redirect after showing the success message
+            setTimeout(() => {
+                navigate("/");
+            }, 400);
         } catch (error) {
-            setError("Failed to create an account");
+            // Display the specific error message from Firebase
+            setError(error.message || "Failed to create an account");
+            setSuccess(""); // Clear any success message if there's an error
         } finally {
             setLoading(false);
         }
