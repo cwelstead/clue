@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { getAuth, validatePassword } from "firebase/auth";
 
 export function SignUpPage({ handleSignUp }) {
 
@@ -10,7 +11,6 @@ export function SignUpPage({ handleSignUp }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const [success, setSuccess] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,8 +21,36 @@ export function SignUpPage({ handleSignUp }) {
         }try {
             setLoading(true);
             setError(""); // Clear any previous errors
+
+            const auth = getAuth();
+            const status = await validatePassword(auth, password);
+            
+            if (!status.isValid) {
+                // Build error message based on what criteria weren't met
+                const errorMessages = [];
+                
+                if (status.containsMinimumCharacters === false) {
+                    errorMessages.push("Password doesn't meet minimum length requirement");
+                    console.log("hey there")
+                }
+                if (status.containsLowercaseLetter === false) {
+                    errorMessages.push("Missing lowercase letter");
+                }
+                if (status.containsUppercaseLetter === false) {
+                    errorMessages.push("Missing uppercase letter");
+                }
+                if (status.containsNumericCharacter === false) {
+                    errorMessages.push("Missing number");
+                }
+                if (status.containsNonAlphanumericCharacter === false) {
+                    errorMessages.push("Missing special character");
+                }
+                
+                setError(`Password doesn't meet requirements: ${errorMessages.join(", ")}`);
+                return;
+            }
+
             await handleSignUp(email, password);
-            setSuccess("Account created successfully! Redirecting to login...");
             // Add a timeout to redirect after showing the success message
             setTimeout(() => {
                 navigate("/");
