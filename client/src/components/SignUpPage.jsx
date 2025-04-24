@@ -28,10 +28,8 @@ export function SignUpPage({ handleSignUp }) {
             if (!status.isValid) {
                 // Build error message based on what criteria weren't met
                 const errorMessages = [];
-                
-                if (status.containsMinimumCharacters === false) {
-                    errorMessages.push("Password doesn't meet minimum length requirement");
-                    console.log("hey there")
+                if (status.meetsMinPasswordLength === false) {
+                    errorMessages.push("Password requires at least 6 characters");
                 }
                 if (status.containsLowercaseLetter === false) {
                     errorMessages.push("Missing lowercase letter");
@@ -41,9 +39,6 @@ export function SignUpPage({ handleSignUp }) {
                 }
                 if (status.containsNumericCharacter === false) {
                     errorMessages.push("Missing number");
-                }
-                if (status.containsNonAlphanumericCharacter === false) {
-                    errorMessages.push("Missing special character");
                 }
                 
                 setError(`Password doesn't meet requirements: ${errorMessages.join(", ")}`);
