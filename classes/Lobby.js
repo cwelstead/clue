@@ -1,4 +1,4 @@
-let lobbyIDs = []
+export let lobbyIDs = []
 
 export const Roles = Object.freeze({
     ADAM: "Adam",
