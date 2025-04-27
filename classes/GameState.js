@@ -1,4 +1,5 @@
 import Board from "./Board.js"
+import { CARDS, getCaseFile } from "./Cards.js"
 
 const startingPositions = {
     "Adam": {x: 7, y: 24, place: ""},
@@ -16,10 +17,11 @@ export class GameState {
         this._players = new Map(JSON.parse(lobby.getPlayers()))
         this._piecePositions = {} // we don't even have to keep pieces on the board if we don't want to
         this._turnOrder = this.determineTurnOrder(this._players) // random for now
+        this._caseFile = getCaseFile()
 
         // Sent to the players as updates
         this._playerPositions = new Map(Object.entries(startingPositions))
-        this._playerCards = new Map()
+        this._playerCards = distributeCards()
         this._spacesToMove = -1
         this._turnIdx = -1 // in the form of getCurrentPlayer()
     }
@@ -128,6 +130,10 @@ export class GameState {
         return JSON.stringify(Array.from(this._playerPositions))
     }
 
+    getPlayerCards() {
+        return JSON.stringify(Array.from(this._playerCards))
+    }
+
     determineTurnOrder(players) {
         // may not work as intended, but doesn't break so not a concern rn
         let playerIDs = Array.from(players.keys())
@@ -138,5 +144,33 @@ export class GameState {
         }
 
         return turnOrder
+    }
+
+    distributeCards() {
+        // Set up cards without case file cards and shuffle their order
+        const remainingCards = [...CARDS]
+        this._caseFile.forEach(caseCard => {
+            remainingCards = remainingCards.filter(card => JSON.stringify(card) != JSON.stringify(caseCard))
+        })
+
+        for (let i = remainingCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            [remainingCards[i], remainingCards[j]] = [remainingCards[j], remainingCards[i]]
+        }
+
+        // Set up the map of player-owned cards
+        playerCards = new Map()
+        this._players.keys.forEach(player => {
+            playerCards.set(player.id, [])
+        })
+
+        // Distribute cards until there are none left, starting with the last player and going against turn order
+        let i = this._turnOrder.length - 1
+        while (remainingCards.length > 0) {
+            playerCards.get(this._turnOrder[i]).push(remainingCards.pop())
+            i = (i + this._turnOrder.length - 1) % this._turnOrder.length
+        }
+
+        return playerCards
     }
 }

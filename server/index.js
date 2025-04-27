@@ -199,6 +199,7 @@ io.on('connection', socket => {
                 gameState.nextTurn()
                 io.to(lobby.getID()).emit('game-start-success', ({
                     playerPositions: gameState.getPlayerPositions(),
+                    playerCards: gameState.getPlayerCards(),
                     currentPlayer: gameState.getCurrentPlayerRole(),
                     spacesToMove: gameState.getSpacesToMove()
                 }))

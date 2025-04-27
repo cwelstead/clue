@@ -21,6 +21,7 @@ function App() {
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState({})
     const [playerPositions, setPlayerPositions] = useState(null)
+    const [cards, setCards] = useState([])
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(-1)
     const [role, setRole] = useState("")
@@ -212,8 +213,11 @@ function App() {
             }
         })
 
-        socket.on('game-start-success', ({playerPositions, currentPlayer, spacesToMove}) => {
+        socket.on('game-start-success', ({playerPositions, playerCards, currentPlayer, spacesToMove}) => {
             console.log("Game start success!")
+            const playerCards = new Map(JSON.parse(playerCards))
+            setCards(playerCards.get(user.id))
+            
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
