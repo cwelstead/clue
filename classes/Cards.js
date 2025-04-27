@@ -85,10 +85,6 @@ export const CARDS = Object.freeze([
     },
 ])
 
-export function getCardSource(card) {
-    return `./assets/${card.type}Cards/${id}.svg`
-}
-
 export function getCaseFile() {
     const room = CARDS.filter(card => card.type == "room")[0] // change to random choice
     const suspect = CARDS.filter(card => card.type == "suspect")[0] // change to random choice

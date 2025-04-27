@@ -215,8 +215,11 @@ function App() {
 
         socket.on('game-start-success', ({playerPositions, playerCards, currentPlayer, spacesToMove}) => {
             console.log("Game start success!")
-            const playerCards = new Map(JSON.parse(playerCards))
-            setCards(playerCards.get(user.id))
+
+            if (playerCards) {
+                const playerCardsMap = new Map(JSON.parse(playerCards))
+                setCards([...cards, ...playerCardsMap.get(socket.id)])
+            }
             
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
@@ -241,6 +244,7 @@ function App() {
                         movePlayerToCell={movePlayerToCell}
                         role={role}
                         currentPlayer={currentPlayer}
+                        cards={cards}
                         buttons={buttons}
                         spacesToMove={spacesToMove} />
                 )

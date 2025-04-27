@@ -6,8 +6,9 @@ import Controls from './Controls';
 import CurrentPlayer from './CurrentPlayer';
 import ClueInfoSheet from '../ClueInfoSheet'; // Import the ClueInfoSheet component
 
-const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, buttons, spacesToMove }) => {
+const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, buttons, spacesToMove }) => {
   const [isNotesOpen, setIsNotesOpen] = useState(false); // State for overlay visibility
+  // const mappableCards = cards.map(({ id, type }) => ({key: id, imageSource: `./assets/${type}Cards/${id}.svg`}))
 
   const handleNotesClick = () => {
     setIsNotesOpen(true); // Open the overlay
@@ -31,6 +32,9 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
       <div className={styles.rightSide}>
         <div className={styles.topRight}>
           <Controls buttons={buttonsWithNotes} spacesToMove={spacesToMove} isUserTurn={role == currentPlayer} />
+          {cards.map(card => (
+            <img src={`./src/assets/${card.type}Cards/${card.id}.svg`} key={card.id} height={"160px"}/>
+          ))}
           <CurrentPlayer currentPlayer={currentPlayer} role={role} />
         </div>
       </div>

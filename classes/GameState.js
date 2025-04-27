@@ -21,7 +21,7 @@ export class GameState {
 
         // Sent to the players as updates
         this._playerPositions = new Map(Object.entries(startingPositions))
-        this._playerCards = distributeCards()
+        this._playerCards = this.distributeCards()
         this._spacesToMove = -1
         this._turnIdx = -1 // in the form of getCurrentPlayer()
     }
@@ -148,20 +148,21 @@ export class GameState {
 
     distributeCards() {
         // Set up cards without case file cards and shuffle their order
-        const remainingCards = [...CARDS]
-        this._caseFile.forEach(caseCard => {
+        let remainingCards = [...CARDS]
+
+        Object.values(this._caseFile).forEach(caseCard => {
             remainingCards = remainingCards.filter(card => JSON.stringify(card) != JSON.stringify(caseCard))
         })
 
         for (let i = remainingCards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1))
-            [remainingCards[i], remainingCards[j]] = [remainingCards[j], remainingCards[i]]
+            const j = Math.floor(Math.random() * (i + 1));
+            [remainingCards[i], remainingCards[j]] = [remainingCards[j], remainingCards[i]];
         }
 
         // Set up the map of player-owned cards
-        playerCards = new Map()
-        this._players.keys.forEach(player => {
-            playerCards.set(player.id, [])
+        const playerCards = new Map()
+        this._players.keys().forEach(player => {
+            playerCards.set(player, [])
         })
 
         // Distribute cards until there are none left, starting with the last player and going against turn order
