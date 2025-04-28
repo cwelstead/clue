@@ -5,10 +5,8 @@ import { SelectLobby } from './components/SelectLobby.jsx'
 import { InLobby } from './components/InLobby.jsx'
 import { socket } from './socket.js'
 import { useEffect } from 'react'
-import { Roles } from '../../classes/Lobby.js'
 import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
 import LOBBYPage from "./components/Navigation/index.jsx"
 
@@ -152,19 +150,12 @@ function App() {
     function rollDice() {
         // Show something to the player...
         console.log("Rolling the dice!")
-
+    
         // Calculate the roll
         const roll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)
-
+    
         socket.emit('roll-dice', ({id: user.id, number: roll}))
     }
-
-    const buttons = [
-        {label: 'PASSAGE', onClick: null, disabledCondition: true},
-        {label: 'ROLL', onClick: rollDice, disabledCondition: spacesToMove > 0 || role != currentPlayer},
-        {label: 'SUGGEST', onClick: null, disabledCondition: (playerPositions && !playerPositions.get(role).place) || role != currentPlayer},
-        {label: 'ACCUSE', onClick: null, disabledCondition: (playerPositions && playerPositions.get(role).place != "Kauffman Clue") || role != currentPlayer},
-    ];
 
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
@@ -245,8 +236,8 @@ function App() {
                         role={role}
                         currentPlayer={currentPlayer}
                         cards={cards}
-                        buttons={buttons}
-                        spacesToMove={spacesToMove} />
+                        spacesToMove={spacesToMove}
+                        rollDice={rollDice} />
                 )
             } else {
                 return (
