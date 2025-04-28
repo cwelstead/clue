@@ -248,10 +248,8 @@ io.on('connection', socket => {
         const player = lobby.getPlayer(id)
         const gameState = gameStates.get(lobby.getID())
 
-        // Step 1: Move the player
+        // Move the player
         if (id == gameState.getCurrentPlayer() && gameState.movePlayerToPlace(player, destPlace)) {
-            // Step 2: Moving to a place ends turn
-            gameState.nextTurn()
             io.to(lobby.getID()).emit('gamestate-update', ({
                 playerPositions: gameState.getPlayerPositions(),
                 currentPlayer: gameState.getCurrentPlayerRole(),
@@ -292,6 +290,17 @@ io.on('connection', socket => {
                 spacesToMove: gameState.getSpacesToMove()
             }))
         }
+    })
+
+    socket.on('end-turn', (id) => {
+        const lobby = getLobbyFromUser(id)
+        const gameState = gameStates.get(lobby.getID())
+        gameState.nextTurn()
+        io.to(lobby.getID()).emit('gamestate-update', ({
+            playerPositions: gameState.getPlayerPositions(),
+            currentPlayer: gameState.getCurrentPlayerRole(),
+            spacesToMove: gameState.getSpacesToMove()
+        }))
     })
 
     // When user disconnects

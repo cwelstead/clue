@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CARDS } from '../../../../classes/Cards';
 
-const Guess = ({ onClose, guessType }) => { //Accept onClose prop
+const Guess = ({ onClose, guessType, makeGuess }) => { //Accept onClose prop
     const [selectedRoom, setSelectedRoom] = useState(null)
     const [selectedSuspect, setSelectedSuspect] = useState(null)
     const [selectedWeapon, setSelectedWeapon] = useState(null)
@@ -9,6 +9,12 @@ const Guess = ({ onClose, guessType }) => { //Accept onClose prop
     const roomCards = CARDS.filter(card => card.type == "room")
     const suspectCards = CARDS.filter(card => card.type == "suspect")
     const weaponCards = CARDS.filter(card => card.type == "weapon")
+
+    function checkSubmitGuess() {
+        if (selectedRoom && selectedSuspect && selectedWeapon) {
+            makeGuess(selectedSuspect, selectedWeapon, selectedRoom)
+        }
+    }
 
     useEffect(() => {
         // Prevent scrolling on the body
@@ -215,6 +221,8 @@ const Guess = ({ onClose, guessType }) => { //Accept onClose prop
                         ))}
                     </div>
                 </div>
+                {/* Submitting a guess */}
+                <button onClick={checkSubmitGuess}>SUBMIT</button>
             </div>
             {/*Add a button to close the component*/}
             <button onClick={onClose} style={{

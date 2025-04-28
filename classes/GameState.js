@@ -117,6 +117,7 @@ export class GameState {
                 place.adjacentSpaces.forEach(exit => {
                     if (exit.x == playerPosition.x && exit.y == playerPosition.y) {
                         this._playerPositions.set(player.role, {x: -1, y: -1, place: destPlace})
+                        this._spacesToMove = 0
                         moveSuccessful = true
                     }
                 })

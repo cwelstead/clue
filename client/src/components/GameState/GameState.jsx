@@ -7,9 +7,10 @@ import CurrentPlayer from './CurrentPlayer';
 import ClueInfoSheet from '../ClueInfoSheet'; // Import the ClueInfoSheet component
 import Guess from './Guess';
 
-const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice }) => {
+const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, endTurn }) => {
   const [isNotesOpen, setIsNotesOpen] = useState(false) // State for overlay visibility
   const [isGuessOpen, setIsGuessOpen] = useState(false)
+  const [lastSuggest, setLastSuggest] = useState("")
   const [guessType, setGuessType] = useState("")
 
   const handleNotesClick = () => {
@@ -22,6 +23,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
 
   const handleCloseGuess = () => {
     setIsGuessOpen(false)
+    setGuessType("")
   }
 
   function openSuggest() {
@@ -34,12 +36,24 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
     setIsGuessOpen(true)
   }
 
+  function makeGuess(suspect, weapon, room) {
+    setLastSuggest(playerPositions.get(role).place)
+    sendGuess({room: room, suspect: suspect, weapon: weapon}, guessType)
+    handleCloseGuess()
+  }
+
+  function startRoll() {
+    setLastSuggest("")
+    rollDice()
+  }
+
   const buttons = [
     {label: 'NOTES', onClick: handleNotesClick, disabledCondition: false},
-    {label: 'PASSAGE', onClick: null, disabledCondition: true},
-    {label: 'ROLL', onClick: rollDice, disabledCondition: spacesToMove > 0 || role != currentPlayer},
-    {label: 'SUGGEST', onClick: openSuggest, disabledCondition: (playerPositions && !playerPositions.get(role).place) || role != currentPlayer},
-    {label: 'ACCUSE', onClick: openAccuse, disabledCondition: (playerPositions && playerPositions.get(role).place != "Kauffman Clue") || role != currentPlayer},
+    {label: 'PASSAGE', onClick: null, disabledCondition: true  || spacesToMove > 0},
+    {label: 'ROLL', onClick: startRoll, disabledCondition: spacesToMove >= 0 || role != currentPlayer},
+    {label: 'SUGGEST', onClick: openSuggest, disabledCondition: (playerPositions && (!playerPositions.get(role).place || playerPositions.get(role).place == lastSuggest)) || role != currentPlayer || spacesToMove > 0},
+    {label: 'ACCUSE', onClick: openAccuse, disabledCondition: (playerPositions && playerPositions.get(role).place != "Kauffman Clue") || role != currentPlayer || spacesToMove > 0},
+    {label: 'END TURN', onClick: endTurn, disabledCondition: role != currentPlayer}
   ];
 
   return (
@@ -58,7 +72,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
         </div>
       </div>
       {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} />} {/* Conditionally render the ClueInfoSheet component */}
-      {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} />}
+      {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess}/>}
     </div>
   );
 };

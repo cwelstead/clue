@@ -157,6 +157,18 @@ function App() {
         socket.emit('roll-dice', ({id: user.id, number: roll}))
     }
 
+    function sendGuess(guess, type) {
+        if (type == 'SUGGEST') {
+            socket.emit('suggestion', ({id: user.id, guess: guess}))
+        } else if (type == 'ACCUSE') {
+            socket.emit('accusation', ({id: user.id, guess: guess}))
+        }
+    }
+
+    function endTurn() {
+        socket.emit('end-turn', (user.id))
+    }
+
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
         socket.on('lobby-create-success', (id) => {
@@ -237,7 +249,9 @@ function App() {
                         currentPlayer={currentPlayer}
                         cards={cards}
                         spacesToMove={spacesToMove}
-                        rollDice={rollDice} />
+                        rollDice={rollDice}
+                        sendGuess={sendGuess}
+                        endTurn={endTurn} />
                 )
             } else {
                 return (
