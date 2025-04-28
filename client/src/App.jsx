@@ -235,6 +235,10 @@ function App() {
             setSpacesToMove(spacesToMove)
         })
 
+        socket.on('select-proof', ({source, guess}) => {
+            
+        })
+
         socket.on('suggestion-proof-view', ({source, card}) => {
 
         })
