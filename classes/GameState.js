@@ -127,6 +127,17 @@ export class GameState {
         return moveSuccessful
     }
 
+    getSuggestionProof(guess) {
+        let playerToProveWrong = undefined
+
+        // Iterate through turn order in reverse
+        // If a player has a card that can prove the guess wrong, update the variable
+        // At the end of iteration, the earliest player in turn order will be the variable
+        // Otherwise, it remains undefined
+
+        return playerToProveWrong
+    }
+
     getPlayerPositions() {
         return JSON.stringify(Array.from(this._playerPositions))
     }

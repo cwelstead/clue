@@ -234,6 +234,18 @@ function App() {
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
         })
+
+        socket.on('suggestion-proof-view', ({source, card}) => {
+
+        })
+
+        socket.on('suggestion-proof-alert', ({source, target}) => {
+
+        })
+
+        socket.on('no-proof', () => {
+            console.log("No proof")
+        })
     })
 
     // Front-end code, returns the correct screen based on gathered data

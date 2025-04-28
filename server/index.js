@@ -292,6 +292,66 @@ io.on('connection', socket => {
         }
     })
 
+    socket.on('suggestion', ({id, guess}) => {
+        const lobby = getLobbyFromUser(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        // Tell rest of lobby what suggestion is being made
+
+        const playerToProveWrong = gameState.getSuggestionProof(guess)
+
+        if (playerToProveWrong) {
+            // Get socket of player
+            const socketID = null // getSocketFromPlayer(id)
+
+            socket.broadcast.to(socketID).emit('select-proof', ({
+                source: "",
+                guess: ""
+            }))
+        } else {
+            io.to(lobby.getID()).emit('no-proof')
+
+            gameState.nextTurn()
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
+    })
+
+    socket.on('proof-selected', ({id, card, target}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        // Get socket of target
+        const socketID = null // getSocketFromPlayer(target)
+
+        // show dialogue to them, tell others player is looking at a card
+        socket.broadcast.to(socketID).emit('suggestion-proof-view', {
+            source: player,
+            card: card
+        })
+        // TODO: Make sure target doesn't get visual feedback from this alert
+        io.to(lobby.getID()).emit('suggestion-proof-alert', {
+            source: player,
+            target: target
+        })
+    })
+
+    socket.on('proof-confirmed', ({id}) => {
+        const lobby = getLobbyFromUser(id)
+        const gameState = gameStates.get(lobby.getID())
+        
+        gameState.nextTurn()
+        io.to(lobby.getID()).emit('gamestate-update', ({
+            playerPositions: gameState.getPlayerPositions(),
+            currentPlayer: gameState.getCurrentPlayerRole(),
+            spacesToMove: gameState.getSpacesToMove()
+        }))
+    })
+
     socket.on('end-turn', (id) => {
         const lobby = getLobbyFromUser(id)
         const gameState = gameStates.get(lobby.getID())
