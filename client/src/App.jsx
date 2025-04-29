@@ -250,9 +250,10 @@ function App() {
          * SUGGESTION FIELDS AND PROPERTIES
          * source: player object, has username and role
          * guess: the 3 cards that are guessed (suspect, room, weapon)
-         * each card has an id and type property
+         * each card has an id, type, and phrase property
+         * phrase is for easier suggestion messages (e.g. "suspect in room with weapon.")
          * refuter: player object, has username and role
-         * card: card object, has id and type
+         * card: card object, has id, type, and phrase
         */
         socket.on('suggestion-alert', ({source, guess}) => {
             setSuggestState({
