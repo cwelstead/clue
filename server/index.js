@@ -298,7 +298,7 @@ io.on('connection', socket => {
         const gameState = gameStates.get(lobby.getID())
 
         // Tell rest of lobby what suggestion is being made
-        socket.broadcast.to(lobby.getID()).emit('suggestion-alert', {
+        io.to(lobby.getID()).emit('suggestion-alert', {
             source: player,
             guess: guess
         })
@@ -314,7 +314,9 @@ io.on('connection', socket => {
                 guess: guess
             }))
         } else {
-            io.to(lobby.getID()).emit('no-proof')
+            io.to(lobby.getID()).emit('no-proof', ({
+                source: player
+            }))
 
             gameState.nextTurn()
             io.to(lobby.getID()).emit('gamestate-update', ({
@@ -335,13 +337,13 @@ io.on('connection', socket => {
 
         // show dialogue to them, tell others player is looking at a card
         socket.broadcast.to(socketID).emit('suggestion-proof-view', {
-            source: player,
+            refuter: player,
             card: card
         })
         // TODO: Make sure target doesn't get visual feedback from this alert
         io.to(lobby.getID()).emit('suggestion-proof-alert', {
-            source: player,
-            target: target
+            source: target,
+            refuter: player
         })
     })
 

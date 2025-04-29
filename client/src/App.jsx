@@ -23,6 +23,7 @@ function App() {
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(-1)
     const [role, setRole] = useState("")
+    const [suggestState, setSuggestState] = useState({type: ""})
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -233,26 +234,79 @@ function App() {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
+
+            // Once gamestate is updated, suggestion process is assumed to be over
+            setSuggestState({
+                ...suggestState,
+                type: '',
+                source: null,
+                guess: null,
+                refuter: null,
+                card: null,
+            })
         })
 
+        /*
+         * SUGGESTION FIELDS AND PROPERTIES
+         * source: player object, has username and role
+         * guess: the 3 cards that are guessed (suspect, room, weapon)
+         * each card has an id and type property
+         * refuter: player object, has username and role
+         * card: card object, has id and type
+        */
         socket.on('suggestion-alert', ({source, guess}) => {
-            
+            setSuggestState({
+                ...suggestState,
+                type: 'suggestion-alert',
+                source: source,
+                guess: guess,
+                refuter: null,
+                card: null,
+            })
         })
 
         socket.on('select-proof', ({source, guess}) => {
-            
+            setSuggestState({
+                ...suggestState,
+                type: 'select-proof',
+                source: source,
+                guess: guess,
+                refuter: null,
+                card: null,
+            })        
         })
 
-        socket.on('suggestion-proof-view', ({source, card}) => {
-
+        socket.on('suggestion-proof-view', ({refuter, card}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'suggestion-proof-view',
+                source: null,
+                guess: null,
+                refuter: refuter,
+                card: card,
+            })
         })
 
-        socket.on('suggestion-proof-alert', ({source, target}) => {
-
+        socket.on('suggestion-proof-alert', ({source, refuter}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'suggestion-proof-alert',
+                source: source,
+                guess: null,
+                refuter: refuter,
+                card: null,
+            })
         })
 
-        socket.on('no-proof', () => {
-            console.log("No proof")
+        socket.on('no-proof', ({source}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'no-proof',
+                source: source,
+                guess: null,
+                refuter: null,
+                card: null,
+            })
         })
     })
 
@@ -271,6 +325,7 @@ function App() {
                         spacesToMove={spacesToMove}
                         rollDice={rollDice}
                         sendGuess={sendGuess}
+                        suggestState={suggestState}
                         endTurn={endTurn} />
                 )
             } else {
