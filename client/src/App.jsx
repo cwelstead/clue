@@ -11,6 +11,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } f
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
 import LOBBYPage from "./components/Navigation/index.jsx"
+import DiceRollerPopup from './components/DiceRollerPopup.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -24,6 +25,7 @@ function App() {
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(-1)
     const [role, setRole] = useState("")
+    const [isDicePopupOpen, setIsDicePopupOpen] = useState(false);
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -148,14 +150,28 @@ function App() {
         }))
     }
 
+    // function rollDice() {
+    //     // Show something to the player...
+    //     console.log("Rolling the dice!")
+
+    //     // Calculate the roll
+    //     const roll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)
+
+    //     socket.emit('roll-dice', ({id: user.id, number: roll}))
+    // }
+
     function rollDice() {
-        // Show something to the player...
-        console.log("Rolling the dice!")
+        console.log("Rolling the dice!");
+        // Open the dice roller popup instead of immediately calculating
+        setIsDicePopupOpen(true);
+    }
 
-        // Calculate the roll
-        const roll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)
-
-        socket.emit('roll-dice', ({id: user.id, number: roll}))
+    function handleRollComplete(rollResult) {
+        // Close the popup
+        setIsDicePopupOpen(false);
+        
+        // Send the result to the server
+        socket.emit('roll-dice', ({id: user.id, number: rollResult}));
     }
 
     const buttons = [
@@ -231,6 +247,7 @@ function App() {
         if (lobby.id) {
             if (playerPositions) {
                 return (
+                    <>
                     <GameState
                         playerPositions={playerPositions}
                         movePlayerToPlace={movePlayerToPlace}
@@ -239,6 +256,13 @@ function App() {
                         currentPlayer={currentPlayer}
                         buttons={buttons}
                         spacesToMove={spacesToMove} />
+                    
+                    <DiceRollerPopup 
+                        isOpen={isDicePopupOpen} 
+                        onClose={() => setIsDicePopupOpen(false)}
+                        onRollComplete={handleRollComplete} 
+                    />
+                </>
                 )
             } else {
                 return (
