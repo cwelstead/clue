@@ -31,6 +31,7 @@ export class Lobby {
             const firstRoleAvailable = Object.values(Roles).filter(role => !this._takenRoles.has(role))[0]
             this._players.set(player.id, {
                 username: player.name,
+                socket: player.socket,
                 role: firstRoleAvailable,
                 ready: false,
             })

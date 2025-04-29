@@ -135,7 +135,7 @@ io.on('connection', socket => {
         } else {
             // Step 3: Join lobby
             if (userID) {
-                lobbyToJoin.addPlayer({name: username, id: userID})
+                lobbyToJoin.addPlayer({name: username, id: userID, socket: socket.id})
                 UsersState.users.find((user) => user.id === userID).lobby = lobbyToJoin.getID()
                 socket.join(lobbyToJoin.getID())
             }
@@ -294,19 +294,24 @@ io.on('connection', socket => {
 
     socket.on('suggestion', ({id, guess}) => {
         const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
         const gameState = gameStates.get(lobby.getID())
 
         // Tell rest of lobby what suggestion is being made
+        socket.broadcast.to(lobby.getID()).emit('suggestion-alert', {
+            source: player,
+            guess: guess
+        })
 
         const playerToProveWrong = gameState.getSuggestionProof(guess)
 
         if (playerToProveWrong) {
             // Get socket of player
-            const socketID = null // getSocketFromPlayer(id)
+            const socketID = playerToProveWrong.socket
 
             socket.broadcast.to(socketID).emit('select-proof', ({
-                source: "",
-                guess: ""
+                source: player,
+                guess: guess
             }))
         } else {
             io.to(lobby.getID()).emit('no-proof')
@@ -323,10 +328,10 @@ io.on('connection', socket => {
     socket.on('proof-selected', ({id, card, target}) => {
         const lobby = getLobbyFromUser(id)
         const player = lobby.getPlayer(id)
-        const gameState = gameStates.get(lobby.getID())
 
         // Get socket of target
-        const socketID = null // getSocketFromPlayer(target)
+        // Make sure target remains a player object in frontend
+        const socketID = target.socket
 
         // show dialogue to them, tell others player is looking at a card
         socket.broadcast.to(socketID).emit('suggestion-proof-view', {

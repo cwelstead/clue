@@ -134,6 +134,16 @@ export class GameState {
         // If a player has a card that can prove the guess wrong, update the variable
         // At the end of iteration, the earliest player in turn order will be the variable
         // Otherwise, it remains undefined
+        let i = (this._turnIdx + this._turnOrder.length - 1) % this._turnOrder.length
+        while (i != this._turnIdx) {
+            const playerCards = this._playerCards.get(this._turnOrder[i])
+
+            if (playerCards.some(card => card.id == guess.room.id
+                                        || card.id == guess.suspect.id
+                                        || card.id == guess.weapon.id)) {
+                playerToProveWrong = this._players.get(this._turnOrder[i])
+            }
+        }
 
         return playerToProveWrong
     }

@@ -235,6 +235,10 @@ function App() {
             setSpacesToMove(spacesToMove)
         })
 
+        socket.on('suggestion-alert', ({source, guess}) => {
+            
+        })
+
         socket.on('select-proof', ({source, guess}) => {
             
         })
