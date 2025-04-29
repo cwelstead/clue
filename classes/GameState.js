@@ -143,6 +143,8 @@ export class GameState {
                                         || card.id == guess.weapon.id)) {
                 playerToProveWrong = this._players.get(this._turnOrder[i])
             }
+
+            i = (i + this._turnOrder.length - 1) % this._turnOrder.length
         }
 
         return playerToProveWrong

@@ -335,15 +335,15 @@ io.on('connection', socket => {
         // Make sure target remains a player object in frontend
         const socketID = target.socket
 
-        // show dialogue to them, tell others player is looking at a card
-        socket.broadcast.to(socketID).emit('suggestion-proof-view', {
-            refuter: player,
-            card: card
-        })
-        // TODO: Make sure target doesn't get visual feedback from this alert
         io.to(lobby.getID()).emit('suggestion-proof-alert', {
             source: target,
             refuter: player
+        })
+        // show dialogue to them, tell others player is looking at a card
+        console.log(`Broadcasting card to ${socketID}`)
+        socket.broadcast.to(socketID).emit('suggestion-proof-view', {
+            refuter: player,
+            card: card
         })
     })
 

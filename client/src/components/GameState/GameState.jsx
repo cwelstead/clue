@@ -6,8 +6,9 @@ import Controls from './Controls';
 import CurrentPlayer from './CurrentPlayer';
 import ClueInfoSheet from '../ClueInfoSheet'; // Import the ClueInfoSheet component
 import Guess from './Guess';
+import RefutePopup from './RefutePopup';
 
-const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, endTurn }) => {
+const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, suggestState, submitProof, endTurn }) => {
   const [isNotesOpen, setIsNotesOpen] = useState(false) // State for overlay visibility
   const [isGuessOpen, setIsGuessOpen] = useState(false)
   const [lastSuggest, setLastSuggest] = useState("")
@@ -64,7 +65,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
         movePlayerToCell={movePlayerToCell} />
       <div className={styles.rightSide}>
         <div className={styles.topRight}>
-          <Controls buttons={buttons} spacesToMove={spacesToMove} isUserTurn={role == currentPlayer} />
+          <Controls buttons={buttons} spacesToMove={spacesToMove} isUserTurn={role == currentPlayer} suggestState={suggestState} />
           {cards.map(card => (
             <img src={`./src/assets/${card.type}Cards/${card.id}.svg`} key={card.id} height={"160px"}/>
           ))}
@@ -73,6 +74,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
       </div>
       {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} />} {/* Conditionally render the ClueInfoSheet component */}
       {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess}/>}
+      {suggestState.type == 'select-proof' && <RefutePopup onSubmit={submitProof} cards={cards} suggestState={suggestState} />}
     </div>
   );
 };

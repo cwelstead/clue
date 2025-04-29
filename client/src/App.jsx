@@ -166,6 +166,14 @@ function App() {
         }
     }
 
+    function submitProof(card) {
+        socket.emit('proof-selected', {
+            id: user.id,
+            card: card,
+            target: suggestState.source
+        })
+    }
+
     function endTurn() {
         socket.emit('end-turn', (user.id))
     }
@@ -327,6 +335,7 @@ function App() {
                         rollDice={rollDice}
                         sendGuess={sendGuess}
                         suggestState={suggestState}
+                        submitProof={submitProof}
                         endTurn={endTurn} />
                 )
             } else {
