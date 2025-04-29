@@ -34,22 +34,6 @@ const Controls = ({ buttons, spacesToMove, isUserTurn, suggestState }) => {
           {suggestState.guess.suspect.phrase} in {suggestState.guess.room.phrase} with {suggestState.guess.weapon.phrase}
         </p>
       }
-      {suggestState.type == 'select-proof' &&
-        <p style={{
-          textAlign: 'left'
-        }}
-        >
-          You can prove {suggestState.source.role} wrong!
-        </p>
-      }
-      {suggestState.type == 'suggestion-proof-view' &&
-        <p style={{
-          textAlign: 'left'
-        }}
-        >
-          {suggestState.refuter.role} is showing you {suggestState.card.id}
-        </p>
-      }
       {suggestState.type == 'suggestion-proof-alert' &&
         <p style={{
           textAlign: 'left'
@@ -58,12 +42,13 @@ const Controls = ({ buttons, spacesToMove, isUserTurn, suggestState }) => {
           {suggestState.refuter.role} is showing a card to {suggestState.source.role}
         </p>
       }
-      {suggestState.type == 'no-proof' &&
+      {suggestState.type == 'no-proof-alert' &&
         <p style={{
           textAlign: 'left'
         }}
         >
-          no proof :/
+          No one could prove {suggestState.source.role} wrong with a suggestion of:{'\n'}
+          {suggestState.guess.suspect.phrase} in {suggestState.guess.room.phrase} with {suggestState.guess.weapon.phrase}
         </p>
       }
     </div>

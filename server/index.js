@@ -314,15 +314,13 @@ io.on('connection', socket => {
                 guess: guess
             }))
         } else {
-            io.to(lobby.getID()).emit('no-proof', ({
-                source: player
+            socket.broadcast.to(lobby.getID()).emit('no-proof-alert', ({
+                source: player,
+                guess: guess
             }))
-
-            gameState.nextTurn()
-            io.to(lobby.getID()).emit('gamestate-update', ({
-                playerPositions: gameState.getPlayerPositions(),
-                currentPlayer: gameState.getCurrentPlayerRole(),
-                spacesToMove: gameState.getSpacesToMove()
+            socket.emit('no-proof-view', ({
+                source: player,
+                guess: guess
             }))
         }
     })

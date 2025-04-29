@@ -307,12 +307,24 @@ function App() {
             })
         })
 
-        socket.on('no-proof', ({source}) => {
+        socket.on('no-proof-view', ({source, guess}) => {
+            console.log("No proof :(")
             setSuggestState({
                 ...suggestState,
-                type: 'no-proof',
+                type: 'no-proof-view',
                 source: source,
                 guess: null,
+                refuter: null,
+                card: null,
+            })
+        })
+
+        socket.on('no-proof-alert', ({source, guess}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'no-proof-alert',
+                source: source,
+                guess: guess,
                 refuter: null,
                 card: null,
             })

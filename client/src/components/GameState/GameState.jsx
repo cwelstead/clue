@@ -7,6 +7,7 @@ import CurrentPlayer from './CurrentPlayer';
 import ClueInfoSheet from '../ClueInfoSheet'; // Import the ClueInfoSheet component
 import Guess from './Guess';
 import RefutePopup from './RefutePopup';
+import AlertPopup from './AlertPopup';
 
 const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, suggestState, submitProof, endTurn }) => {
   const [isNotesOpen, setIsNotesOpen] = useState(false) // State for overlay visibility
@@ -75,6 +76,8 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
       {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} />} {/* Conditionally render the ClueInfoSheet component */}
       {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess}/>}
       {suggestState.type == 'select-proof' && <RefutePopup onSubmit={submitProof} cards={cards} suggestState={suggestState} />}
+      {suggestState.type == 'suggestion-proof-view' && <AlertPopup onConfirm={endTurn} card={suggestState.card} suggestState={suggestState} />}
+      {suggestState.type == 'no-proof-view' && <AlertPopup onConfirm={endTurn} card={null} suggestState={suggestState} />}
     </div>
   );
 };
