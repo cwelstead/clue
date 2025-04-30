@@ -4,7 +4,7 @@ import {useAuth} from "../authContext"
 import { useNavigate } from "react-router-dom"
 
 
-export function Login({handleSignUp, handleLogin}) {
+export function Login({ handleLogin, redirectToSignup }) {
     const { login } = useAuth()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -19,11 +19,12 @@ export function Login({handleSignUp, handleLogin}) {
           await handleLogin(email, password)
           navigate("/")
         } catch {
-          setError("Failed to log in")
+          setError("Invalid password or username")
         }
     
         setLoading(false)
       }
+      
 
     
     return (
@@ -123,7 +124,8 @@ export function Login({handleSignUp, handleLogin}) {
     
             {/* Sign Up Button */}
             <button 
-                onClick={() => handleSignUp(email,password)}
+
+                onClick={redirectToSignup}
                 style={{
                     width: '100%',
                     height: '55px',

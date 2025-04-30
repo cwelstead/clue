@@ -1,4 +1,4 @@
-let lobbyIDs = []
+export let lobbyIDs = []
 
 export const Roles = Object.freeze({
     ADAM: "Adam",
@@ -10,6 +10,7 @@ export const Roles = Object.freeze({
 })
 
 export class Lobby {
+
     constructor(name) {
         this._name = name
         this._id = generateID()
@@ -27,7 +28,9 @@ export class Lobby {
     }
 
     addPlayer(player) {
-        if (player.id !== undefined && !this._players.has(player.id) && this._players.size < 6)  {
+        if (player && player.id && player.name
+            && !this._players.has(player.id)
+            && this._players.size < 6)  {
             const firstRoleAvailable = Object.values(Roles).filter(role => !this._takenRoles.has(role))[0]
             this._players.set(player.id, {
                 username: player.name,
@@ -58,7 +61,7 @@ export class Lobby {
     }
 
     readyToStart() {
-        // if (this._players.length < 3) return false
+        if (this._players.size < 3) return false
 
         let allPlayersReady = true
         this._players.forEach(player => {
@@ -87,7 +90,6 @@ export class Lobby {
 
     switchRole(id, role) {
         if (this._takenRoles.has(role) || !Object.values(Roles).includes(role)) {
-            console.log("Role is taken or doesn't exist")
             return false
         } else if (!this._players.has(id)) {
             return false

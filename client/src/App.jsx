@@ -9,6 +9,9 @@ import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import GameState from "./components/GameState/GameState.jsx"
 import LOBBYPage from "./components/Navigation/index.jsx"
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { SignUpPage } from './components/SignUpPage.jsx'
+import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -24,20 +27,39 @@ function App() {
     const [spacesToMove, setSpacesToMove] = useState(-1)
     const [role, setRole] = useState("")
     const [suggestState, setSuggestState] = useState({type: ""})
+    const navigate = useNavigate();
+    // Add navigation state management
+    const [navState, setNavState] = useState("main")
+    // Add user stats state
+    const [userStats, setUserStats] = useState({
+        correctAccusations: 0,
+        gamesPlayed: 0,
+        totalSpacesMoved: 0
+    })
+
+    // Load user stats when component mounts or user changes
+    useEffect(() => {
+        if (user) {
+            // Load user stats from localStorage
+            const storedStats = localStorage.getItem(`userStats_${user.id}`);
+            if (storedStats) {
+                setUserStats(JSON.parse(storedStats));
+            }
+        }
+    }, [user]);
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
-    
+        
         const auth = getAuth();
-    
+        
         // Functions to handle user authentication
-        signInWithEmailAndPassword(auth, email, password)
+        return signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
-                const token = await user.getIdToken(); // Get Firebase token
-    
-                // Send token to backend for validation
-                fetch("http://localhost:8080/authenticate", {
+                const token = await user.getIdToken();
+                
+                return fetch("http://localhost:8080/authenticate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -45,23 +67,26 @@ function App() {
                     },
                     body: JSON.stringify({ userID: socket.id }),
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("User authenticated with backend");
-                            socket.emit("login", {
-                                name: email,
-                                id: socket.id,
-                            });
-                            setUser({ name: email, id: socket.id });
-                        } else {
-                            console.error("Authentication failed on backend:", data.message);
-                        }
-                    })
-                    .catch(error => console.error("Error sending token to backend:", error));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("User authenticated with backend");
+                        socket.emit("login", {
+                            name: email,
+                            id: socket.id,
+                        });
+                        setUser({ name: email, id: socket.id });
+                        navigate("/");
+                        return true;
+                    } else {
+                        console.error("Authentication failed on backend:", data.message);
+                        throw new Error(data.message || "Authentication failed on backend");
+                    }
+                });
             })
             .catch(error => {
                 console.error("Firebase login error:", error.message);
+                throw error; // Re-throw to be caught by the Login component
             });
     }
 
@@ -95,6 +120,7 @@ function App() {
                                 id: socket.id,
                             });
                             setUser({ name: email, id: socket.id });
+                            navigate("/"); // Navigate to home after successful signup
                         } else {
                             console.error("Registration failed on backend:", data.message);
                         }
@@ -103,9 +129,18 @@ function App() {
             })
             .catch(error => {
                 console.error("Firebase signup error:", error.message);
+                if (error.code === 'auth/email-already-in-use') {
+                    throw new Error("This email is already registered. Please try logging in instead.");
+                } else {
+                    throw error; // Re-throw other errors
+                }
             });
     }
 
+    function redirectToSignup() {
+        console.log("being used")
+        navigate("/signup");
+    }
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
@@ -242,7 +277,7 @@ function App() {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
-
+        
             // Once gamestate is updated, suggestion process is assumed to be over
             setSuggestState({
                 ...suggestState,
@@ -329,11 +364,51 @@ function App() {
                 card: null,
             })
         })
-    })
+        
+        // Add cleanup to prevent memory leaks
+        return () => {
+            socket.off('lobby-create-success');
+            socket.off('lobby-join-success');
+            socket.off('lobby-join-fail');
+            socket.off('lobby-update');
+            socket.off('game-start-success');
+            socket.off('gamestate-update');
+            socket.off('suggestion-alert');
+        };
+    }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
-    // Front-end code, returns the correct screen based on gathered data
+    // Updated user stats update function - can be called after games
+    function updateUserStats(gameStats) {
+        const updatedStats = {
+            correctAccusations: userStats.correctAccusations + (gameStats.madeCorrectAccusation ? 1 : 0),
+            gamesPlayed: userStats.gamesPlayed + 1,
+            totalSpacesMoved: userStats.totalSpacesMoved + (gameStats.spacesMoved || 0)
+        };
+        
+        // Save to localStorage
+        localStorage.setItem(`userStats_${user.id}`, JSON.stringify(updatedStats));
+        setUserStats(updatedStats);
+        
+        return updatedStats;
+    }
+
     if (user) {
-        if (lobby.id) {
+        if (navState === "ProfilePage") {
+            return (
+                <ProfilePage 
+                    user={{ username: user.name, ...user }}
+                    setNavState={setNavState}
+                    stats={userStats}
+                />
+            )
+        } else if (navState === "lobby-select") {
+            return (
+                <SelectLobby 
+                    joinLobbyWithID={joinLobbyWithID}
+                    setNavState={setNavState}
+                />
+            )
+        } else if (lobby.id) {
             if (playerPositions) {
                 return (
                     <GameState
@@ -362,12 +437,34 @@ function App() {
             }
         } else {
             return (
-                <LOBBYPage solveACase={SelectLobby} onLobbyJoin={joinLobbyWithID}/>
+                <LOBBYPage 
+                    solveACase={() => setNavState("lobby-select")} 
+                    setNavState={setNavState} 
+                />
             )
         }
     } else {
         return (
-            <LoginPage handleLogin={onLogin} handleSignUp={onSignUp}/>
+            <Routes>
+            <Route path="/login" element={
+                !user ? <LoginPage handleLogin={onLogin} redirectToSignup = {redirectToSignup}  /> : <Navigate to="/" />
+            } />
+            <Route path="/signup" element={
+                !user ? <SignUpPage handleSignUp={onSignUp} /> : <Navigate to="/" />
+            } />
+            <Route path="/" element={
+                user ? (
+                    lobby ? (
+                        gameState ? <GameState /> : <InLobby
+                            lobby={lobby}
+                            onReadyToggle={readyToggle}
+                            onSwitchRole={switchRole}
+                            onLeave={leaveLobby}
+                            onGo={startGame} />
+                    ) : <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
+                ) : <Navigate to="/login" />
+            } />
+        </Routes>
         )
     }
 }

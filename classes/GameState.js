@@ -1,7 +1,7 @@
 import Board from "./Board.js"
 import { CARDS, getCaseFile } from "./Cards.js"
 
-const startingPositions = {
+export const startingPositions = {
     "Adam": {x: 7, y: 24, place: ""},
     "Dr Cooper": {x: 14, y: 0, place: ""},
     "Bob": {x: 23, y: 19, place: ""},
@@ -27,7 +27,10 @@ export class GameState {
     }
 
     getCurrentPlayer() {
-        return this._turnOrder[this._turnIdx]
+        if (this._turnIdx < 0)
+            return undefined
+        else
+            return this._turnOrder[this._turnIdx]
     }
 
     getCurrentPlayerRole() {
@@ -68,6 +71,8 @@ export class GameState {
         const currPlace = playerPosition.place
 
         if (currX >= 0 && currY >= 0) {
+            if (Board.BOARD[destY][destX] === 0) return false
+
             if (Math.abs(playerPosition.x - destX) + Math.abs(playerPosition.y - destY) <= 1) {
                 let destOccupied = false
                 this._playerPositions.forEach((position) => {

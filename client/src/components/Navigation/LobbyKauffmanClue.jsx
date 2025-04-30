@@ -98,7 +98,7 @@ export default function LobbyKauffmanClue({ backgroundImage, setNavState }) {
               }}
               onClick={(e) => {
                 e.preventDefault()
-                // setNavState("player-profile")
+                setNavState("player-profile")
               }}
             >
               Player Profile
