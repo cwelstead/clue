@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import './index.css'
 import { SelectLobby } from './components/SelectLobby.jsx'
 import { InLobby } from './components/InLobby.jsx'
 import { socket } from './socket.js'
@@ -9,20 +10,22 @@ import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
+import LOBBYPage from "./components/Navigation/index.jsx"
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { SignUpPage } from './components/SignUpPage.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
- * 
- * Authors: Cole Welstead
 */
 
 function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
-    const [lobby, setLobby] = useState("")
-    const [gameState, setGameState] = useState(null)
+    const [lobby, setLobby] = useState({})
+    const [playerPositions, setPlayerPositions] = useState(null)
+    const [currentPlayer, setCurrentPlayer] = useState("")
+    const [spacesToMove, setSpacesToMove] = useState(-1)
+    const [role, setRole] = useState("")
     const navigate = useNavigate();
 
     function onLogin(email, password) {
@@ -30,6 +33,7 @@ function App() {
         
         const auth = getAuth();
         
+        // Functions to handle user authentication
         return signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
@@ -65,7 +69,7 @@ function App() {
                 throw error; // Re-throw to be caught by the Login component
             });
     }
-    
+
     function onSignUp(email, password) {
         console.log("sign up button clicked")
         const auth = getAuth();
@@ -82,7 +86,7 @@ function App() {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         userID: socket.id,
                         email: email 
                     }),
@@ -146,6 +150,36 @@ function App() {
         socket.emit('game-start')
     }
 
+    // Functions to manipulate GameState
+    function movePlayerToPlace(place) {
+        socket.emit('move-place', ({id: user.id, destPlace: place}))
+    }
+
+    function movePlayerToCell(x, y) {
+        socket.emit('move-cell', ({
+            id: user.id,
+            destX: x,
+            destY: y,
+        }))
+    }
+
+    function rollDice() {
+        // Show something to the player...
+        console.log("Rolling the dice!")
+
+        // Calculate the roll
+        const roll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)
+
+        socket.emit('roll-dice', ({id: user.id, number: roll}))
+    }
+
+    const buttons = [
+        {label: 'PASSAGE', onClick: null, disabledCondition: true},
+        {label: 'ROLL', onClick: rollDice, disabledCondition: false},
+        {label: 'SUGGEST', onClick: null, disabledCondition: true},
+        {label: 'ACCUSE', onClick: null, disabledCondition: true},
+    ];
+
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
         socket.on('lobby-create-success', (id) => {
@@ -154,13 +188,22 @@ function App() {
 
         socket.on('lobby-join-success', ({ name, id, players, takenRoles }) => {
             console.log(`Lobby joined: ${name} with ID ${id}`)
-            setLobby({
+            const playersMap = new Map(JSON.parse(players))
+            
+            setLobby(lobby => ({
+                ...lobby,
+                ...{
                 name: name,
                 id: id,
-                players: new Map(JSON.parse(players)),
+                players: playersMap,
                 takenRoles: new Set(JSON.parse(takenRoles)),
                 readyToStart: false
-            })
+                }
+            }))
+            const userPlayer = playersMap.get(user.id)
+            if (userPlayer) {
+                setRole(userPlayer.role)
+            }
         })
 
         socket.on('lobby-join-fail', (lobbyID) => {
@@ -168,26 +211,49 @@ function App() {
         })
 
         socket.on('lobby-update', ({ players, takenRoles, readyToStart }) => {
-            setLobby({
-                name: lobby.name,
-                id: lobby.id,
-                players: new Map(JSON.parse(players)),
+            const playersMap = new Map(JSON.parse(players))
+
+            setLobby(lobby => ({
+                ...lobby,
+                ...{
+                players: playersMap,
                 takenRoles: new Set(JSON.parse(takenRoles)),
-                readyToStart: readyToStart,
-            })
+                readyToStart: readyToStart
+                }
+            }))
+            const userPlayer = playersMap.get(user.id)
+            if (userPlayer) {
+                setRole(userPlayer.role)
+            }
         })
 
-        socket.on('game-start-success', (game) => {
-            setGameState(game)
+        socket.on('game-start-success', ({playerPositions, currentPlayer, spacesToMove}) => {
+            console.log("Game start success!")
+            setPlayerPositions(new Map(JSON.parse(playerPositions)))
+            setCurrentPlayer(currentPlayer)
+            setSpacesToMove(spacesToMove)
+        })
+
+        socket.on('gamestate-update', ({playerPositions, currentPlayer, spacesToMove}) => {
+            setPlayerPositions(new Map(JSON.parse(playerPositions)))
+            setCurrentPlayer(currentPlayer)
+            setSpacesToMove(spacesToMove)
         })
     }, [lobby]); // Added dependency array to prevent re-attaching listeners
 
     // Front-end code, returns the correct screen based on gathered data
     if (user) {
-        if (lobby) {
-            if (gameState) {
+        if (lobby.id) {
+            if (playerPositions) {
                 return (
-                    <GameState />
+                    <GameState
+                        playerPositions={playerPositions}
+                        movePlayerToPlace={movePlayerToPlace}
+                        movePlayerToCell={movePlayerToCell}
+                        role={role}
+                        currentPlayer={currentPlayer}
+                        buttons={buttons}
+                        spacesToMove={spacesToMove} />
                 )
             } else {
                 return (
@@ -201,7 +267,7 @@ function App() {
             }
         } else {
             return (
-                <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
+                <LOBBYPage solveACase={SelectLobby}/>
             )
         }
     } else {
