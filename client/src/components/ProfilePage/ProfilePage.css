@@ -1,0 +1,187 @@
+.profile-page {
+  width: 100%;
+  min-height: 100vh;
+  background: url('https://dashboard.codeparrot.ai/api/image/aA-6VgROQIWTswzf/profile.png') center/cover;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.deep-color-overlay {
+  width: auto;
+  min-height: 100vh;
+  padding: 42px 47px;
+  background: rgba(42, 26, 26, 0.57);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.back-button {
+  width: 157px;
+  height: 50px;
+  font-size: 20px;
+  font-weight: 400;
+  background: #800000;
+  border-radius: 5.66px;
+  border: none;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.26px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background: #960000;
+}
+
+.main-content {
+  display: flex;
+  gap: 81px;
+  align-items: center; /* Centers items vertically */
+  justify-content: center; /* Centers items horizontally */
+  width: 100%;
+  max-width: 1300px; /* Adjust this value based on your design needs */
+  margin: 30px auto; /* Centers the frame horizontally */
+  padding-block: 40px;
+  background: rgba(70, 64, 57, 0.3);
+  border-radius: 12px; /* Optional: rounds the frame corners */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-card {
+  width: 300px;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  display:block;
+  border-radius: 20px;
+}
+
+.stats-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 23px;
+  max-width: 892px;
+  min-width: 500px;
+}
+
+.username-frame {
+  width: auto;
+  padding: 6px 8px;
+  background: linear-gradient(180deg, rgba(77,72,68,1) 0%, rgba(70,64,57,1) 99.99%);
+  border-radius: 8px;
+  border: 1px solid #fff;
+  position: relative;
+}
+
+.username-label {
+  position: absolute;
+  top: 20px;
+  left: 59px;
+  color: #1d1c1a;
+  font-size: 40px;
+  font-weight: 700;
+  z-index: 1;
+}
+
+.username-input {
+  width: 95%;
+  height: 85px;
+  background: #ead7b7cc;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  padding: 0 20px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: transparent;
+}
+
+.statistics-frame {
+  width: auto;
+  background: rgba(70, 64, 57, 0.95);
+  border-radius: 8px;
+  border: 1px solid #fff;
+  padding: 65px 59px;
+}
+
+.statistics-content {
+  color: white;
+}
+
+.statistics-content h2 {
+  font-size: 40px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  text-align:left ;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 30px;
+  font-weight: 400;
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+
+.stat-value {
+  color: #fff;
+}
+
+.join-game-button {
+  align-self: flex-end;
+  width: 190px;
+  height: 50px;
+  font-size: 20px;
+  font-weight: 600;
+  background: #D4A017;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: auto;
+}
+
+.join-game-button:hover {
+  background: #E5B120;
+  transform: scale(1.02);
+}
+
+/* Add media queries for responsiveness */
+@media (max-width: 1200px) {
+  .main-content {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .stats-container {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .profile-card {
+    width: 250px; /* Slightly smaller on smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .deep-color-overlay {
+    padding: 20px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .profile-card {
+    width: 200px; /* Even smaller on mobile */
+  }
+}
