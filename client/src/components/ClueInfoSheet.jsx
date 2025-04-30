@@ -1,7 +1,7 @@
 /* src/ClueInfoSheet.jsx */
 import React, { useEffect, useState } from 'react';
 
-const ClueInfoSheet = ({ onClose }) => { //Accept onClose prop
+const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //Accept onClose prop
   // Hardcoded arrays for simplicity
   const suspects = [
     { name: "Dr. Cooper", car: "src/assets/suspectCards/DrCooper.svg" },
@@ -32,13 +32,6 @@ const ClueInfoSheet = ({ onClose }) => { //Accept onClose prop
     { name: "110", car: "src/assets/roomCards/110.svg" },
     { name: "Study", car: "src/assets/roomCards/STUDY.svg" }
   ];
-
-  // State to track which cards have been crossed off
-  const [crossedOffCards, setCrossedOffCards] = useState({
-    suspects: {},
-    weapons: {},
-    rooms: {}
-  });
 
   useEffect(() => {
     // Prevent scrolling on the body

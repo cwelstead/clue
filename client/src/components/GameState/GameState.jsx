@@ -15,6 +15,13 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
   const [lastSuggest, setLastSuggest] = useState("")
   const [guessType, setGuessType] = useState("")
 
+  // State to track which cards have been crossed off
+  const [crossedOffCards, setCrossedOffCards] = useState({
+    suspects: {},
+    weapons: {},
+    rooms: {}
+  });
+
   const handleNotesClick = () => {
     setIsNotesOpen(true) // Open the overlay
   };
@@ -73,7 +80,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
           <CurrentPlayer currentPlayer={currentPlayer} role={role} />
         </div>
       </div>
-      {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} />} {/* Conditionally render the ClueInfoSheet component */}
+      {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} crossedOffCards={crossedOffCards} setCrossedOffCards={setCrossedOffCards} />} {/* Conditionally render the ClueInfoSheet component */}
       {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess}/>}
       {suggestState.type == 'select-proof' && <RefutePopup onSubmit={submitProof} cards={cards} suggestState={suggestState} />}
       {suggestState.type == 'suggestion-proof-view' && <AlertPopup onConfirm={endTurn} card={suggestState.card} suggestState={suggestState} />}
