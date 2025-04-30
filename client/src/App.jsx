@@ -11,6 +11,7 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } f
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
 import LOBBYPage from "./components/Navigation/index.jsx"
+import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -24,6 +25,25 @@ function App() {
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(-1)
     const [role, setRole] = useState("")
+    // Add navigation state management
+    const [navState, setNavState] = useState("main")
+    // Add user stats state
+    const [userStats, setUserStats] = useState({
+        correctAccusations: 0,
+        gamesPlayed: 0,
+        totalSpacesMoved: 0
+    })
+
+    // Load user stats when component mounts or user changes
+    useEffect(() => {
+        if (user) {
+            // Load user stats from localStorage
+            const storedStats = localStorage.getItem(`userStats_${user.id}`);
+            if (storedStats) {
+                setUserStats(JSON.parse(storedStats));
+            }
+        }
+    }, [user]);
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
@@ -54,6 +74,7 @@ function App() {
                                 id: socket.id,
                             });
                             setUser({ name: email, id: socket.id });
+                            setNavState("main"); // Set navigation state to main after login
                         } else {
                             console.error("Authentication failed on backend:", data.message);
                         }
@@ -95,6 +116,7 @@ function App() {
                                 id: socket.id,
                             });
                             setUser({ name: email, id: socket.id });
+                            setNavState("main"); // Set navigation state to main after signup
                         } else {
                             console.error("Registration failed on backend:", data.message);
                         }
@@ -224,11 +246,50 @@ function App() {
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
         })
-    })
+        
+        // Add cleanup to prevent memory leaks
+        return () => {
+            socket.off('lobby-create-success');
+            socket.off('lobby-join-success');
+            socket.off('lobby-join-fail');
+            socket.off('lobby-update');
+            socket.off('game-start-success');
+            socket.off('gamestate-update');
+        };
+    }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
-    // Front-end code, returns the correct screen based on gathered data
+    // Updated user stats update function - can be called after games
+    function updateUserStats(gameStats) {
+        const updatedStats = {
+            correctAccusations: userStats.correctAccusations + (gameStats.madeCorrectAccusation ? 1 : 0),
+            gamesPlayed: userStats.gamesPlayed + 1,
+            totalSpacesMoved: userStats.totalSpacesMoved + (gameStats.spacesMoved || 0)
+        };
+        
+        // Save to localStorage
+        localStorage.setItem(`userStats_${user.id}`, JSON.stringify(updatedStats));
+        setUserStats(updatedStats);
+        
+        return updatedStats;
+    }
+
     if (user) {
-        if (lobby.id) {
+        if (navState === "ProfilePage") {
+            return (
+                <ProfilePage 
+                    user={{ username: user.name, ...user }}
+                    setNavState={setNavState}
+                    stats={userStats}
+                />
+            )
+        } else if (navState === "lobby-select") {
+            return (
+                <SelectLobby 
+                    joinLobbyWithID={joinLobbyWithID}
+                    setNavState={setNavState}
+                />
+            )
+        } else if (lobby.id) {
             if (playerPositions) {
                 return (
                     <GameState
@@ -252,7 +313,10 @@ function App() {
             }
         } else {
             return (
-                <LOBBYPage solveACase={SelectLobby}/>
+                <LOBBYPage 
+                    solveACase={() => setNavState("lobby-select")} 
+                    setNavState={setNavState} 
+                />
             )
         }
     } else {

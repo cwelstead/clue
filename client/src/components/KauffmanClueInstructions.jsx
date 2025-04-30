@@ -185,7 +185,7 @@ export default function KauffmanClueInstructions() {
       )}
       
       {/* Styles for fonts and other customizations */}
-      <style jsx global>{`
+      <style>{`
         @import url('../pages/styles/font.css');
         
         h1, h2 {
