@@ -5,22 +5,65 @@ import GameBoard from './GameBoard';
 import Controls from './Controls';
 import CurrentPlayer from './CurrentPlayer';
 import ClueInfoSheet from '../ClueInfoSheet'; // Import the ClueInfoSheet component
+import Guess from './Guess';
+import RefutePopup from './RefutePopup';
+import AlertPopup from './AlertPopup';
 
-const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, buttons, spacesToMove }) => {
-  const [isNotesOpen, setIsNotesOpen] = useState(false); // State for overlay visibility
+const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, suggestState, submitProof, endTurn }) => {
+  const [isNotesOpen, setIsNotesOpen] = useState(false) // State for overlay visibility
+  const [isGuessOpen, setIsGuessOpen] = useState(false)
+  const [lastSuggest, setLastSuggest] = useState("")
+  const [guessType, setGuessType] = useState("")
+
+  // State to track which cards have been crossed off
+  const [crossedOffCards, setCrossedOffCards] = useState({
+    suspects: {},
+    weapons: {},
+    rooms: {}
+  });
 
   const handleNotesClick = () => {
-    setIsNotesOpen(true); // Open the overlay
+    setIsNotesOpen(true) // Open the overlay
   };
 
   const handleCloseNotes = () => {
-    setIsNotesOpen(false); // Close the overlay
+    setIsNotesOpen(false) // Close the overlay
   };
 
-  const buttonsWithNotes = [
+  const handleCloseGuess = () => {
+    setIsGuessOpen(false)
+    setGuessType("")
+  }
+
+  function openSuggest() {
+    setGuessType("SUGGEST")
+    setIsGuessOpen(true)
+  }
+
+  function openAccuse() {
+    setGuessType("ACCUSE")
+    setIsGuessOpen(true)
+  }
+
+  function makeGuess(suspect, weapon, room) {
+    setLastSuggest(playerPositions.get(role).place)
+    sendGuess({room: room, suspect: suspect, weapon: weapon}, guessType)
+    handleCloseGuess()
+  }
+
+  function startRoll() {
+    setLastSuggest("")
+    rollDice()
+  }
+
+  const buttons = [
     {label: 'NOTES', onClick: handleNotesClick, disabledCondition: false},
-    ...buttons
-  ]
+    {label: 'PASSAGE', onClick: null, disabledCondition: true  || spacesToMove > 0},
+    {label: 'ROLL', onClick: startRoll, disabledCondition: spacesToMove >= 0 || role != currentPlayer},
+    {label: 'SUGGEST', onClick: openSuggest, disabledCondition: (playerPositions && (!playerPositions.get(role).place || playerPositions.get(role).place == lastSuggest)) || role != currentPlayer || spacesToMove > 0},
+    {label: 'ACCUSE', onClick: openAccuse, disabledCondition: (playerPositions && playerPositions.get(role).place != "Kauffman Clue") || role != currentPlayer || spacesToMove > 0},
+    {label: 'END TURN', onClick: endTurn, disabledCondition: role != currentPlayer}
+  ];
 
   return (
     <div className={styles.gameState}>
@@ -30,11 +73,18 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
         movePlayerToCell={movePlayerToCell} />
       <div className={styles.rightSide}>
         <div className={styles.topRight}>
-          <Controls buttons={buttonsWithNotes} spacesToMove={spacesToMove} />
+          <Controls buttons={buttons} spacesToMove={spacesToMove} isUserTurn={role == currentPlayer} suggestState={suggestState} />
+          {cards.map(card => (
+            <img src={`./src/assets/${card.type}Cards/${card.id}.svg`} key={card.id} height={"160px"}/>
+          ))}
           <CurrentPlayer currentPlayer={currentPlayer} role={role} />
         </div>
       </div>
-      {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} />} {/* Conditionally render the ClueInfoSheet component */}
+      {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} crossedOffCards={crossedOffCards} setCrossedOffCards={setCrossedOffCards} />} {/* Conditionally render the ClueInfoSheet component */}
+      {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess}/>}
+      {suggestState.type == 'select-proof' && <RefutePopup onSubmit={submitProof} cards={cards} suggestState={suggestState} />}
+      {suggestState.type == 'suggestion-proof-view' && <AlertPopup onConfirm={endTurn} card={suggestState.card} suggestState={suggestState} />}
+      {suggestState.type == 'no-proof-view' && <AlertPopup onConfirm={endTurn} card={null} suggestState={suggestState} />}
     </div>
   );
 };
