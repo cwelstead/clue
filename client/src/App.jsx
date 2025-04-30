@@ -374,6 +374,11 @@ function App() {
             socket.off('game-start-success');
             socket.off('gamestate-update');
             socket.off('suggestion-alert');
+            socket.off('select-proof');
+            socket.off('suggestion-proof-view');
+            socket.off('suggestion-proof-alert');
+            socket.off('no-proof-view');
+            socket.off('no-proof-alert');
         };
     }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
@@ -387,7 +392,7 @@ function App() {
         
         // Save to localStorage
         localStorage.setItem(`userStats_${user.id}`, JSON.stringify(updatedStats));
-        setUserStats(updatedStats);
+        setUserStats({...userStats, ...updatedStats});
         
         return updatedStats;
     }
