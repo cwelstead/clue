@@ -2,8 +2,15 @@
 import { useEffect } from 'react';
 import React from 'react';
 import { Login } from './Login';
+import { useNavigate } from "react-router-dom";
 
-export function LoginPage({handleLogin, handleSignUp}) {
+
+
+export function LoginPage({handleLogin}) {
+    const navigate = useNavigate();
+    const redirectToSignup = () => {
+        navigate("/signup");
+    };
     useEffect(() => {
         // Prevent scrolling on the body
         document.body.style.overflow = 'hidden';
@@ -82,7 +89,7 @@ export function LoginPage({handleLogin, handleSignUp}) {
                 zIndex: 1,
                 position: 'relative',
             }}>
-                <Login handleLogin={handleLogin} handleSignUp={handleSignUp} />
+                <Login handleLogin={handleLogin} redirectToSignup={redirectToSignup} />
             </div>
 
             {/* Seal Image */}

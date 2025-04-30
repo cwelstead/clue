@@ -11,6 +11,8 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } f
 import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
 import LOBBYPage from "./components/Navigation/index.jsx"
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { SignUpPage } from './components/SignUpPage.jsx'
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 
 /*
@@ -25,6 +27,7 @@ function App() {
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(-1)
     const [role, setRole] = useState("")
+    const navigate = useNavigate();
     // Add navigation state management
     const [navState, setNavState] = useState("main")
     // Add user stats state
@@ -47,17 +50,16 @@ function App() {
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
-    
+        
         const auth = getAuth();
-    
+        
         // Functions to handle user authentication
-        signInWithEmailAndPassword(auth, email, password)
+        return signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
-                const token = await user.getIdToken(); // Get Firebase token
-    
-                // Send token to backend for validation
-                fetch("http://localhost:8080/authenticate", {
+                const token = await user.getIdToken();
+                
+                return fetch("http://localhost:8080/authenticate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -65,24 +67,26 @@ function App() {
                     },
                     body: JSON.stringify({ userID: socket.id }),
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("User authenticated with backend");
-                            socket.emit("login", {
-                                name: email,
-                                id: socket.id,
-                            });
-                            setUser({ name: email, id: socket.id });
-                            setNavState("main"); // Set navigation state to main after login
-                        } else {
-                            console.error("Authentication failed on backend:", data.message);
-                        }
-                    })
-                    .catch(error => console.error("Error sending token to backend:", error));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("User authenticated with backend");
+                        socket.emit("login", {
+                            name: email,
+                            id: socket.id,
+                        });
+                        setUser({ name: email, id: socket.id });
+                        navigate("/");
+                        return true;
+                    } else {
+                        console.error("Authentication failed on backend:", data.message);
+                        throw new Error(data.message || "Authentication failed on backend");
+                    }
+                });
             })
             .catch(error => {
                 console.error("Firebase login error:", error.message);
+                throw error; // Re-throw to be caught by the Login component
             });
     }
 
@@ -116,7 +120,7 @@ function App() {
                                 id: socket.id,
                             });
                             setUser({ name: email, id: socket.id });
-                            setNavState("main"); // Set navigation state to main after signup
+                            navigate("/"); // Navigate to home after successful signup
                         } else {
                             console.error("Registration failed on backend:", data.message);
                         }
@@ -125,9 +129,18 @@ function App() {
             })
             .catch(error => {
                 console.error("Firebase signup error:", error.message);
+                if (error.code === 'auth/email-already-in-use') {
+                    throw new Error("This email is already registered. Please try logging in instead.");
+                } else {
+                    throw error; // Re-throw other errors
+                }
             });
     }
 
+    function redirectToSignup() {
+        console.log("being used")
+        navigate("/signup");
+    }
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
@@ -321,7 +334,26 @@ function App() {
         }
     } else {
         return (
-            <LoginPage handleLogin={onLogin} handleSignUp={onSignUp}/>
+            <Routes>
+            <Route path="/login" element={
+                !user ? <LoginPage handleLogin={onLogin} redirectToSignup = {redirectToSignup}  /> : <Navigate to="/" />
+            } />
+            <Route path="/signup" element={
+                !user ? <SignUpPage handleSignUp={onSignUp} /> : <Navigate to="/" />
+            } />
+            <Route path="/" element={
+                user ? (
+                    lobby ? (
+                        gameState ? <GameState /> : <InLobby
+                            lobby={lobby}
+                            onReadyToggle={readyToggle}
+                            onSwitchRole={switchRole}
+                            onLeave={leaveLobby}
+                            onGo={startGame} />
+                    ) : <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
+                ) : <Navigate to="/login" />
+            } />
+        </Routes>
         )
     }
 }
