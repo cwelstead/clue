@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import LobbyKauffmanClue from "./LobbyKauffmanClue";
 import backgroundImage from "../../assets/kauffman-building.png";
 import { SelectLobby } from "../SelectLobby";
+import ProfilePage from "../ProfilePage/ProfilePage";
 
 export default function LOBBYPage({ user, onLobbyJoin }) {
   const [navState, setNavState] = useState("")
@@ -13,7 +14,7 @@ export default function LOBBYPage({ user, onLobbyJoin }) {
           <div></div>
         }
         { navState === "player-profile" &&
-          <div></div>
+          <ProfilePage setNavState={setNavState} />
         }
         { navState === "lobby-select" &&
           <SelectLobby user={user} onLobbyJoin={onLobbyJoin} setNavState={setNavState} />

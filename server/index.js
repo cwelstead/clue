@@ -135,7 +135,7 @@ io.on('connection', socket => {
         } else {
             // Step 3: Join lobby
             if (userID) {
-                lobbyToJoin.addPlayer({name: username, id: userID})
+                lobbyToJoin.addPlayer({name: username, id: userID, socket: socket.id})
                 UsersState.users.find((user) => user.id === userID).lobby = lobbyToJoin.getID()
                 socket.join(lobbyToJoin.getID())
             }
@@ -199,6 +199,7 @@ io.on('connection', socket => {
                 gameState.nextTurn()
                 io.to(lobby.getID()).emit('game-start-success', ({
                     playerPositions: gameState.getPlayerPositions(),
+                    playerCards: gameState.getPlayerCards(),
                     currentPlayer: gameState.getCurrentPlayerRole(),
                     spacesToMove: gameState.getSpacesToMove()
                 }))
@@ -247,10 +248,8 @@ io.on('connection', socket => {
         const player = lobby.getPlayer(id)
         const gameState = gameStates.get(lobby.getID())
 
-        // Step 1: Move the player
+        // Move the player
         if (id == gameState.getCurrentPlayer() && gameState.movePlayerToPlace(player, destPlace)) {
-            // Step 2: Moving to a place ends turn
-            gameState.nextTurn()
             io.to(lobby.getID()).emit('gamestate-update', ({
                 playerPositions: gameState.getPlayerPositions(),
                 currentPlayer: gameState.getCurrentPlayerRole(),
@@ -291,6 +290,82 @@ io.on('connection', socket => {
                 spacesToMove: gameState.getSpacesToMove()
             }))
         }
+    })
+
+    socket.on('suggestion', ({id, guess}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        // Tell rest of lobby what suggestion is being made
+        io.to(lobby.getID()).emit('suggestion-alert', {
+            source: player,
+            guess: guess
+        })
+
+        const playerToProveWrong = gameState.getSuggestionProof(guess)
+
+        if (playerToProveWrong) {
+            // Get socket of player
+            const socketID = playerToProveWrong.socket
+
+            socket.broadcast.to(socketID).emit('select-proof', ({
+                source: player,
+                guess: guess
+            }))
+        } else {
+            socket.broadcast.to(lobby.getID()).emit('no-proof-alert', ({
+                source: player,
+                guess: guess
+            }))
+            socket.emit('no-proof-view', ({
+                source: player,
+                guess: guess
+            }))
+        }
+    })
+
+    socket.on('proof-selected', ({id, card, target}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+
+        // Get socket of target
+        // Make sure target remains a player object in frontend
+        const socketID = target.socket
+
+        io.to(lobby.getID()).emit('suggestion-proof-alert', {
+            source: target,
+            refuter: player
+        })
+        // show dialogue to them, tell others player is looking at a card
+        console.log(`Broadcasting card to ${socketID}`)
+        socket.broadcast.to(socketID).emit('suggestion-proof-view', {
+            refuter: player,
+            card: card
+        })
+    })
+
+    socket.on('proof-confirmed', ({id}) => {
+        const lobby = getLobbyFromUser(id)
+        const gameState = gameStates.get(lobby.getID())
+        
+        gameState.nextTurn()
+        io.to(lobby.getID()).emit('gamestate-update', ({
+            playerPositions: gameState.getPlayerPositions(),
+            currentPlayer: gameState.getCurrentPlayerRole(),
+            spacesToMove: gameState.getSpacesToMove()
+        }))
+    })
+
+    socket.on('end-turn', (id) => {
+        const lobby = getLobbyFromUser(id)
+        const gameState = gameStates.get(lobby.getID())
+        gameState.nextTurn()
+        io.to(lobby.getID()).emit('gamestate-update', ({
+            playerPositions: gameState.getPlayerPositions(),
+            currentPlayer: gameState.getCurrentPlayerRole(),
+            spacesToMove: gameState.getSpacesToMove()
+        }))
     })
 
     // When user disconnects

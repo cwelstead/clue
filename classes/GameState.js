@@ -1,6 +1,7 @@
 import Board from "./Board.js"
+import { CARDS, getCaseFile } from "./Cards.js"
 
-const startingPositions = {
+export const startingPositions = {
     "Adam": {x: 7, y: 24, place: ""},
     "Dr Cooper": {x: 14, y: 0, place: ""},
     "Bob": {x: 23, y: 19, place: ""},
@@ -16,16 +17,20 @@ export class GameState {
         this._players = new Map(JSON.parse(lobby.getPlayers()))
         this._piecePositions = {} // we don't even have to keep pieces on the board if we don't want to
         this._turnOrder = this.determineTurnOrder(this._players) // random for now
+        this._caseFile = getCaseFile()
 
         // Sent to the players as updates
         this._playerPositions = new Map(Object.entries(startingPositions))
-        this._playerCards = new Map()
+        this._playerCards = this.distributeCards()
         this._spacesToMove = -1
         this._turnIdx = -1 // in the form of getCurrentPlayer()
     }
 
     getCurrentPlayer() {
-        return this._turnOrder[this._turnIdx]
+        if (this._turnIdx < 0)
+            return undefined
+        else
+            return this._turnOrder[this._turnIdx]
     }
 
     getCurrentPlayerRole() {
@@ -66,6 +71,8 @@ export class GameState {
         const currPlace = playerPosition.place
 
         if (currX >= 0 && currY >= 0) {
+            if (Board.BOARD[destY][destX] === 0) return false
+
             if (Math.abs(playerPosition.x - destX) + Math.abs(playerPosition.y - destY) <= 1) {
                 let destOccupied = false
                 this._playerPositions.forEach((position) => {
@@ -115,6 +122,7 @@ export class GameState {
                 place.adjacentSpaces.forEach(exit => {
                     if (exit.x == playerPosition.x && exit.y == playerPosition.y) {
                         this._playerPositions.set(player.role, {x: -1, y: -1, place: destPlace})
+                        this._spacesToMove = 0
                         moveSuccessful = true
                     }
                 })
@@ -124,8 +132,35 @@ export class GameState {
         return moveSuccessful
     }
 
+    getSuggestionProof(guess) {
+        let playerToProveWrong = undefined
+
+        // Iterate through turn order in reverse
+        // If a player has a card that can prove the guess wrong, update the variable
+        // At the end of iteration, the earliest player in turn order will be the variable
+        // Otherwise, it remains undefined
+        let i = (this._turnIdx + this._turnOrder.length - 1) % this._turnOrder.length
+        while (i != this._turnIdx) {
+            const playerCards = this._playerCards.get(this._turnOrder[i])
+
+            if (playerCards.some(card => card.id == guess.room.id
+                                        || card.id == guess.suspect.id
+                                        || card.id == guess.weapon.id)) {
+                playerToProveWrong = this._players.get(this._turnOrder[i])
+            }
+
+            i = (i + this._turnOrder.length - 1) % this._turnOrder.length
+        }
+
+        return playerToProveWrong
+    }
+
     getPlayerPositions() {
         return JSON.stringify(Array.from(this._playerPositions))
+    }
+
+    getPlayerCards() {
+        return JSON.stringify(Array.from(this._playerCards))
     }
 
     determineTurnOrder(players) {
@@ -138,5 +173,34 @@ export class GameState {
         }
 
         return turnOrder
+    }
+
+    distributeCards() {
+        // Set up cards without case file cards and shuffle their order
+        let remainingCards = [...CARDS]
+
+        Object.values(this._caseFile).forEach(caseCard => {
+            remainingCards = remainingCards.filter(card => JSON.stringify(card) != JSON.stringify(caseCard))
+        })
+
+        for (let i = remainingCards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [remainingCards[i], remainingCards[j]] = [remainingCards[j], remainingCards[i]];
+        }
+
+        // Set up the map of player-owned cards
+        const playerCards = new Map()
+        this._players.keys().forEach(player => {
+            playerCards.set(player, [])
+        })
+
+        // Distribute cards until there are none left, starting with the last player and going against turn order
+        let i = this._turnOrder.length - 1
+        while (remainingCards.length > 0) {
+            playerCards.get(this._turnOrder[i]).push(remainingCards.pop())
+            i = (i + this._turnOrder.length - 1) % this._turnOrder.length
+        }
+
+        return playerCards
     }
 }

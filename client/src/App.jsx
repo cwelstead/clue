@@ -5,12 +5,13 @@ import { SelectLobby } from './components/SelectLobby.jsx'
 import { InLobby } from './components/InLobby.jsx'
 import { socket } from './socket.js'
 import { useEffect } from 'react'
-import { Roles } from '../../classes/Lobby.js'
 import { LoginPage } from './components/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { InGame } from './components/InGame.jsx'
 import GameState from "./components/GameState/GameState.jsx"
 import LOBBYPage from "./components/Navigation/index.jsx"
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { SignUpPage } from './components/SignUpPage.jsx'
+import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 import DiceRollerPopup from './components/DiceRollerPopup.jsx'
 
 /*
@@ -22,24 +23,45 @@ function App() {
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState({})
     const [playerPositions, setPlayerPositions] = useState(null)
+    const [cards, setCards] = useState([])
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(-1)
     const [role, setRole] = useState("")
     const [isDicePopupOpen, setIsDicePopupOpen] = useState(false);
+    const [suggestState, setSuggestState] = useState({type: ""})
+    const navigate = useNavigate();
+    // Add navigation state management
+    const [navState, setNavState] = useState("main")
+    // Add user stats state
+    const [userStats, setUserStats] = useState({
+        correctAccusations: 0,
+        gamesPlayed: 0,
+        totalSpacesMoved: 0
+    })
+
+    // Load user stats when component mounts or user changes
+    useEffect(() => {
+        if (user) {
+            // Load user stats from localStorage
+            const storedStats = localStorage.getItem(`userStats_${user.id}`);
+            if (storedStats) {
+                setUserStats(JSON.parse(storedStats));
+            }
+        }
+    }, [user]);
 
     function onLogin(email, password) {
         console.log(`Attempting login with username ${email} and ID ${socket.id}`);
-    
+        
         const auth = getAuth();
-    
+        
         // Functions to handle user authentication
-        signInWithEmailAndPassword(auth, email, password)
+        return signInWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 const user = userCredential.user;
-                const token = await user.getIdToken(); // Get Firebase token
-    
-                // Send token to backend for validation
-                fetch("http://localhost:8080/authenticate", {
+                const token = await user.getIdToken();
+                
+                return fetch("http://localhost:8080/authenticate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -47,23 +69,26 @@ function App() {
                     },
                     body: JSON.stringify({ userID: socket.id }),
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log("User authenticated with backend");
-                            socket.emit("login", {
-                                name: email,
-                                id: socket.id,
-                            });
-                            setUser({ name: email, id: socket.id });
-                        } else {
-                            console.error("Authentication failed on backend:", data.message);
-                        }
-                    })
-                    .catch(error => console.error("Error sending token to backend:", error));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("User authenticated with backend");
+                        socket.emit("login", {
+                            name: email,
+                            id: socket.id,
+                        });
+                        setUser({ name: email, id: socket.id });
+                        navigate("/");
+                        return true;
+                    } else {
+                        console.error("Authentication failed on backend:", data.message);
+                        throw new Error(data.message || "Authentication failed on backend");
+                    }
+                });
             })
             .catch(error => {
                 console.error("Firebase login error:", error.message);
+                throw error; // Re-throw to be caught by the Login component
             });
     }
 
@@ -97,6 +122,7 @@ function App() {
                                 id: socket.id,
                             });
                             setUser({ name: email, id: socket.id });
+                            navigate("/"); // Navigate to home after successful signup
                         } else {
                             console.error("Registration failed on backend:", data.message);
                         }
@@ -105,9 +131,18 @@ function App() {
             })
             .catch(error => {
                 console.error("Firebase signup error:", error.message);
+                if (error.code === 'auth/email-already-in-use') {
+                    throw new Error("This email is already registered. Please try logging in instead.");
+                } else {
+                    throw error; // Re-throw other errors
+                }
             });
     }
 
+    function redirectToSignup() {
+        console.log("being used")
+        navigate("/signup");
+    }
 
     // Functions to handle buttons from the SelectLobby component
     function joinLobbyWithID(id) {
@@ -150,16 +185,6 @@ function App() {
         }))
     }
 
-    // function rollDice() {
-    //     // Show something to the player...
-    //     console.log("Rolling the dice!")
-
-    //     // Calculate the roll
-    //     const roll = 2 + Math.floor(Math.random() * 6) + Math.floor(Math.random() * 6)
-
-    //     socket.emit('roll-dice', ({id: user.id, number: roll}))
-    // }
-
     function rollDice() {
         console.log("Rolling the dice!");
         // Open the dice roller popup instead of immediately calculating
@@ -174,12 +199,25 @@ function App() {
         socket.emit('roll-dice', ({id: user.id, number: rollResult}));
     }
 
-    const buttons = [
-        {label: 'PASSAGE', onClick: null, disabledCondition: true},
-        {label: 'ROLL', onClick: rollDice, disabledCondition: false},
-        {label: 'SUGGEST', onClick: null, disabledCondition: true},
-        {label: 'ACCUSE', onClick: null, disabledCondition: true},
-    ];
+    function sendGuess(guess, type) {
+        if (type == 'SUGGEST') {
+            socket.emit('suggestion', ({id: user.id, guess: guess}))
+        } else if (type == 'ACCUSE') {
+            socket.emit('accusation', ({id: user.id, guess: guess}))
+        }
+    }
+
+    function submitProof(card) {
+        socket.emit('proof-selected', {
+            id: user.id,
+            card: card,
+            target: suggestState.source
+        })
+    }
+
+    function endTurn() {
+        socket.emit('end-turn', (user.id))
+    }
 
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
@@ -228,8 +266,14 @@ function App() {
             }
         })
 
-        socket.on('game-start-success', ({playerPositions, currentPlayer, spacesToMove}) => {
+        socket.on('game-start-success', ({playerPositions, playerCards, currentPlayer, spacesToMove}) => {
             console.log("Game start success!")
+
+            if (playerCards) {
+                const playerCardsMap = new Map(JSON.parse(playerCards))
+                setCards([...cards, ...playerCardsMap.get(socket.id)])
+            }
+            
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
@@ -239,12 +283,143 @@ function App() {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
+        
+            // Once gamestate is updated, suggestion process is assumed to be over
+            setSuggestState({
+                ...suggestState,
+                type: '',
+                source: null,
+                guess: null,
+                refuter: null,
+                card: null,
+            })
         })
-    })
 
-    // Front-end code, returns the correct screen based on gathered data
+        /*
+         * SUGGESTION FIELDS AND PROPERTIES
+         * source: player object, has username and role
+         * guess: the 3 cards that are guessed (suspect, room, weapon)
+         * each card has an id, type, and phrase property
+         * phrase is for easier suggestion messages (e.g. "suspect in room with weapon.")
+         * refuter: player object, has username and role
+         * card: card object, has id, type, and phrase
+        */
+        socket.on('suggestion-alert', ({source, guess}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'suggestion-alert',
+                source: source,
+                guess: guess,
+                refuter: null,
+                card: null,
+            })
+        })
+
+        socket.on('select-proof', ({source, guess}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'select-proof',
+                source: source,
+                guess: guess,
+                refuter: null,
+                card: null,
+            })        
+        })
+
+        socket.on('suggestion-proof-view', ({refuter, card}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'suggestion-proof-view',
+                source: null,
+                guess: null,
+                refuter: refuter,
+                card: card,
+            })
+        })
+
+        socket.on('suggestion-proof-alert', ({source, refuter}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'suggestion-proof-alert',
+                source: source,
+                guess: null,
+                refuter: refuter,
+                card: null,
+            })
+        })
+
+        socket.on('no-proof-view', ({source, guess}) => {
+            console.log("No proof :(")
+            setSuggestState({
+                ...suggestState,
+                type: 'no-proof-view',
+                source: source,
+                guess: null,
+                refuter: null,
+                card: null,
+            })
+        })
+
+        socket.on('no-proof-alert', ({source, guess}) => {
+            setSuggestState({
+                ...suggestState,
+                type: 'no-proof-alert',
+                source: source,
+                guess: guess,
+                refuter: null,
+                card: null,
+            })
+        })
+        
+        // Add cleanup to prevent memory leaks
+        return () => {
+            socket.off('lobby-create-success');
+            socket.off('lobby-join-success');
+            socket.off('lobby-join-fail');
+            socket.off('lobby-update');
+            socket.off('game-start-success');
+            socket.off('gamestate-update');
+            socket.off('suggestion-alert');
+            socket.off('select-proof');
+            socket.off('suggestion-proof-view');
+            socket.off('suggestion-proof-alert');
+            socket.off('no-proof-view');
+            socket.off('no-proof-alert');
+        };
+    }, [user]); // Add user as dependency to ensure correct behavior when user changes
+
+    // Updated user stats update function - can be called after games
+    function updateUserStats(gameStats) {
+        const updatedStats = {
+            correctAccusations: userStats.correctAccusations + (gameStats.madeCorrectAccusation ? 1 : 0),
+            gamesPlayed: userStats.gamesPlayed + 1,
+            totalSpacesMoved: userStats.totalSpacesMoved + (gameStats.spacesMoved || 0)
+        };
+        
+        // Save to localStorage
+        localStorage.setItem(`userStats_${user.id}`, JSON.stringify(updatedStats));
+        setUserStats({...userStats, ...updatedStats});
+        
+        return updatedStats;
+    }
+
     if (user) {
-        if (lobby.id) {
+        if (navState === "ProfilePage") {
+            return (
+                <ProfilePage 
+                    user={{ username: user.name, ...user }}
+                    setNavState={setNavState}
+                    stats={userStats}
+                />
+            )
+        } else if (navState === "lobby-select") {
+            return (
+                <SelectLobby 
+                    joinLobbyWithID={joinLobbyWithID}
+                    setNavState={setNavState}
+                />
+            )
+        } else if (lobby.id) {
             if (playerPositions) {
                 return (
                     <>
@@ -254,8 +429,13 @@ function App() {
                         movePlayerToCell={movePlayerToCell}
                         role={role}
                         currentPlayer={currentPlayer}
-                        buttons={buttons}
-                        spacesToMove={spacesToMove} />
+                        cards={cards}
+                        spacesToMove={spacesToMove}
+                        rollDice={rollDice}
+                        sendGuess={sendGuess}
+                        suggestState={suggestState}
+                        submitProof={submitProof}
+                        endTurn={endTurn} />
                     
                     <DiceRollerPopup 
                         isOpen={isDicePopupOpen} 
@@ -276,12 +456,34 @@ function App() {
             }
         } else {
             return (
-                <LOBBYPage solveACase={SelectLobby}/>
+                <LOBBYPage 
+                    solveACase={() => setNavState("lobby-select")} 
+                    setNavState={setNavState} 
+                />
             )
         }
     } else {
         return (
-            <LoginPage handleLogin={onLogin} handleSignUp={onSignUp}/>
+            <Routes>
+            <Route path="/login" element={
+                !user ? <LoginPage handleLogin={onLogin} redirectToSignup = {redirectToSignup}  /> : <Navigate to="/" />
+            } />
+            <Route path="/signup" element={
+                !user ? <SignUpPage handleSignUp={onSignUp} /> : <Navigate to="/" />
+            } />
+            <Route path="/" element={
+                user ? (
+                    lobby ? (
+                        gameState ? <GameState /> : <InLobby
+                            lobby={lobby}
+                            onReadyToggle={readyToggle}
+                            onSwitchRole={switchRole}
+                            onLeave={leaveLobby}
+                            onGo={startGame} />
+                    ) : <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
+                ) : <Navigate to="/login" />
+            } />
+        </Routes>
         )
     }
 }
