@@ -17,6 +17,13 @@ const CurrentPlayer = ({ currentPlayer, role }) => {
       {currentPlayer == role &&
       <button className={styles.button}>
         It's your turn!
+        <img
+            style={{
+              margin: '0 5%',
+              height: '150%',
+            }}
+            src={`./src/assets/pieceIcons/piece-${roleColors.get(currentPlayer)}.png`}>
+          </img>
       </button>
       }
       {currentPlayer != role &&
