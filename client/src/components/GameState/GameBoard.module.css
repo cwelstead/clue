@@ -1,7 +1,7 @@
 /* GameBoard.module.css */
 .gameBoard {
-  max-width: 90vh; /* Changed the size of the left column*/
-  max-height: 90vh;
+  max-width: 45%; /* Changed the size of the left column*/
+  max-height: 100%;
   background-color: #9e8b80;
   box-sizing: border-box;
   overflow: hidden;
