@@ -13,6 +13,7 @@ import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { SignUpPage } from './components/SignUpPage.jsx'
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 import DiceRollerPopup from './components/DiceRollerPopup.jsx'
+import EndgamePopup from './components/GameState/EndgamePopup.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -29,6 +30,7 @@ function App() {
     const [role, setRole] = useState("")
     const [isDicePopupOpen, setIsDicePopupOpen] = useState(false);
     const [suggestState, setSuggestState] = useState({type: ""})
+    const [endgamePopupState, setEndgamePopupState] = useState({type: ""})
     const navigate = useNavigate();
     // Add navigation state management
     const [navState, setNavState] = useState("main")
@@ -186,7 +188,6 @@ function App() {
     }
 
     function rollDice() {
-        console.log("Rolling the dice!");
         // Open the dice roller popup instead of immediately calculating
         setIsDicePopupOpen(true);
     }
@@ -217,6 +218,32 @@ function App() {
 
     function endTurn() {
         socket.emit('end-turn', (user.id))
+    }
+
+    function closeEndgamePopup() {
+        setEndgamePopupState({
+            ...endgamePopupState,
+            type: ''
+        })
+    }
+
+    function exitGameState() {
+        closeEndgamePopup()
+        setLobby({
+            ...lobby,
+            ...{
+                name: '',
+                id: '',
+                players: null,
+                takenRoles: null,
+                readyToStart: false
+                }
+        })
+        setPlayerPositions(null)
+        setCards([])
+        setCurrentPlayer("")
+        setSpacesToMove(-1)
+        setRole("")
     }
 
     // Essential functions go here, such as receiving socket messages
@@ -370,6 +397,27 @@ function App() {
                 card: null,
             })
         })
+
+        // Ending the game
+        socket.on('game-end', ({winner, guess}) => {
+            setEndgamePopupState({
+                ...endgamePopupState,
+                type: role == currentPlayer? 'win' : 'lose',
+                guess: guess,
+                winner: winner,
+                onClose: exitGameState
+            })
+        })
+
+        socket.on('player-loss', ({loser, guess}) => {
+            setEndgamePopupState({
+                ...endgamePopupState,
+                type: role == currentPlayer? 'out' : 'other-out',
+                guess: guess,
+                loser: loser,
+                onClose: youLose? exitGameState : closeEndgamePopup
+            })
+        })
         
         // Add cleanup to prevent memory leaks
         return () => {
@@ -385,6 +433,8 @@ function App() {
             socket.off('suggestion-proof-alert');
             socket.off('no-proof-view');
             socket.off('no-proof-alert');
+            socket.off('game-end');
+            socket.off('player-loss');
         };
     }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
@@ -442,6 +492,7 @@ function App() {
                         onClose={() => setIsDicePopupOpen(false)}
                         onRollComplete={handleRollComplete} 
                     />
+                    {endgamePopupState.type && <EndgamePopup endgamePopupState={endgamePopupState} />}
                 </>
                 )
             } else {

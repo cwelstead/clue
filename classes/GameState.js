@@ -175,6 +175,12 @@ export class GameState {
         return turnOrder
     }
 
+    checkAccusation(guess) {
+        return guess.suspect.id == this._caseFile.suspect.id
+            && guess.weapon.id == this._caseFile.weapon.id
+            && guess.room.id == this._caseFile.room.id
+    }
+
     distributeCards() {
         // Set up cards without case file cards and shuffle their order
         let remainingCards = [...CARDS]

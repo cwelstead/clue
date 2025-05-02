@@ -75,6 +75,7 @@ function createLobby(name) {
 }
 function destroyLobby(id) {
     LobbiesState.setLobbies(LobbiesState.lobbies.filter(lobby => lobby.getID() !== id));
+    gameStates.delete(id)
 }
 
 // Abstraction to make getting a user's lobby easier
@@ -355,6 +356,36 @@ io.on('connection', socket => {
             currentPlayer: gameState.getCurrentPlayerRole(),
             spacesToMove: gameState.getSpacesToMove()
         }))
+    })
+
+    socket.on('accusation', ({id, guess}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        if (gameState.checkAccusation(guess)) {
+            // game win!
+            io.to(lobby.getID()).emit('game-end', {
+                winner: player,
+                guess: guess
+            })
+            
+            destroyLobby(lobby.getID())
+        } else {
+            io.to(lobby.getID()).emit('player-loss', {
+                loser: player,
+                guess: guess
+            })
+
+            // removePlayerFromGame(player)
+
+            gameState.nextTurn()
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
     })
 
     socket.on('end-turn', (id) => {

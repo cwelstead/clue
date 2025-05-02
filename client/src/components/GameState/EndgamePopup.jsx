@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const AlertPopup = ({ onConfirm, card, suggestState }) => {
+const EndgamePopup = ({ endgamePopupState }) => {
     useEffect(() => {
         // Prevent scrolling on the body
         document.body.style.overflow = 'hidden';
@@ -9,32 +9,6 @@ const AlertPopup = ({ onConfirm, card, suggestState }) => {
             document.body.style.overflow = '';
         };
     }, []);
-
-    // Enhanced card component with click handling and overlay
-    const CardComponent = ({ src, }) => {
-        return (
-            <div
-                style={{
-                    border: "2px solid black",
-                    borderRadius: "10px",
-                    backgroundSize: "auto",
-                    backgroundPosition: "center",
-                    height: "160px",
-                    width: "103px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-end",
-                    textAlign: "center",
-                    minWidth: "103px",
-                    position: "relative",
-                    cursor: "pointer",
-                    overflow: "hidden",
-                }}
-            >
-                <img src={src} style={{ objectFit: 'fill', margin: '-2px' }} />
-            </div>
-        );
-    };
 
     return (
         <div style={{
@@ -98,27 +72,34 @@ const AlertPopup = ({ onConfirm, card, suggestState }) => {
                         paddingBottom: '5px',
                         marginBottom: '15px'
                     }}>
-                        {suggestState.type == 'no-proof-view' && 
-                        "No one could prove you wrong."}
-                        {suggestState.type == 'suggestion-proof-view' &&
-                        `${suggestState.refuter.role} IS SHOWING YOU A CARD`}
+                        {endgamePopupState.type == 'win' && "YOU WIN!"}
+                        {endgamePopupState.type == 'lose' && "YOU LOSE!"}
+                        {endgamePopupState.type == 'out' && "YOU'RE OUT!"}
+                        {endgamePopupState.type == 'other-out' && `${endgamePopupState.loser.role} IS OUT`}
                     </h2>
-                    <div style={{
-                        display: "flex",
-                        gap: "20px",
-                        flexWrap: "wrap",
-                        justifyContent: "center",
+                    <p style={{
+                        fontFamily: 'Courier New',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        letterSpacing: '0.1em',
+                        color: '#000',
                     }}>
-                        {card && (
-                            <CardComponent src={`./src/assets/${card.type}Cards/${card.id}.svg`} />
-                        )}
-                    </div>
+                        {endgamePopupState.type == 'win' && "Your accusation was correct. Congratulations!"}
+                        {endgamePopupState.type == 'lose' &&
+                        `${endgamePopupState.winner.role}'s  accusation of 
+                        ${endgamePopupState.guess.suspect.phrase} in ${endgamePopupState.guess.room.phrase} with ${endgamePopupState.guess.weapon.phrase}
+                        was correct.`}
+                        {endgamePopupState.type == 'out' && "Your accusation was incorrect. Better luck next time!"}
+                        {endgamePopupState.type == 'other-out' && `${endgamePopupState.loser.role}'s accusation of 
+                        ${endgamePopupState.guess.suspect.phrase} in ${endgamePopupState.guess.room.phrase} with ${endgamePopupState.guess.weapon.phrase}
+                        was incorrect.`}
+                    </p>
                 </div>
                 {/* Submitting a guess */}
-                <button onClick={onConfirm}>CONFIRM</button>
+                <button onClick={endgamePopupState.onClose}>CONFIRM</button>
             </div>
         </div>
     )
 }
 
-export default AlertPopup
+export default EndgamePopup
