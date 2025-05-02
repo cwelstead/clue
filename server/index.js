@@ -377,7 +377,7 @@ io.on('connection', socket => {
                 guess: guess
             })
 
-            // removePlayerFromGame(player)
+            gameState.removeCurrentPlayer()
 
             gameState.nextTurn()
             io.to(lobby.getID()).emit('gamestate-update', ({

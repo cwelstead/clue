@@ -412,10 +412,10 @@ function App() {
         socket.on('player-loss', ({loser, guess}) => {
             setEndgamePopupState({
                 ...endgamePopupState,
-                type: role == currentPlayer? 'out' : 'other-out',
+                type: role == loser.role? 'out' : 'other-out',
                 guess: guess,
                 loser: loser,
-                onClose: youLose? exitGameState : closeEndgamePopup
+                onClose: closeEndgamePopup
             })
         })
         
@@ -510,6 +510,7 @@ function App() {
                 <LOBBYPage 
                     solveACase={() => setNavState("lobby-select")} 
                     setNavState={setNavState} 
+                    onLobbyJoin={joinLobbyWithID}
                 />
             )
         }
