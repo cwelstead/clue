@@ -49,13 +49,13 @@ export default class Board {
             img: './src/assets/rooms/great-hall.png'
         },
         {
-            key: "DS Room",
+            key: "Selleck",
             xPos: 18,
             yPos: 1,
             width: 6,
             height: 5,
             adjacentSpaces: [{x: 18, y: 5}],
-            img: './src/assets/rooms/ds-room.png'
+            img: './src/assets/rooms/selleck.png'
         },
         {
             key: "Mega Lounge",
@@ -76,22 +76,22 @@ export default class Board {
             img: './src/assets/rooms/kauffman-clue.png'
         },
         {
-            key: "Library",
+            key: "Study",
             xPos: 18,
             yPos: 8,
             width: 6,
             height: 5,
             adjacentSpaces: [{x: 17, y: 9}, {x: 22, y: 13}],
-            img: './src/assets/rooms/library.png'
+            img: './src/assets/rooms/study.png'
         },
         {
-            key: "Study",
+            key: "DS Room",
             xPos: 17,
             yPos: 14,
             width: 7,
             height: 5,
             adjacentSpaces: [{x: 20, y: 13}, {x: 16, y: 16}],
-            img: './src/assets/rooms/study.png'
+            img: './src/assets/rooms/ds-room.png'
         },
         {
             key: "Conference",
