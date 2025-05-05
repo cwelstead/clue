@@ -23,6 +23,7 @@ function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState({})
+    const [joinFail, setJoinFail] = useState(false)
     const [playerPositions, setPlayerPositions] = useState(null)
     const [cards, setCards] = useState([])
     const [currentPlayer, setCurrentPlayer] = useState("")
@@ -273,6 +274,7 @@ function App() {
 
         socket.on('lobby-join-fail', (lobbyID) => {
             console.warn(`Failed to join lobby ${lobbyID}`)
+            setJoinFail(true)
         })
 
         socket.on('lobby-update', ({ players, takenRoles, readyToStart }) => {
@@ -461,13 +463,6 @@ function App() {
                     stats={userStats}
                 />
             )
-        } else if (navState === "lobby-select") {
-            return (
-                <SelectLobby 
-                    joinLobbyWithID={joinLobbyWithID}
-                    setNavState={setNavState}
-                />
-            )
         } else if (lobby.id) {
             if (playerPositions) {
                 return (
@@ -505,11 +500,13 @@ function App() {
                 )
             }
         } else {
-            return (
+            return ( // this is the one being used
                 <LOBBYPage 
                     solveACase={() => setNavState("lobby-select")} 
                     setNavState={setNavState} 
                     onLobbyJoin={joinLobbyWithID}
+                    joinFail={joinFail}
+                    setJoinFail={setJoinFail}
                 />
             )
         }
@@ -522,17 +519,7 @@ function App() {
             <Route path="/signup" element={
                 !user ? <SignUpPage handleSignUp={onSignUp} /> : <Navigate to="/" />
             } />
-            <Route path="/" element={
-                user ? (
-                    lobby ? (
-                        gameState ? <GameState /> : <InLobby
-                            lobby={lobby}
-                            onReadyToggle={readyToggle}
-                            onSwitchRole={switchRole}
-                            onLeave={leaveLobby}
-                            onGo={startGame} />
-                    ) : <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
-                ) : <Navigate to="/login" />
+            <Route path="/" element={<Navigate to="/login" />
             } />
         </Routes>
         )
