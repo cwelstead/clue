@@ -65,8 +65,8 @@ const LobbiesState = {
 }
 
 // Functions that manage and update the LobbiesState
-function createLobby(name) {
-    const lobby = new Lobby(name)
+function createLobby() {
+    const lobby = new Lobby()
     LobbiesState.setLobbies([
         ...LobbiesState.lobbies.filter(existingLobby => existingLobby.getID() !== lobby.getID()),
         lobby
@@ -117,9 +117,9 @@ io.on('connection', socket => {
     })
 
     // Lobby manipulation
-    socket.on('lobby-create', ({name}) => {
-        const createdLobby = createLobby(name)
-        console.log(`Lobby created with name ${createdLobby.getName()} ID ${createdLobby.getID()}`)
+    socket.on('lobby-create', () => {
+        const createdLobby = createLobby()
+        console.log(`Lobby created with ID ${createdLobby.getID()}`)
 
         socket.emit('lobby-create-success', createdLobby.getID())
     })
@@ -152,7 +152,6 @@ io.on('connection', socket => {
             })
             // Step 4b: Notify client of success
             socket.emit('lobby-join-success', {
-                name: lobbyToJoin.getName(),
                 id: lobbyToJoin.getID(),
                 players: lobbyToJoin.getPlayers(),
                 takenRoles: lobbyToJoin.getTakenRoles(),

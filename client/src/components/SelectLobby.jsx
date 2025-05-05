@@ -12,9 +12,7 @@ export function SelectLobby({ user, onLobbyJoin, setNavState }) {
     }, []);
 
     const createLobby = () => {
-        socket.emit('lobby-create', {
-            name: "Test Lobby",
-        });
+        socket.emit('lobby-create');
     };
 
     return (

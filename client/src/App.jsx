@@ -252,14 +252,13 @@ function App() {
             joinLobbyWithID(id)
         })
 
-        socket.on('lobby-join-success', ({ name, id, players, takenRoles }) => {
-            console.log(`Lobby joined: ${name} with ID ${id}`)
+        socket.on('lobby-join-success', ({ id, players, takenRoles }) => {
+            console.log(`Lobby joined with ID ${id}`)
             const playersMap = new Map(JSON.parse(players))
             
             setLobby(lobby => ({
                 ...lobby,
                 ...{
-                name: name,
                 id: id,
                 players: playersMap,
                 takenRoles: new Set(JSON.parse(takenRoles)),

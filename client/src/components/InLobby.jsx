@@ -76,7 +76,7 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
                         color: '#2C2C2C',
                         textAlign: 'center',
                     }}>
-                        {lobby.name}
+                        Waiting Room
                     </h1>
 
                     {/* Lobby ID */}
