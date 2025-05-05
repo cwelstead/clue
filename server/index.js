@@ -31,7 +31,6 @@ app.post('/authenticate', (req, res) => {
     console.log("Received authentication request");
     res.json({ success: true, message: "Authenticated successfully" });
 });
-// Rest of your server code...
 
 // Starts the server
 const expressServer = app.listen(PORT, () => {
@@ -116,7 +115,10 @@ io.on('connection', socket => {
         console.log(`User ${id} successfully logged in as ${name}`)
     })
 
-    // Lobby manipulation
+    /*
+     * LOBBY FUNCTIONS
+     * INCLUDES: CREATING LOBBIES, JOINING LOBBIES, STARTING GAME
+    */
     socket.on('lobby-create', () => {
         const createdLobby = createLobby()
         console.log(`Lobby created with ID ${createdLobby.getID()}`)
@@ -242,7 +244,10 @@ io.on('connection', socket => {
         console.log(`User ${socket.id} left a lobby, leaving ${UsersState.users.length} active users and ${LobbiesState.lobbies.length} active lobbies`);
     })
 
-    // GameState functions
+    /*
+     * GAMESTATE FUNCTIONS
+     * INCLUDES: MOVING, SUGGESTING, ACCUSING, ETC.
+    */
     socket.on('move-place', ({id, destPlace}) => {
         const lobby = getLobbyFromUser(id)
         const player = lobby.getPlayer(id)
