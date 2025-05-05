@@ -12,7 +12,7 @@ const roleColors = new Map([
 ])
 
 const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
-  const placeOffsetLeft = 2.1
+  const placeOffsetLeft = 1.8
   const placeOffsetTop = 1.8
 
   return (
@@ -23,9 +23,9 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
         {Board.PLACES.map(place =>
           <div key={place.key} style={{
             position: "absolute",
-            left: `${place.xPos * 3.98 + placeOffsetLeft}%`,
+            left: `${place.xPos * 4 + placeOffsetLeft}%`,
             top: `${place.yPos * 3.77 + placeOffsetTop}%`,
-            width: `${place.width * 4.03}%`,
+            width: `${place.width * 4.05}%`,
             height: `${place.height * 3.8}%`,
             boxSizing: 'border-box',
             alignContent: 'center',
