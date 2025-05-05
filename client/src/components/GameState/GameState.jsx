@@ -81,7 +81,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
         </div>
       </div>
       {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} crossedOffCards={crossedOffCards} setCrossedOffCards={setCrossedOffCards} />} {/* Conditionally render the ClueInfoSheet component */}
-      {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess}/>}
+      {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess} place={playerPositions.get(role).place}/>}
       {suggestState.type == 'select-proof' && <RefutePopup onSubmit={submitProof} cards={cards} suggestState={suggestState} />}
       {suggestState.type == 'suggestion-proof-view' && <AlertPopup onConfirm={endTurn} card={suggestState.card} suggestState={suggestState} />}
       {suggestState.type == 'no-proof-view' && <AlertPopup onConfirm={endTurn} card={null} suggestState={suggestState} />}
