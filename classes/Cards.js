@@ -10,37 +10,37 @@ export const CARDS = Object.freeze([
         phrase: "room 112"
     },
     {
-        id: "CONFERENCE",
+        id: "Conference",
         type: "room",
         phrase: "the conference room"
     },
     {
-        id: "DS_ROOM",
+        id: "DS Room",
         type: "room",
         phrase: "the Design Studio room"
     },
     {
-        id: "GREAT_HALL",
+        id: "Great Hall",
         type: "room",
         phrase: "the Great Hall"
     },
     {
-        id: "MAIN_OFFICE",
+        id: "Main Office",
         type: "room",
         phrase: "the Main Office"
     },
     {
-        id: "MEGA_LOUNGE",
+        id: "Mega Lounge",
         type: "room",
         phrase: "the Mega Lounge"
     },
     {
-        id: "SELLECK",
+        id: "Selleck",
         type: "room",
         phrase: "Selleck"
     },
     {
-        id: "STUDY",
+        id: "Study",
         type: "room",
         phrase: "the study room"
     },
@@ -55,7 +55,7 @@ export const CARDS = Object.freeze([
         phrase: "Bob"
     },
     {
-        id: "DrCooper",
+        id: "Dr Cooper",
         type: "suspect",
         phrase: "Dr. Cooper"
     },

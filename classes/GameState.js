@@ -142,6 +142,12 @@ export class GameState {
         return moveSuccessful
     }
 
+    // Function to manage movement that doesn't follow the valid movement structure
+    // e.g. moving between passageways and suggestion-based movement
+    forceRoleToPlace(role, destPlace) {
+        this._playerPositions.set(role, {x: -1, y: -1, place: destPlace})
+    }
+
     getSuggestionProof(guess) {
         let playerToProveWrong = undefined
 

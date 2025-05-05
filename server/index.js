@@ -303,6 +303,7 @@ io.on('connection', socket => {
         const gameState = gameStates.get(lobby.getID())
 
         // Tell rest of lobby what suggestion is being made
+        gameState.forceRoleToPlace(guess.suspect.id, guess.room.id)
         io.to(lobby.getID()).emit('suggestion-alert', {
             source: player,
             guess: guess
