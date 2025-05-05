@@ -42,9 +42,9 @@ export default class Board {
         {
             key: "Great Hall",
             xPos: 8,
-            yPos: .2,
+            yPos: .3,
             width: 8,
-            height: 7.8,
+            height: 7.7,
             adjacentSpaces: [{x: 7, y: 5}, {x: 9, y: 8}, {x: 14, y: 8}, {x: 16, y: 5}],
             img: './src/assets/rooms/great-hall.png'
         },
@@ -79,7 +79,7 @@ export default class Board {
             key: "Study",
             xPos: 18,
             yPos: 8,
-            width: 6,
+            width: 6.15,
             height: 5,
             adjacentSpaces: [{x: 17, y: 9}, {x: 22, y: 13}],
             img: './src/assets/rooms/study.png'
