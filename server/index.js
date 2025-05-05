@@ -282,6 +282,22 @@ io.on('connection', socket => {
         }
     })
 
+    // Logic for switching between passages is handled in client
+    // If logic succeeds, server forces a move to the destination passage
+    socket.on('force-place', ({id, destPlace}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        if (id == gameState.getCurrentPlayer() && gameState.forceRoleToPlace(player.role, destPlace)) {
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
+    })
+
     socket.on('roll-dice', ({id, number}) => {
         const lobby = getLobbyFromUser(id)
         const gameState = gameStates.get(lobby.getID())

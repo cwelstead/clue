@@ -145,7 +145,15 @@ export class GameState {
     // Function to manage movement that doesn't follow the valid movement structure
     // e.g. moving between passageways and suggestion-based movement
     forceRoleToPlace(role, destPlace) {
-        this._playerPositions.set(role, {x: -1, y: -1, place: destPlace})
+        if (destPlace) {
+            this._playerPositions.set(role, {x: -1, y: -1, place: destPlace})
+            // if using a secret passageway, player can still make a suggestion
+            this.setSpacesToMove(0)
+
+            return true
+        } else {
+            return false
+        }
     }
 
     getSuggestionProof(guess) {

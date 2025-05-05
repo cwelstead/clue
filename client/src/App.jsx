@@ -468,6 +468,7 @@ function App() {
                 return (
                     <>
                     <GameState
+                        user={user}
                         playerPositions={playerPositions}
                         movePlayerToPlace={movePlayerToPlace}
                         movePlayerToCell={movePlayerToCell}
