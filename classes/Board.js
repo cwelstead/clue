@@ -58,13 +58,13 @@ export default class Board {
             img: './src/assets/rooms/selleck.png'
         },
         {
-            key: "Mega Lounge",
+            key: "Conference",
             xPos: 0,
             yPos: 9,
             width: 8,
             height: 7,
             adjacentSpaces: [{x: 8, y: 12}, {x: 6, y: 16}],
-            img: './src/assets/rooms/mega-lounge.png'
+            img: './src/assets/rooms/conference.png'
         },
         {
             key: "Kauffman Clue",
@@ -94,13 +94,13 @@ export default class Board {
             img: './src/assets/rooms/ds-room.png'
         },
         {
-            key: "Conference",
+            key: "Mega Lounge",
             xPos: 0,
             yPos: 19,
             width: 7,
             height: 6,
             adjacentSpaces: [{x: 6, y: 18}],
-            img: './src/assets/rooms/conference.png'
+            img: './src/assets/rooms/mega-lounge.png'
         },
         {
             key: "Main Office",
