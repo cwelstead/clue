@@ -17,6 +17,7 @@ export class GameState {
         this._players = new Map(JSON.parse(lobby.getPlayers()))
         this._piecePositions = {} // we don't even have to keep pieces on the board if we don't want to
         this._turnOrder = this.determineTurnOrder(this._players) // random for now
+        this._suggestOrder = this._turnOrder // Order of suggestion for players who have been removed from the game
         this._caseFile = getCaseFile()
 
         // Sent to the players as updates
@@ -40,6 +41,15 @@ export class GameState {
         } else {
             return ""
         }
+    }
+
+    // Removes the current player from the turn order.
+    // They can still prove others wrong, but they cannot move or suggest.
+    removeCurrentPlayer() {
+        const playerID = this.getCurrentPlayer()
+
+        this._turnOrder = this._turnOrder.filter(id => id != playerID)
+        this._turnIdx -= 1
     }
 
     // Increments the turn counter and returns whose turn is up next.
@@ -132,6 +142,20 @@ export class GameState {
         return moveSuccessful
     }
 
+    // Function to manage movement that doesn't follow the valid movement structure
+    // e.g. moving between passageways and suggestion-based movement
+    forceRoleToPlace(role, destPlace) {
+        if (destPlace) {
+            this._playerPositions.set(role, {x: -1, y: -1, place: destPlace})
+            // if using a secret passageway, player can still make a suggestion
+            this.setSpacesToMove(0)
+
+            return true
+        } else {
+            return false
+        }
+    }
+
     getSuggestionProof(guess) {
         let playerToProveWrong = undefined
 
@@ -139,17 +163,17 @@ export class GameState {
         // If a player has a card that can prove the guess wrong, update the variable
         // At the end of iteration, the earliest player in turn order will be the variable
         // Otherwise, it remains undefined
-        let i = (this._turnIdx + this._turnOrder.length - 1) % this._turnOrder.length
+        let i = (this._turnIdx + this._suggestOrder.length - 1) % this._suggestOrder.length
         while (i != this._turnIdx) {
-            const playerCards = this._playerCards.get(this._turnOrder[i])
+            const playerCards = this._playerCards.get(this._suggestOrder[i])
 
             if (playerCards.some(card => card.id == guess.room.id
                                         || card.id == guess.suspect.id
                                         || card.id == guess.weapon.id)) {
-                playerToProveWrong = this._players.get(this._turnOrder[i])
+                playerToProveWrong = this._players.get(this._suggestOrder[i])
             }
 
-            i = (i + this._turnOrder.length - 1) % this._turnOrder.length
+            i = (i + this._suggestOrder.length - 1) % this._suggestOrder.length
         }
 
         return playerToProveWrong
@@ -164,7 +188,6 @@ export class GameState {
     }
 
     determineTurnOrder(players) {
-        // may not work as intended, but doesn't break so not a concern rn
         let playerIDs = Array.from(players.keys())
         let turnOrder = []
         
@@ -173,6 +196,12 @@ export class GameState {
         }
 
         return turnOrder
+    }
+
+    checkAccusation(guess) {
+        return guess.suspect.id == this._caseFile.suspect.id
+            && guess.weapon.id == this._caseFile.weapon.id
+            && guess.room.id == this._caseFile.room.id
     }
 
     distributeCards() {

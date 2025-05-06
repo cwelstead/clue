@@ -1,5 +1,6 @@
 // GameState.jsx
 import React, { useState } from 'react';
+import { socket } from '../../socket';
 import styles from './GameState.module.css';
 import GameBoard from './GameBoard';
 import Controls from './Controls';
@@ -9,7 +10,7 @@ import Guess from './Guess';
 import RefutePopup from './RefutePopup';
 import AlertPopup from './AlertPopup';
 
-const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, suggestState, submitProof, endTurn }) => {
+const GameState = ({ user, playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, suggestState, submitProof, endTurn }) => {
   const [isNotesOpen, setIsNotesOpen] = useState(false) // State for overlay visibility
   const [isGuessOpen, setIsGuessOpen] = useState(false)
   const [lastSuggest, setLastSuggest] = useState("")
@@ -29,6 +30,19 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
   const handleCloseNotes = () => {
     setIsNotesOpen(false) // Close the overlay
   };
+
+  const passageMap = new Map([
+    ["Selleck", "Mega Lounge"],
+    ["Mega Lounge", "Selleck"],
+    ["110", "112"],
+    ["112", "110"],
+  ])
+  function usePassage() {
+    socket.emit('force-place', {
+      id: user.id,
+      destPlace: passageMap.get(playerPositions.get(role).place)
+    })
+  }
 
   const handleCloseGuess = () => {
     setIsGuessOpen(false)
@@ -58,10 +72,18 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
 
   const buttons = [
     {label: 'NOTES', onClick: handleNotesClick, disabledCondition: false},
-    {label: 'PASSAGE', onClick: null, disabledCondition: true  || spacesToMove > 0},
+    {label: 'PASSAGE', onClick: usePassage, disabledCondition: !(playerPositions.get(role).place == 'Mega Lounge'
+                                                          || playerPositions.get(role).place == 'Selleck'
+                                                          || playerPositions.get(role).place == '110'
+                                                          || playerPositions.get(role).place == '112')
+                                                          || role != currentPlayer
+                                                          || spacesToMove != -1},
     {label: 'ROLL', onClick: startRoll, disabledCondition: spacesToMove >= 0 || role != currentPlayer},
-    {label: 'SUGGEST', onClick: openSuggest, disabledCondition: (playerPositions && (!playerPositions.get(role).place || playerPositions.get(role).place == lastSuggest)) || role != currentPlayer || spacesToMove > 0},
-    {label: 'ACCUSE', onClick: openAccuse, disabledCondition: (playerPositions && playerPositions.get(role).place != "Kauffman Clue") || role != currentPlayer || spacesToMove > 0},
+    {label: 'SUGGEST', onClick: openSuggest, disabledCondition: (playerPositions 
+                                                                && (!playerPositions.get(role).place || playerPositions.get(role).place == lastSuggest))
+                                                                || role != currentPlayer || spacesToMove > 0},
+    {label: 'ACCUSE', onClick: openAccuse, disabledCondition: (playerPositions && playerPositions.get(role).place != "Kauffman Clue")
+                                                               || role != currentPlayer || spacesToMove > 0},
     {label: 'END TURN', onClick: endTurn, disabledCondition: role != currentPlayer}
   ];
 
@@ -81,7 +103,7 @@ const GameState = ({ playerPositions, movePlayerToPlace, movePlayerToCell, role,
         </div>
       </div>
       {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} crossedOffCards={crossedOffCards} setCrossedOffCards={setCrossedOffCards} />} {/* Conditionally render the ClueInfoSheet component */}
-      {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess}/>}
+      {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess} place={playerPositions.get(role).place}/>}
       {suggestState.type == 'select-proof' && <RefutePopup onSubmit={submitProof} cards={cards} suggestState={suggestState} />}
       {suggestState.type == 'suggestion-proof-view' && <AlertPopup onConfirm={endTurn} card={suggestState.card} suggestState={suggestState} />}
       {suggestState.type == 'no-proof-view' && <AlertPopup onConfirm={endTurn} card={null} suggestState={suggestState} />}

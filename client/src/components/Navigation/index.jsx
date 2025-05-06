@@ -4,7 +4,7 @@ import backgroundImage from "../../assets/kauffman-building.png";
 import { SelectLobby } from "../SelectLobby";
 import ProfilePage from "../ProfilePage/ProfilePage";
 
-export default function LOBBYPage({ user, onLobbyJoin }) {
+export default function LOBBYPage({ onLobbyJoin, joinFail, setJoinFail }) {
   const [navState, setNavState] = useState("")
 
   if (navState) {
@@ -17,7 +17,7 @@ export default function LOBBYPage({ user, onLobbyJoin }) {
           <ProfilePage setNavState={setNavState} />
         }
         { navState === "lobby-select" &&
-          <SelectLobby user={user} onLobbyJoin={onLobbyJoin} setNavState={setNavState} />
+          <SelectLobby onLobbyJoin={onLobbyJoin} setNavState={setNavState} joinFail={joinFail} setJoinFail={setJoinFail} />
         }
       </div>
     )

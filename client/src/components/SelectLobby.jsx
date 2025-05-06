@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { socket } from '../socket.js';
 
-export function SelectLobby({ user, onLobbyJoin, setNavState }) {
+export function SelectLobby({ onLobbyJoin, setNavState, joinFail, setJoinFail }) {
     const [lobbyID, setLobbyID] = useState("");
     
     useEffect(() => {
@@ -12,9 +12,7 @@ export function SelectLobby({ user, onLobbyJoin, setNavState }) {
     }, []);
 
     const createLobby = () => {
-        socket.emit('lobby-create', {
-            name: "Test Lobby",
-        });
+        socket.emit('lobby-create');
     };
 
     return (
@@ -100,7 +98,10 @@ export function SelectLobby({ user, onLobbyJoin, setNavState }) {
                     value={lobbyID}
                     maxLength="6"
                     placeholder="Enter lobby code..."
-                    onChange={(e) => setLobbyID(e.target.value)}
+                    onChange={(e) => {
+                        setLobbyID(e.target.value)
+                        setJoinFail(false)
+                    }}
                     required
                     style={{
                         height: '50px',
@@ -115,6 +116,16 @@ export function SelectLobby({ user, onLobbyJoin, setNavState }) {
                         color: '#6E6E6E',
                     }}
                 />
+                {joinFail &&
+                    <p style={{
+                        fontFamily: 'Courier New',
+                        fontSize: '12px',
+                        letterSpacing: '0.08em',
+                        color: '#2C2C2C',
+                        margin: '0px'
+                    }}>
+                        Failed to join lobby
+                </p>}
                 <button 
                     onClick={(e) => {
                         e.preventDefault();

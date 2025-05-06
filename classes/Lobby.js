@@ -11,8 +11,7 @@ export const Roles = Object.freeze({
 
 export class Lobby {
 
-    constructor(name) {
-        this._name = name
+    constructor() {
         this._id = generateID()
         this._players = new Map()
         this._takenRoles = new Set()
@@ -70,10 +69,6 @@ export class Lobby {
             }
         })
         return allPlayersReady
-    }
-
-    getName() {
-        return this._name
     }
 
     getID() {

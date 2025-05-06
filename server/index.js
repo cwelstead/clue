@@ -64,8 +64,8 @@ const LobbiesState = {
 }
 
 // Functions that manage and update the LobbiesState
-function createLobby(name) {
-    const lobby = new Lobby(name)
+function createLobby() {
+    const lobby = new Lobby()
     LobbiesState.setLobbies([
         ...LobbiesState.lobbies.filter(existingLobby => existingLobby.getID() !== lobby.getID()),
         lobby
@@ -74,6 +74,7 @@ function createLobby(name) {
 }
 function destroyLobby(id) {
     LobbiesState.setLobbies(LobbiesState.lobbies.filter(lobby => lobby.getID() !== id));
+    gameStates.delete(id)
 }
 
 // Abstraction to make getting a user's lobby easier
@@ -118,9 +119,9 @@ io.on('connection', socket => {
      * LOBBY FUNCTIONS
      * INCLUDES: CREATING LOBBIES, JOINING LOBBIES, STARTING GAME
     */
-    socket.on('lobby-create', ({name}) => {
-        const createdLobby = createLobby(name)
-        console.log(`Lobby created with name ${createdLobby.getName()} ID ${createdLobby.getID()}`)
+    socket.on('lobby-create', () => {
+        const createdLobby = createLobby()
+        console.log(`Lobby created with ID ${createdLobby.getID()}`)
 
         socket.emit('lobby-create-success', createdLobby.getID())
     })
@@ -153,7 +154,6 @@ io.on('connection', socket => {
             })
             // Step 4b: Notify client of success
             socket.emit('lobby-join-success', {
-                name: lobbyToJoin.getName(),
                 id: lobbyToJoin.getID(),
                 players: lobbyToJoin.getPlayers(),
                 takenRoles: lobbyToJoin.getTakenRoles(),
@@ -282,6 +282,22 @@ io.on('connection', socket => {
         }
     })
 
+    // Logic for switching between passages is handled in client
+    // If logic succeeds, server forces a move to the destination passage
+    socket.on('force-place', ({id, destPlace}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        if (id == gameState.getCurrentPlayer() && gameState.forceRoleToPlace(player.role, destPlace)) {
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
+    })
+
     socket.on('roll-dice', ({id, number}) => {
         const lobby = getLobbyFromUser(id)
         const gameState = gameStates.get(lobby.getID())
@@ -303,6 +319,7 @@ io.on('connection', socket => {
         const gameState = gameStates.get(lobby.getID())
 
         // Tell rest of lobby what suggestion is being made
+        gameState.forceRoleToPlace(guess.suspect.id, guess.room.id)
         io.to(lobby.getID()).emit('suggestion-alert', {
             source: player,
             guess: guess
@@ -360,6 +377,36 @@ io.on('connection', socket => {
             currentPlayer: gameState.getCurrentPlayerRole(),
             spacesToMove: gameState.getSpacesToMove()
         }))
+    })
+
+    socket.on('accusation', ({id, guess}) => {
+        const lobby = getLobbyFromUser(id)
+        const player = lobby.getPlayer(id)
+        const gameState = gameStates.get(lobby.getID())
+
+        if (gameState.checkAccusation(guess)) {
+            // game win!
+            io.to(lobby.getID()).emit('game-end', {
+                winner: player,
+                guess: guess
+            })
+            
+            destroyLobby(lobby.getID())
+        } else {
+            io.to(lobby.getID()).emit('player-loss', {
+                loser: player,
+                guess: guess
+            })
+
+            gameState.removeCurrentPlayer()
+
+            gameState.nextTurn()
+            io.to(lobby.getID()).emit('gamestate-update', ({
+                playerPositions: gameState.getPlayerPositions(),
+                currentPlayer: gameState.getCurrentPlayerRole(),
+                spacesToMove: gameState.getSpacesToMove()
+            }))
+        }
     })
 
     socket.on('end-turn', (id) => {

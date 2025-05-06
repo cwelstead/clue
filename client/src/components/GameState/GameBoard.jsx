@@ -12,21 +12,21 @@ const roleColors = new Map([
 ])
 
 const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
-  const placeScale = 4
+  const placeOffsetLeft = 1.8
+  const placeOffsetTop = 1.8
 
   return (
     <div className={styles.gameBoard} style={{display: 'flex', position: 'relative', flex: '1', aspectRatio: '1'}}>
       {/* Grid */}
-      <div style={{flex: '1', aspectRatio: '1', position: 'relative'}}>
-
+      <div style={{flex: '1', aspectRatio: '1', position: 'relative',}}>
         {/* Places */}
         {Board.PLACES.map(place =>
           <div key={place.key} style={{
             position: "absolute",
-            left: `${place.xPos * placeScale}%`,
-            top: `${place.yPos * placeScale}%`,
-            width: `${place.width * placeScale}%`,
-            height: `${place.height * placeScale}%`,
+            left: `${place.xPos * 4 + placeOffsetLeft}%`,
+            top: `${place.yPos * 3.77 + placeOffsetTop}%`,
+            width: `${place.width * 4.05}%`,
+            height: `${place.height * 3.8}%`,
             boxSizing: 'border-box',
             alignContent: 'center',
           }}>
@@ -57,16 +57,16 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
             ))}
           </div>
         )}
-        <div style={{display: 'flex', flex: '1', flexDirection: 'column', alignContent: 'stretch', height: '100vh', maxWidth: '100%', maxHeight: '100%'}}>
+        <div style={{display: 'flex', flex: '1', flexDirection: 'column', alignContent: 'stretch', height: '100vh', maxWidth: '100%', maxHeight: '100%', backgroundColor: '#702023', paddingLeft: '2%', paddingTop: '2%', paddingBottom: '4%'}}>
         {/* Cells */}
         {Board.BOARD.map((row, rowKey) => (
-          <div key={rowKey} style={{display: 'flex', flex: '1 1 100%', flexDirection: 'row', alignContent: 'stretch', maxWidth: '100%', maxHeight: '100%'}}>
+          <div key={rowKey} style={{display: 'flex', flex: '1 1 100%', flexDirection: 'row', alignContent: 'stretch', maxHeight: '100%'}}>
             {row.map((cell, colKey) => (
               <div key={`${colKey},${rowKey}`} style={{
                 position: "relative",
                 flex: '-1',
                 aspectRatio: '1/1',
-                backgroundColor: "#dbd8c6",
+                backgroundColor: "#c4a67d",
                 borderWidth: '1px',
                 borderColor: "#7e7f82",
                 borderStyle: "solid",

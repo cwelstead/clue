@@ -10,37 +10,37 @@ export const CARDS = Object.freeze([
         phrase: "room 112"
     },
     {
-        id: "CONFERENCE",
+        id: "Conference",
         type: "room",
         phrase: "the conference room"
     },
     {
-        id: "DS_ROOM",
+        id: "DS Room",
         type: "room",
         phrase: "the Design Studio room"
     },
     {
-        id: "GREAT_HALL",
+        id: "Great Hall",
         type: "room",
         phrase: "the Great Hall"
     },
     {
-        id: "MAIN_OFFICE",
+        id: "Main Office",
         type: "room",
         phrase: "the Main Office"
     },
     {
-        id: "MEGA_LOUNGE",
+        id: "Mega Lounge",
         type: "room",
         phrase: "the Mega Lounge"
     },
     {
-        id: "SELLECK",
+        id: "Selleck",
         type: "room",
         phrase: "Selleck"
     },
     {
-        id: "STUDY",
+        id: "Study",
         type: "room",
         phrase: "the study room"
     },
@@ -55,7 +55,7 @@ export const CARDS = Object.freeze([
         phrase: "Bob"
     },
     {
-        id: "DrCooper",
+        id: "Dr Cooper",
         type: "suspect",
         phrase: "Dr. Cooper"
     },
@@ -107,9 +107,11 @@ export const CARDS = Object.freeze([
 ])
 
 export function getCaseFile() {
-    const room = CARDS.filter(card => card.type == "room")[0] // change to random choice
-    const suspect = CARDS.filter(card => card.type == "suspect")[0] // change to random choice
-    const weapon = CARDS.filter(card => card.type == "weapon")[0] // change to random choice
+    const rooms = CARDS.filter(card => card.type == "room")
+    const suspects = CARDS.filter(card => card.type == "suspect")
+    const weapons = CARDS.filter(card => card.type == "weapon")
 
-    return {room: room, suspect: suspect, weapon: weapon}
+    return {room: rooms[Math.floor(Math.random() * rooms.length)],
+            suspect: suspects[Math.floor(Math.random() * suspects.length)],
+            weapon: weapons[Math.floor(Math.random() * weapons.length)]}
 }

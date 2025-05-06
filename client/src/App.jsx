@@ -13,6 +13,7 @@ import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { SignUpPage } from './components/SignUpPage.jsx'
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 import DiceRollerPopup from './components/DiceRollerPopup.jsx'
+import EndgamePopup from './components/GameState/EndgamePopup.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -22,6 +23,7 @@ function App() {
     // Holds the values for client data
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState({})
+    const [joinFail, setJoinFail] = useState(false)
     const [playerPositions, setPlayerPositions] = useState(null)
     const [cards, setCards] = useState([])
     const [currentPlayer, setCurrentPlayer] = useState("")
@@ -29,6 +31,7 @@ function App() {
     const [role, setRole] = useState("")
     const [isDicePopupOpen, setIsDicePopupOpen] = useState(false);
     const [suggestState, setSuggestState] = useState({type: ""})
+    const [endgamePopupState, setEndgamePopupState] = useState({type: ""})
     const navigate = useNavigate();
     // Add navigation state management
     const [navState, setNavState] = useState("main")
@@ -186,7 +189,6 @@ function App() {
     }
 
     function rollDice() {
-        console.log("Rolling the dice!");
         // Open the dice roller popup instead of immediately calculating
         setIsDicePopupOpen(true);
     }
@@ -219,20 +221,45 @@ function App() {
         socket.emit('end-turn', (user.id))
     }
 
+    function closeEndgamePopup() {
+        setEndgamePopupState({
+            ...endgamePopupState,
+            type: ''
+        })
+    }
+
+    function exitGameState() {
+        closeEndgamePopup()
+        setLobby({
+            ...lobby,
+            ...{
+                name: '',
+                id: '',
+                players: null,
+                takenRoles: null,
+                readyToStart: false
+                }
+        })
+        setPlayerPositions(null)
+        setCards([])
+        setCurrentPlayer("")
+        setSpacesToMove(-1)
+        setRole("")
+    }
+
     // Essential functions go here, such as receiving socket messages
     useEffect(() => {
         socket.on('lobby-create-success', (id) => {
             joinLobbyWithID(id)
         })
 
-        socket.on('lobby-join-success', ({ name, id, players, takenRoles }) => {
-            console.log(`Lobby joined: ${name} with ID ${id}`)
+        socket.on('lobby-join-success', ({ id, players, takenRoles }) => {
+            console.log(`Lobby joined with ID ${id}`)
             const playersMap = new Map(JSON.parse(players))
             
             setLobby(lobby => ({
                 ...lobby,
                 ...{
-                name: name,
                 id: id,
                 players: playersMap,
                 takenRoles: new Set(JSON.parse(takenRoles)),
@@ -247,6 +274,7 @@ function App() {
 
         socket.on('lobby-join-fail', (lobbyID) => {
             console.warn(`Failed to join lobby ${lobbyID}`)
+            setJoinFail(true)
         })
 
         socket.on('lobby-update', ({ players, takenRoles, readyToStart }) => {
@@ -370,6 +398,27 @@ function App() {
                 card: null,
             })
         })
+
+        // Ending the game
+        socket.on('game-end', ({winner, guess}) => {
+            setEndgamePopupState({
+                ...endgamePopupState,
+                type: role == currentPlayer? 'win' : 'lose',
+                guess: guess,
+                winner: winner,
+                onClose: exitGameState
+            })
+        })
+
+        socket.on('player-loss', ({loser, guess}) => {
+            setEndgamePopupState({
+                ...endgamePopupState,
+                type: role == loser.role? 'out' : 'other-out',
+                guess: guess,
+                loser: loser,
+                onClose: closeEndgamePopup
+            })
+        })
         
         // Add cleanup to prevent memory leaks
         return () => {
@@ -385,6 +434,8 @@ function App() {
             socket.off('suggestion-proof-alert');
             socket.off('no-proof-view');
             socket.off('no-proof-alert');
+            socket.off('game-end');
+            socket.off('player-loss');
         };
     }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
@@ -412,18 +463,12 @@ function App() {
                     stats={userStats}
                 />
             )
-        } else if (navState === "lobby-select") {
-            return (
-                <SelectLobby 
-                    joinLobbyWithID={joinLobbyWithID}
-                    setNavState={setNavState}
-                />
-            )
         } else if (lobby.id) {
             if (playerPositions) {
                 return (
                     <>
                     <GameState
+                        user={user}
                         playerPositions={playerPositions}
                         movePlayerToPlace={movePlayerToPlace}
                         movePlayerToCell={movePlayerToCell}
@@ -442,6 +487,7 @@ function App() {
                         onClose={() => setIsDicePopupOpen(false)}
                         onRollComplete={handleRollComplete} 
                     />
+                    {endgamePopupState.type && <EndgamePopup endgamePopupState={endgamePopupState} />}
                 </>
                 )
             } else {
@@ -455,10 +501,13 @@ function App() {
                 )
             }
         } else {
-            return (
+            return ( // this is the one being used
                 <LOBBYPage 
                     solveACase={() => setNavState("lobby-select")} 
                     setNavState={setNavState} 
+                    onLobbyJoin={joinLobbyWithID}
+                    joinFail={joinFail}
+                    setJoinFail={setJoinFail}
                 />
             )
         }
@@ -471,17 +520,7 @@ function App() {
             <Route path="/signup" element={
                 !user ? <SignUpPage handleSignUp={onSignUp} /> : <Navigate to="/" />
             } />
-            <Route path="/" element={
-                user ? (
-                    lobby ? (
-                        gameState ? <GameState /> : <InLobby
-                            lobby={lobby}
-                            onReadyToggle={readyToggle}
-                            onSwitchRole={switchRole}
-                            onLeave={leaveLobby}
-                            onGo={startGame} />
-                    ) : <SelectLobby user={user} onLobbyJoin={joinLobbyWithID} />
-                ) : <Navigate to="/login" />
+            <Route path="/" element={<Navigate to="/login" />
             } />
         </Routes>
         )

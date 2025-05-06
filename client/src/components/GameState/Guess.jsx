@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { CARDS } from '../../../../classes/Cards';
 
-const Guess = ({ onClose, guessType, makeGuess }) => { //Accept onClose prop
-    const [selectedRoom, setSelectedRoom] = useState(null)
+const Guess = ({ onClose, guessType, makeGuess, place }) => { //Accept onClose prop
+    const [selectedRoom, setSelectedRoom] = useState(place != 'Kauffman Clue'? 
+                                                    CARDS.find(card => card.id == place) : null)
     const [selectedSuspect, setSelectedSuspect] = useState(null)
     const [selectedWeapon, setSelectedWeapon] = useState(null)
 
@@ -216,7 +217,11 @@ const Guess = ({ onClose, guessType, makeGuess }) => { //Accept onClose prop
                                 isSelected={card == selectedRoom}
                                 onClick={(e) => {
                                     e.preventDefault()
-                                    setSelectedRoom(card)
+                                    if (guessType != 'SUGGEST') {
+                                        setSelectedRoom(card)
+                                    } else {
+                                        console.log(`Place is already ${selectedRoom}`)
+                                    }
                                 }} />
                         ))}
                     </div>
