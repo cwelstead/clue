@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //Accept onClose prop
   // Hardcoded arrays for simplicity
   const suspects = [
-    { name: "Dr. Cooper", car: "src/assets/suspectCards/DrCooper.svg" },
+    { name: "Dr. Cooper", car: "./src/assets/suspectCards/Dr Cooper.svg" },
     { name: "Theresa", car: "src/assets/suspectCards/Theresa.svg" },
     { name: "Bob", car: "src/assets/suspectCards/Bob.svg" },
     { name: "Adam", car: "src/assets/suspectCards/Adam.svg" },
@@ -22,15 +22,15 @@ const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //
   ];
 
   const rooms = [
-    { name: "Great Hall", car: "src/assets/roomCards/GREAT_HALL.svg" },
-    { name: "Conference", car: "src/assets/roomCards/CONFERENCE.svg" },
-    { name: "DS Room", car: "src/assets/roomCards/DS_ROOM.svg" },
-    { name: "Mega Lounge", car: "src/assets/roomCards/MEGA_LOUNGE.svg" },
-    { name: "Main Office", car: "src/assets/roomCards/MAIN_OFFICE.svg" },
+    { name: "Great Hall", car: "src/assets/roomCards/Great Hall.svg" },
+    { name: "Conference", car: "src/assets/roomCards/Conference.svg" },
+    { name: "DS Room", car: "src/assets/roomCards/DS Room.svg" },
+    { name: "Mega Lounge", car: "src/assets/roomCards/Mega Lounge.svg" },
+    { name: "Main Office", car: "src/assets/roomCards/Main Office.svg" },
     { name: "112", car: "src/assets/roomCards/112.svg" },
-    { name: "Selleck", car: "src/assets/roomCards/SELLECK.svg" },
+    { name: "Selleck", car: "src/assets/roomCards/Selleck.svg" },
     { name: "110", car: "src/assets/roomCards/110.svg" },
-    { name: "Study", car: "src/assets/roomCards/STUDY.svg" }
+    { name: "Study", car: "src/assets/roomCards/Study.svg" }
   ];
 
   useEffect(() => {
@@ -62,7 +62,6 @@ const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //
         style={{
           border: "2px solid black",
           borderRadius: "10px",
-          backgroundImage: `url(${card.car})`,
           backgroundSize: "auto",
           backgroundPosition: "center",
           height: "160px",
@@ -77,6 +76,7 @@ const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //
         }}
         onClick={() => handleCardClick(type, card.name)}
       >
+        <img src={card.car} style={{ objectFit: 'fill', margin: '-2px' }} />
         {isCrossedOff && (
           <div style={{
             position: "absolute",
