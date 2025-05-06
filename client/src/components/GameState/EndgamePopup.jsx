@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const EndgamePopup = ({ endgamePopupState }) => {
+const EndgamePopup = ({ endgamePopupState, role }) => {
     useEffect(() => {
         // Prevent scrolling on the body
         document.body.style.overflow = 'hidden';
@@ -72,10 +72,10 @@ const EndgamePopup = ({ endgamePopupState }) => {
                         paddingBottom: '5px',
                         marginBottom: '15px'
                     }}>
-                        {endgamePopupState.type == 'win' && "YOU WIN!"}
-                        {endgamePopupState.type == 'lose' && "YOU LOSE!"}
-                        {endgamePopupState.type == 'out' && "YOU'RE OUT!"}
-                        {endgamePopupState.type == 'other-out' && `${endgamePopupState.loser.role} IS OUT`}
+                        {endgamePopupState.type == 'correct' && endgamePopupState.accuser.role == role && "YOU WIN!"}
+                        {endgamePopupState.type == 'correct' && endgamePopupState.accuser.role != role && "YOU LOSE!"}
+                        {endgamePopupState.type == 'incorrect' && endgamePopupState.accuser.role == role && "YOU'RE OUT!"}
+                        {endgamePopupState.type == 'incorrect' && endgamePopupState.accuser.role != role && `${endgamePopupState.accuser.role} IS OUT`}
                     </h2>
                     <p style={{
                         fontFamily: 'Courier New',
@@ -84,14 +84,20 @@ const EndgamePopup = ({ endgamePopupState }) => {
                         letterSpacing: '0.1em',
                         color: '#000',
                     }}>
-                        {endgamePopupState.type == 'win' && "Your accusation was correct. Congratulations!"}
-                        {endgamePopupState.type == 'lose' &&
-                        `${endgamePopupState.winner.role}'s  accusation of 
-                        ${endgamePopupState.guess.suspect.phrase} in ${endgamePopupState.guess.room.phrase} with ${endgamePopupState.guess.weapon.phrase}
+                        {endgamePopupState.type == 'correct' && endgamePopupState.accuser.role == role &&
+                        "Your accusation was correct. Congratulations!"}
+
+                        {endgamePopupState.type == 'correct' && endgamePopupState.accuser.role != role &&
+                        `${endgamePopupState.accuser.role}'s  accusation of ${endgamePopupState.guess.suspect.phrase} 
+                        in ${endgamePopupState.guess.room.phrase} with ${endgamePopupState.guess.weapon.phrase}
                         was correct.`}
-                        {endgamePopupState.type == 'out' && "Your accusation was incorrect. Better luck next time!"}
-                        {endgamePopupState.type == 'other-out' && `${endgamePopupState.loser.role}'s accusation of 
-                        ${endgamePopupState.guess.suspect.phrase} in ${endgamePopupState.guess.room.phrase} with ${endgamePopupState.guess.weapon.phrase}
+
+                        {endgamePopupState.type == 'incorrect' && endgamePopupState.accuser.role == role &&
+                        "Your accusation was incorrect. Better luck next time!"}
+
+                        {endgamePopupState.type == 'incorrect' && endgamePopupState.accuser.role != role &&
+                        `${endgamePopupState.accuser.role}'s accusation of ${endgamePopupState.guess.suspect.phrase} in 
+                        ${endgamePopupState.guess.room.phrase} with ${endgamePopupState.guess.weapon.phrase}
                         was incorrect.`}
                     </p>
                 </div>

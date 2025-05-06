@@ -403,9 +403,9 @@ function App() {
         socket.on('game-end', ({winner, guess}) => {
             setEndgamePopupState({
                 ...endgamePopupState,
-                type: role == currentPlayer? 'win' : 'lose',
+                type: 'correct',
                 guess: guess,
-                winner: winner,
+                accuser: winner,
                 onClose: exitGameState
             })
         })
@@ -413,9 +413,9 @@ function App() {
         socket.on('player-loss', ({loser, guess}) => {
             setEndgamePopupState({
                 ...endgamePopupState,
-                type: role == loser.role? 'out' : 'other-out',
+                type: 'incorrect',
                 guess: guess,
-                loser: loser,
+                accuser: loser,
                 onClose: closeEndgamePopup
             })
         })
@@ -487,7 +487,7 @@ function App() {
                         onClose={() => setIsDicePopupOpen(false)}
                         onRollComplete={handleRollComplete} 
                     />
-                    {endgamePopupState.type && <EndgamePopup endgamePopupState={endgamePopupState} />}
+                    {endgamePopupState.type && <EndgamePopup endgamePopupState={endgamePopupState} role={role} />}
                 </>
                 )
             } else {
