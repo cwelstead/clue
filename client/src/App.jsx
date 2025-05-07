@@ -14,6 +14,7 @@ import { SignUpPage } from './components/SignUpPage.jsx'
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 import DiceRollerPopup from './components/DiceRollerPopup.jsx'
 import EndgamePopup from './components/GameState/EndgamePopup.jsx'
+import { db, doc, getDoc, setDoc, updateDoc } from './firebase.jsx';
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -45,11 +46,34 @@ function App() {
     // Load user stats when component mounts or user changes
     useEffect(() => {
         if (user) {
-            // Load user stats from localStorage
-            const storedStats = localStorage.getItem(`userStats_${user.id}`);
-            if (storedStats) {
-                setUserStats(JSON.parse(storedStats));
-            }
+            // // Load user stats from localStorage
+            // const storedStats = localStorage.getItem(`userStats_${user.id}`);
+            // if (storedStats) {
+            //     setUserStats(JSON.parse(storedStats));
+            // }
+
+            // Load user stats from Firestore
+            const fetchStats = async () => {
+                const uid = getAuth().currentUser?.uid;
+                const userDocRef = doc(db, "users", uid);
+
+                const docSnap = await getDoc(userDocRef);
+            
+                if (docSnap.exists()) {
+                    setUserStats(docSnap.data().stats);
+                } else {
+                    // Create initial stats if not present
+                    const initialStats = {
+                        correctAccusations: 0,
+                        gamesPlayed: 0,
+                        totalSpacesMoved: 0
+                };
+                await setDoc(userDocRef, { stats: initialStats });
+                setUserStats(initialStats);
+                }
+            };
+            
+            fetchStats().catch(console.error);
         }
     }, [user]);
 
@@ -80,7 +104,8 @@ function App() {
                             name: email,
                             id: socket.id,
                         });
-                        setUser({ name: email, id: socket.id });
+                        const authUser = userCredential.user;
+                        setUser({ name: email, id: socket.id, uid: authUser.uid });
                         navigate("/");
                         return true;
                     } else {
@@ -124,7 +149,8 @@ function App() {
                                 name: email,
                                 id: socket.id,
                             });
-                            setUser({ name: email, id: socket.id });
+                            const authUser = userCredential.user;
+                            setUser({ name: email, id: socket.id, uid: authUser.uid });
                             navigate("/"); // Navigate to home after successful signup
                         } else {
                             console.error("Registration failed on backend:", data.message);
@@ -401,6 +427,13 @@ function App() {
 
         // Ending the game
         socket.on('game-end', ({winner, guess}) => {
+            if (winner?.id === user.id) {
+                // Player made a correct accusation
+                updateUserStats({ madeCorrectAccusation: true, spacesMoved: spacesToMove });
+            } else {
+                updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesToMove });
+            }        
+
             setEndgamePopupState({
                 ...endgamePopupState,
                 type: 'correct',
@@ -411,6 +444,13 @@ function App() {
         })
 
         socket.on('player-loss', ({loser, guess}) => {
+            if (winner?.id === user.id) {
+                // Player made a correct accusation
+                updateUserStats({ madeCorrectAccusation: true, spacesMoved: spacesToMove });
+            } else {
+                updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesToMove });
+            }        
+
             setEndgamePopupState({
                 ...endgamePopupState,
                 type: 'incorrect',
@@ -440,16 +480,25 @@ function App() {
     }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
     // Updated user stats update function - can be called after games
-    function updateUserStats(gameStats) {
+    async function updateUserStats(gameStats) {
         const updatedStats = {
             correctAccusations: userStats.correctAccusations + (gameStats.madeCorrectAccusation ? 1 : 0),
             gamesPlayed: userStats.gamesPlayed + 1,
             totalSpacesMoved: userStats.totalSpacesMoved + (gameStats.spacesMoved || 0)
         };
         
-        // Save to localStorage
+        setUserStats(updatedStats);
+        // Save to localStorage as backup
         localStorage.setItem(`userStats_${user.id}`, JSON.stringify(updatedStats));
         setUserStats({...userStats, ...updatedStats});
+
+        // Update Firebase
+        const uid = getAuth().currentUser?.uid;
+        const userDocRef = doc(db, "users", uid);
+
+        await updateDoc(userDocRef, { stats: updatedStats });
+
+        console.log("\nInside updateUserStats\n")
         
         return updatedStats;
     }
