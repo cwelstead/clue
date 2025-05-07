@@ -87,6 +87,12 @@ const GameState = ({ user, playerPositions, movePlayerToPlace, movePlayerToCell,
     {label: 'END TURN', onClick: endTurn, disabledCondition: role != currentPlayer}
   ];
 
+  console.table({
+    "user.id (myID)": user.id,
+    "source.id": suggestState.source?.id,
+    "source.role": suggestState.source?.role
+  });
+
   return (
     <div className={styles.gameState}>
       <GameBoard
@@ -105,8 +111,15 @@ const GameState = ({ user, playerPositions, movePlayerToPlace, movePlayerToCell,
       {isNotesOpen && <ClueInfoSheet onClose={handleCloseNotes} crossedOffCards={crossedOffCards} setCrossedOffCards={setCrossedOffCards} />} {/* Conditionally render the ClueInfoSheet component */}
       {isGuessOpen && <Guess onClose={handleCloseGuess} guessType={guessType} makeGuess={makeGuess} place={playerPositions.get(role).place}/>}
       {suggestState.type == 'select-proof' && <RefutePopup onSubmit={submitProof} cards={cards} suggestState={suggestState} />}
-      {suggestState.type == 'suggestion-proof-view' && <AlertPopup onConfirm={endTurn} card={suggestState.card} suggestState={suggestState} />}
-      {suggestState.type == 'no-proof-view' && <AlertPopup onConfirm={endTurn} card={null} suggestState={suggestState} />}
+      {(suggestState.type === 'suggestion-proof-view' || suggestState.type === 'no-proof-view') && (
+        <AlertPopup 
+          onConfirm={endTurn}
+          refuter={suggestState.type === 'suggestion-proof-view' ? suggestState.refuter : null}
+          cardImage={suggestState.card ? `./src/assets/${suggestState.card.type}Cards/${suggestState.card.id}.svg` : undefined}
+          sourceID={suggestState.source?.id}
+          myID={user.id}
+        />
+      )}
     </div>
   );
 };

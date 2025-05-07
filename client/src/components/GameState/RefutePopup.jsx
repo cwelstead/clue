@@ -126,13 +126,14 @@ const RefutePopup = ({ onSubmit, cards, suggestState }) => {
                         paddingBottom: '5px',
                         marginBottom: '15px'
                     }}>
-                        SELECT A CARD to show to {suggestState.source.role}
+                        Select a card to show to {suggestState.source.role}
                     </h2>
                     <div style={{
                         display: "flex",
                         gap: "20px",
                         flexWrap: "wrap",
                         justifyContent: "center",
+                        marginBottom: '15px'
                     }}>
                         {availableCards.map(card => (
                             <CardComponent src={`./src/assets/${card.type}Cards/${card.id}.svg`} key={card.id}
