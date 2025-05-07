@@ -36,7 +36,7 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
                 position: 'fixed',
                 top: 0,
                 left: 0,
-                backgroundImage: `url(src/assets/lobby.png)`, // Use backgroundImage and the imported image
+                backgroundImage: `url(src/assets/KauffmanLobby.png)`, // Use backgroundImage and the imported image
                 backgroundPosition: 'center',   // Ensure it's centered
                 backgroundSize: 'cover',         // Cover the entire area
                 display: 'flex',

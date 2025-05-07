@@ -7,7 +7,6 @@ import { GameState } from '../classes/GameState.js'
 /*
  * THIS FILE IS FOR SERVER-SIDE LOGIC
  * 
- * Authors: Cole Welstead
  * Credit to Dave Gray for the starting code and tutorial
 */
 
@@ -213,8 +212,8 @@ io.on('connection', socket => {
     })
 
     function removeUserFromLobby(id) {
-        // socket does a lot of weird things during development e.g. emitting events multiple times
-        // this if statement is designed to prevent errors from weird reloads or disconnects
+        // socket does some weird things during development e.g. emitting events multiple times
+        // this if statement is designed to prevent errors from unexpected reloads or disconnects
         if (id === undefined || UsersState.users.find((user) => user.id === id) === undefined) {
             return false
         }

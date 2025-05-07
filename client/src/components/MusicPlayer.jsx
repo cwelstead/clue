@@ -18,8 +18,7 @@ export function MusicPlayer() {
     return (
         <>
             {/* Background Music */}
-            <audio ref={audioRef} loop>
-                <source src="/ominous-music-background.mp3" type="audio/mp3" />
+            <audio ref={audioRef} loop src="src/assets/sfx/ominous-music-background.mp3">
                 Your browser does not support the audio element.
             </audio>
 

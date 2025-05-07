@@ -1,7 +1,7 @@
 /* ===== Inter (Variable) ===== */
 @font-face {
   font-family: "Inter";
-  src: url("/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  src: "src/assets/fonts/Inter-VariableFont_opsz,wght.ttf" format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -10,7 +10,7 @@
 /* ===== Playfair Display (Variable) ===== */
 @font-face {
   font-family: "Playfair Display";
-  src: url("/fonts/PlayfairDisplay-VariableFont_wght.ttf") format("truetype");
+  src: "src/assets/fonts/PlayfairDisplay-VariableFont_wght.ttf" format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -19,7 +19,7 @@
 /* ===== Bricolage Grotesque (Variable) ===== */
 @font-face {
   font-family: "Bricolage Grotesque";
-  src: url("/fonts/BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf") format("truetype");
+  src: "src/assets/fonts/BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf" format("truetype");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -28,7 +28,7 @@
 /* ===== Hubballi (Static) ===== */
 @font-face {
   font-family: "Hubballi";
-  src: url("/fonts/Hubballi-Regular.ttf") format("truetype");
+  src: "src/assets/fonts/Hubballi-Regular.ttf" format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -37,7 +37,7 @@
 /* ===== Bowlby One (Static) ===== */
 @font-face {
   font-family: "Bowlby One";
-  src: url("/fonts/BowlbyOne-Regular.ttf") format("truetype");
+  src: "src/assets/fonts/BowlbyOne-Regular.ttf" format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -46,7 +46,7 @@
 /* ===== IBM Plex Mono (Static) ===== */
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("/fonts/IBMPlexMono-Light.ttf") format("truetype");
+  src: "src/assets/fonts/IBMPlexMono-Light.ttf" format("truetype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -54,7 +54,7 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("/fonts/IBMPlexMono-Regular.ttf") format("truetype");
+  src: "src/assets/fonts/IBMPlexMono-Regular.ttf" format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -62,7 +62,7 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("/fonts/IBMPlexMono-SemiBold.ttf") format("truetype");
+  src: "src/assets/fonts/IBMPlexMono-SemiBold.ttf" format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
