@@ -1,6 +1,4 @@
 import React from "react";
-import { Button } from "./LobbyComponents";
-import { SelectLobby } from "../SelectLobby";
 import KauffmanClueInstructions from "../KauffmanClueInstructions";
 
 export default function LobbyKauffmanClue({ backgroundImage, setNavState }) {
