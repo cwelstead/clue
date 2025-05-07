@@ -1,19 +1,18 @@
 import { useState } from 'react'
 import './App.css'
 import './index.css'
-import { SelectLobby } from './components/SelectLobby.jsx'
-import { InLobby } from './components/InLobby.jsx'
+import { InLobby } from './components/MainMenu/Lobbies/InLobby.jsx'
 import { socket } from './socket.js'
 import { useEffect } from 'react'
-import { LoginPage } from './components/LoginPage.jsx'
+import { LoginPage } from './components/Login/LoginPage.jsx'
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import GameState from "./components/GameState/GameState.jsx"
-import LOBBYPage from "./components/Navigation/index.jsx"
+import LOBBYPage from "./components/MainMenu/LOBBYPage.jsx"
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import { SignUpPage } from './components/SignUpPage.jsx'
-import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
-import DiceRollerPopup from './components/DiceRollerPopup.jsx'
-import EndgamePopup from './components/GameState/EndgamePopup.jsx'
+import { SignUpPage } from './components/Login/SignUpPage.jsx'
+import ProfilePage from "./components/MainMenu/ProfilePage.jsx" // Import ProfilePage
+import DiceRollerPopup from './components/GameState/Popups/DiceRollerPopup.jsx'
+import EndgamePopup from './components/GameState/Popups/EndgamePopup.jsx'
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC

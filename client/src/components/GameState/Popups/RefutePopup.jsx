@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { CARDS } from '../../../../classes/Cards';
 
 const RefutePopup = ({ onSubmit, cards, suggestState }) => {
     const [selectedCard, setSelectedCard] = useState(null)

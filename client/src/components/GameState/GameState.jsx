@@ -5,10 +5,10 @@ import styles from './GameState.module.css';
 import GameBoard from './GameBoard';
 import Controls from './Controls';
 import CurrentPlayer from './CurrentPlayer';
-import ClueInfoSheet from '../ClueInfoSheet'; // Import the ClueInfoSheet component
+import ClueInfoSheet from './ClueInfoSheet'; // Import the ClueInfoSheet component
 import Guess from './Guess';
-import RefutePopup from './RefutePopup';
-import AlertPopup from './AlertPopup';
+import RefutePopup from './Popups/RefutePopup';
+import AlertPopup from './Popups/AlertPopup';
 
 const GameState = ({ user, playerPositions, movePlayerToPlace, movePlayerToCell, role, currentPlayer, cards, spacesToMove, rollDice, sendGuess, suggestState, submitProof, endTurn }) => {
   const [isNotesOpen, setIsNotesOpen] = useState(false) // State for overlay visibility

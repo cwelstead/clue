@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import "../components/styles/font.css";
-import { Button } from "./Navigation/LobbyComponents";
+import "../styles/font.css";
+import { Button } from "./LobbyComponents";
 
 export default function KauffmanClueInstructions() {
   const [isModalOpen, setIsModalOpen] = useState(false);

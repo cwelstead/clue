@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Roles } from "../../../classes/Lobby"
+import { Roles } from "../../../../../classes/Lobby"
 import { MusicPlayer } from "./MusicPlayer";
 
 export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {

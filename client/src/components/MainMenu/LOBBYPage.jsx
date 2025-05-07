@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import LobbyKauffmanClue from "./LobbyKauffmanClue";
 import backgroundImage from "../../assets/kauffman-building.png";
-import { SelectLobby } from "../SelectLobby";
-import ProfilePage from "../ProfilePage/ProfilePage";
+import { SelectLobby } from "./Lobbies/SelectLobby";
+import ProfilePage from "./ProfilePage";
 
 export default function LOBBYPage({ onLobbyJoin, joinFail, setJoinFail }) {
   const [navState, setNavState] = useState("")

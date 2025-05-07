@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { socket } from '../socket.js';
+import { socket } from '../../../socket.js';
 
 export function SelectLobby({ onLobbyJoin, setNavState, joinFail, setJoinFail }) {
     const [lobbyID, setLobbyID] = useState("");

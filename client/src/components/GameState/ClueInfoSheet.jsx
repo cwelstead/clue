@@ -1,5 +1,5 @@
 /* src/ClueInfoSheet.jsx */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //Accept onClose prop
   // Hardcoded arrays for simplicity
