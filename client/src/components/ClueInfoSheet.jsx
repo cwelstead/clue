@@ -1,7 +1,7 @@
 /* src/ClueInfoSheet.jsx */
 import React, { useEffect, useState } from 'react';
 
-const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //Accept onClose prop
+const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => {
   // Hardcoded arrays for simplicity
   const suspects = [
     { name: "Dr. Cooper", car: "./src/assets/suspectCards/Dr Cooper.svg" },
@@ -98,22 +98,17 @@ const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //
 
   return (
     <div style={{
-      width: '100vw',
+      width: '47%',
       height: '100vh',
       position: 'fixed',
       top: 0,
       left: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      overflowY: 'auto',
-      paddingBottom: '50px',
-      zIndex: 1000 // Ensure it's on top of everything
+      zIndex: 1000
     }}>
       {/* Background Image Wrapper with Inner Shadow*/}
       <div
         style={{
-          position: 'fixed',
+          position: 'absolute',
           width: '100%',
           height: '100%',
           zIndex: 0,
@@ -135,10 +130,24 @@ const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //
         />
       </div>
 
+      {/* Scrollable content container */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        overflowY: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        zIndex: 2
+      }}>
+      
       {/* Container for all cards */}
       <div style={{
         width: '80%',
-        maxWidth: '1200px',
+        maxWidth: '600px',
         marginBlock: "70px",
         zIndex: 1,
         backgroundColor: 'rgba(234, 215, 183, 1)',
@@ -240,21 +249,23 @@ const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //
           </div>
         </div>
       </div>
-        {/*Add a button to close the component*/}
-        <button onClick={onClose} style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            padding: '10px',
-            background: '#7F1700',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            zIndex: '1001',
-        }}>
-            Close
-        </button>
+      </div>
+      {/*Add a button to close the component*/}
+      <button onClick={onClose} style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          padding: '10px',
+          background: '#7F1700',
+          color: 'white',
+          fontWeight: '600',
+          border: 'none',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          zIndex: 1003,
+      }}>
+          X
+      </button>
     </div>
   );
 };
