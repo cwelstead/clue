@@ -76,16 +76,16 @@ const ClueInfoSheet = ({ onClose, crossedOffCards, setCrossedOffCards }) => { //
         }}
         onClick={() => handleCardClick(type, card.name)}
       >
-        <img src={card.car} style={{ objectFit: 'fill', margin: '-2px' }} />
+        <img src={card.car} style={{ objectFit: 'fill', margin: '-3px' }} />
         {isCrossedOff && (
           <div style={{
             position: "absolute",
-            top: 0,
+            top: -1,
             left: 0,
             right: 0,
             bottom: 0,
             backgroundColor: "rgba(0, 0, 0, 0.70)",
-            borderRadius: "8px",
+            borderRadius: "6px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center"
