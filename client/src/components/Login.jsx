@@ -47,10 +47,11 @@ export function Login({ handleLogin, redirectToSignup }) {
                 <label style={{
                     fontFamily: 'Courier New',
                     fontSize: '16px',
+                    fontWeight: 500,
                     letterSpacing: '0.08em',
-                    color: '#2C2C2C',
+                    color: '#333333',
                 }}>
-                Username
+                Email
                 </label>
                 <input
                     type="text"
@@ -63,11 +64,11 @@ export function Login({ handleLogin, redirectToSignup }) {
                         border: '1px solid #000000',
                         borderRadius: '8px',
                         padding: '0 15px',
-                        fontFamily: 'IBM Plex Mono',
+                        fontFamily: 'Courier New',
                         fontSize: '14px',
-                        fontWeight: 300,
+                        fontWeight: 400,
                         letterSpacing: '0.07em',
-                        color: '#6E6E6E',
+                        color: '#383838',
                     }}
                 />
             </div>
@@ -77,8 +78,9 @@ export function Login({ handleLogin, redirectToSignup }) {
                 <label style={{
                     fontFamily: 'Courier New',
                     fontSize: '16px',
+                    fontWeight: 500,
                     letterSpacing: '0.08em',
-                    color: '#2C2C2C',
+                    color: '#333333',
                 }}>
                     Password
                 </label>
@@ -93,11 +95,11 @@ export function Login({ handleLogin, redirectToSignup }) {
                     border: '1px solid #000000',
                     borderRadius: '8px',
                     padding: '0 15px',
-                    fontFamily: 'IBM Plex Mono',
+                    fontFamily: 'Courier New',
                     fontSize: '14px',
-                    fontWeight: 300,
+                    fontWeight: 500,
                     letterSpacing: '0.07em',
-                    color: '#6E6E6E',
+                    color: '#383838',
                     }}
                 />
             </div>

@@ -74,6 +74,7 @@ export function SelectLobby({ onLobbyJoin, setNavState, joinFail, setJoinFail })
 
             <div style={{
                 padding: '20px',
+                width: '350px',
                 position: 'relative',
                 backgroundColor: 'rgba(234, 215, 183, 1)',
                 backgroundBlendMode: 'overlay',
@@ -90,6 +91,7 @@ export function SelectLobby({ onLobbyJoin, setNavState, joinFail, setJoinFail })
                     fontSize: '16px',
                     letterSpacing: '0.08em',
                     color: '#2C2C2C',
+                    fontWeight: 500,
                 }}>
                     Lobby Code
                 </label>
@@ -109,11 +111,11 @@ export function SelectLobby({ onLobbyJoin, setNavState, joinFail, setJoinFail })
                         border: '1px solid #000000',
                         borderRadius: '8px',
                         padding: '0 15px',
-                        fontFamily: 'IBM Plex Mono',
+                        fontFamily: 'Courier New',
                         fontSize: '14px',
-                        fontWeight: 300,
+                        fontWeight: 400,
                         letterSpacing: '0.07em',
-                        color: '#6E6E6E',
+                        color: '#383838',
                     }}
                 />
                 {joinFail &&
