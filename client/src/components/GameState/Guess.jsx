@@ -227,7 +227,17 @@ const Guess = ({ onClose, guessType, makeGuess, place }) => { //Accept onClose p
                     </div>
                 </div>
                 {/* Submitting a guess */}
-                <button onClick={checkSubmitGuess}>SUBMIT</button>
+                <button onClick={checkSubmitGuess}
+                        disabled={selectedRoom==null || selectedSuspect==null || selectedWeapon==null}
+                        style={{
+                        marginTop: '20px',
+                        padding: '10px',
+                        background: (selectedRoom==null || selectedSuspect==null || selectedWeapon==null)? '#666' : '#7F1700',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: (selectedRoom==null || selectedSuspect==null || selectedWeapon==null)? 'default' : 'pointer',
+                }}>SUBMIT</button>
             </div>
             {/*Add a button to close the component*/}
             <button onClick={onClose} style={{

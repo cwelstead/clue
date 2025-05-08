@@ -146,7 +146,16 @@ const RefutePopup = ({ onSubmit, cards, suggestState }) => {
                     </div>
                 </div>
                 {/* Submitting a guess */}
-                <button onClick={checkSubmitCard}>SUBMIT</button>
+                <button onClick={checkSubmitCard}
+                    disabled={selectedCard==null}
+                    style={{
+                    padding: '10px',
+                    background: (selectedCard==null)? '#666' : '#7F1700',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: (selectedCard==null)? 'default' : 'pointer',
+                }}>SUBMIT</button>
             </div>
         </div>
     )
