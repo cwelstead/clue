@@ -1,30 +1,53 @@
 import './ProfilePage.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAuth } from 'firebase/auth';
+import { db } from '../../firebase.jsx';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 
-const ProfilePage = ({
-  user,  // This will have user.username and other user properties
-  setNavState,
-  stats = {
-    correctAccusations: 0,
-    gamesPlayed: 0,
-    totalSpacesMoved: 0
-  } 
-  }) => {
-  // Default card image - can be updated based on user preferences
-  const [profileCard, setProfileCard] = useState("src/assets/suspectCards/Theresa.svg");
+const ProfilePage = ({ user, setNavState }) => {
+  const [profileCard, setProfileCard] = useState('src/assets/suspectCards/Theresa.svg');
+  const [stats, setStats] = useState({ correctAccusations: 0, gamesPlayed: 0, totalSpacesMoved: 0 });
+  const [loading, setLoading] = useState(true);
 
-  const handleBack = () => {
-    setNavState("");
-  };
+  // Navigation handlers
+  const handleBack = () => setNavState('');
+  const handleJoinGame = () => setNavState('lobby-select');
 
-  const handleJoinGame = () => {
-    setNavState("lobby-select");
-  };
+  useEffect(() => {
+    const uid = user?.uid || getAuth().currentUser?.uid;
+    if (!uid) return;
 
-  //Below I want to create a back button to navigate back to the "Navigation Page" the sylying is already made
-  // I also want the card image shown to update based on the specific user and what card is their most played
-  // The Join a game button should navigate the user to SelectLobby
-  // The username of the user should be updated in the Username box
+    const userRef = doc(db, 'users', uid);
+
+    // Listen for real-time updates
+    const unsubscribe = onSnapshot(
+      userRef,
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data().stats;
+          setStats({
+            correctAccusations: data.correctAccusations || 0,
+            gamesPlayed: data.gamesPlayed || 0,
+            totalSpacesMoved: data.totalSpacesMoved || 0,
+          });
+        } else {
+          setStats({ correctAccusations: 0, gamesPlayed: 0, totalSpacesMoved: 0 });
+        }
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error fetching stats:', err);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user]);
+
+  if (loading) {
+    return <div className="profile-page">Loading stats...</div>;
+  }
+
   return (
     <div className="profile-page">
       <div className="deep-color-overlay">
@@ -35,9 +58,9 @@ const ProfilePage = ({
         <div className="main-content">
           <div className="profile-card">
             <div className="profile-image-container">
-              <img 
-                src={profileCard} 
-                alt="Profile" 
+              <img
+                src={profileCard}
+                alt="Profile"
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
               />
             </div>
@@ -46,10 +69,10 @@ const ProfilePage = ({
           <div className="stats-container">
             <div className="username-frame">
               <div className="username-label">Username</div>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 className="username-input"
-                value={user?.username || "Guest"}
+                value={user?.username || 'Guest'}
                 readOnly
               />
             </div>
@@ -57,7 +80,7 @@ const ProfilePage = ({
             <div className="statistics-frame">
               <div className="statistics-content">
                 <h2>Statistics</h2>
-                
+
                 <div className="stat-row">
                   <span>Correct Accusations</span>
                   <span className="stat-value">{stats.correctAccusations}</span>
