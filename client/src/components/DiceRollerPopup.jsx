@@ -19,14 +19,14 @@ export default function DiceRollerPopup({ isOpen, onClose, onRollComplete }) {
     setIsRolling(true);
     
     // Simulate dice rolling animation with multiple updates
-    const totalDuration = 1500; // Total animation time in ms
+    const totalDuration = 1000; // Total animation time in ms
     const intervals = 10; // Number of "rolls" to show
     const intervalTime = totalDuration / intervals;
     
     let count = 0;
     const rollInterval = setInterval(() => {
-      const die1 = Math.floor(Math.random() * 6) + 1;
-      const die2 = Math.floor(Math.random() * 6) + 1;
+      const die1 = Math.floor(Math.random() * 4) + 3;
+      const die2 = Math.floor(Math.random() * 3) + 4;
       setDice([die1, die2]);
       
       count++;

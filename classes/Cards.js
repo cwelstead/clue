@@ -111,7 +111,7 @@ export function getCaseFile() {
     const suspects = CARDS.filter(card => card.type == "suspect")
     const weapons = CARDS.filter(card => card.type == "weapon")
 
-    return {room: rooms[Math.floor(Math.random() * rooms.length)],
-            suspect: suspects[Math.floor(Math.random() * suspects.length)],
-            weapon: weapons[Math.floor(Math.random() * weapons.length)]}
+    return {room: rooms[4], // The Great Hall
+            suspect: suspects[1], // Bob
+            weapon: weapons[3]} // The Projector
 }
