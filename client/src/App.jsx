@@ -14,7 +14,8 @@ import { SignUpPage } from './components/SignUpPage.jsx'
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 import DiceRollerPopup from './components/DiceRollerPopup.jsx'
 import EndgamePopup from './components/GameState/EndgamePopup.jsx'
-import { db, doc, getDoc, setDoc, updateDoc } from './firebase.jsx';
+import { doc, getDoc, setDoc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
+import { db } from './firebase.jsx';
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -28,7 +29,7 @@ function App() {
     const [playerPositions, setPlayerPositions] = useState(null)
     const [cards, setCards] = useState([])
     const [currentPlayer, setCurrentPlayer] = useState("")
-    const [spacesToMove, setSpacesToMove] = useState(-1)
+    const [spacesToMove, setSpacesToMove] = useState(0)
     const [role, setRole] = useState("")
     const [isDicePopupOpen, setIsDicePopupOpen] = useState(false);
     const [suggestState, setSuggestState] = useState({type: ""})
@@ -427,12 +428,7 @@ function App() {
 
         // Ending the game
         socket.on('game-end', ({winner, guess}) => {
-            if (winner?.id === user.id) {
-                // Player made a correct accusation
-                updateUserStats({ madeCorrectAccusation: true, spacesMoved: spacesToMove });
-            } else {
-                updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesToMove });
-            }        
+            updateUserStats({ madeCorrectAccusation: true, spacesMoved: spacesToMove });        
 
             setEndgamePopupState({
                 ...endgamePopupState,
@@ -444,12 +440,7 @@ function App() {
         })
 
         socket.on('player-loss', ({loser, guess}) => {
-            if (winner?.id === user.id) {
-                // Player made a correct accusation
-                updateUserStats({ madeCorrectAccusation: true, spacesMoved: spacesToMove });
-            } else {
-                updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesToMove });
-            }        
+            updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesToMove });        
 
             setEndgamePopupState({
                 ...endgamePopupState,
@@ -479,28 +470,15 @@ function App() {
         };
     }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
-    // Updated user stats update function - can be called after games
-    async function updateUserStats(gameStats) {
-        const updatedStats = {
-            correctAccusations: userStats.correctAccusations + (gameStats.madeCorrectAccusation ? 1 : 0),
-            gamesPlayed: userStats.gamesPlayed + 1,
-            totalSpacesMoved: userStats.totalSpacesMoved + (gameStats.spacesMoved || 0)
-        };
-        
-        setUserStats(updatedStats);
-        // Save to localStorage as backup
-        localStorage.setItem(`userStats_${user.id}`, JSON.stringify(updatedStats));
-        setUserStats({...userStats, ...updatedStats});
-
-        // Update Firebase
+    async function updateUserStats({ madeCorrectAccusation, spacesMoved }) {
+        // server‐side atomic increments
         const uid = getAuth().currentUser?.uid;
         const userDocRef = doc(db, "users", uid);
-
-        await updateDoc(userDocRef, { stats: updatedStats });
-
-        console.log("\nInside updateUserStats\n")
-        
-        return updatedStats;
+        await updateDoc(userDocRef, {
+          'stats.correctAccusations': increment(madeCorrectAccusation ? 1 : 0),
+          'stats.gamesPlayed':       increment(1),
+          'stats.totalSpacesMoved':  increment(spacesMoved)
+        });
     }
 
     if (user) {

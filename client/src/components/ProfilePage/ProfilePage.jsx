@@ -68,7 +68,7 @@ const ProfilePage = ({ user, setNavState }) => {
 
           <div className="stats-container">
             <div className="username-frame">
-              <div className="username-label">Username</div>
+              <div className="username-label">{getAuth().currentUser?.email}</div>
               <input
                 type="text"
                 className="username-input"
