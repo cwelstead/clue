@@ -126,13 +126,14 @@ const RefutePopup = ({ onSubmit, cards, suggestState }) => {
                         paddingBottom: '5px',
                         marginBottom: '15px'
                     }}>
-                        SELECT A CARD to show to {suggestState.source.role}
+                        Select a card to show to {suggestState.source.role}
                     </h2>
                     <div style={{
                         display: "flex",
                         gap: "20px",
                         flexWrap: "wrap",
                         justifyContent: "center",
+                        marginBottom: '15px'
                     }}>
                         {availableCards.map(card => (
                             <CardComponent src={`./src/assets/${card.type}Cards/${card.id}.svg`} key={card.id}
@@ -145,7 +146,16 @@ const RefutePopup = ({ onSubmit, cards, suggestState }) => {
                     </div>
                 </div>
                 {/* Submitting a guess */}
-                <button onClick={checkSubmitCard}>SUBMIT</button>
+                <button onClick={checkSubmitCard}
+                    disabled={selectedCard==null}
+                    style={{
+                    padding: '10px',
+                    background: (selectedCard==null)? '#666' : '#7F1700',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: (selectedCard==null)? 'default' : 'pointer',
+                }}>SUBMIT</button>
             </div>
         </div>
     )

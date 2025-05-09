@@ -102,7 +102,15 @@ const EndgamePopup = ({ endgamePopupState, role }) => {
                     </p>
                 </div>
                 {/* Submitting a guess */}
-                <button onClick={endgamePopupState.onClose}>CONFIRM</button>
+                <button onClick={endgamePopupState.onClose}
+                    style={{
+                    padding: '10px',
+                    background: '#7F1700',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    }}>CONFIRM</button>
             </div>
         </div>
     )
