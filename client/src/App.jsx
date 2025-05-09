@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 import './index.css'
 import { SelectLobby } from './components/SelectLobby.jsx'
@@ -14,6 +14,8 @@ import { SignUpPage } from './components/SignUpPage.jsx'
 import ProfilePage from "./components/ProfilePage/ProfilePage.jsx" // Import ProfilePage
 import DiceRollerPopup from './components/DiceRollerPopup.jsx'
 import EndgamePopup from './components/GameState/EndgamePopup.jsx'
+import { doc, getDoc, setDoc, updateDoc, increment, onSnapshot } from 'firebase/firestore';
+import { db } from './firebase.jsx';
 
 /*
  * THIS FILE IS FOR CLIENT-SIDE LOGIC
@@ -24,11 +26,15 @@ function App() {
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState({})
     const [joinFail, setJoinFail] = useState(false)
+
     const [playerPositions, setPlayerPositions] = useState(null)
     const [cards, setCards] = useState([])
     const [currentPlayer, setCurrentPlayer] = useState("")
-    const [spacesToMove, setSpacesToMove] = useState(-1)
+    const [spacesToMove, setSpacesToMove] = useState(0)
     const [role, setRole] = useState("")
+    const roleRef = useRef()
+    roleRef.current = role
+
     const [isDicePopupOpen, setIsDicePopupOpen] = useState(false);
     const [suggestState, setSuggestState] = useState({type: ""})
     const [endgamePopupState, setEndgamePopupState] = useState({type: ""})
@@ -41,15 +47,50 @@ function App() {
         gamesPlayed: 0,
         totalSpacesMoved: 0
     })
+    const [gameSpacesMoved, setGameSpacesMoved] = useState(0)
+    const spacesMovedRef = useRef()
+    spacesMovedRef.current = gameSpacesMoved
+    const [statsUpdated, setStatsUpdated] = useState(false)
+    const statsUpdatedRef = useRef()
+    statsUpdatedRef.current = statsUpdated
 
     // Load user stats when component mounts or user changes
     useEffect(() => {
         if (user) {
-            // Load user stats from localStorage
-            const storedStats = localStorage.getItem(`userStats_${user.id}`);
-            if (storedStats) {
-                setUserStats(JSON.parse(storedStats));
-            }
+            // // Load user stats from localStorage
+            // const storedStats = localStorage.getItem(`userStats_${user.id}`);
+            // if (storedStats) {
+            //     setUserStats(JSON.parse(storedStats));
+            // }
+
+            // Load user stats from Firestore
+            const fetchStats = async () => {
+                const uid = getAuth().currentUser?.uid;
+                const userDocRef = doc(db, "users", uid);
+
+                const docSnap = await getDoc(userDocRef);
+            
+                if (docSnap.exists()) {
+                    setUserStats({
+                        ...userStats,
+                        ...docSnap.data().stats
+                    });
+                } else {
+                    // Create initial stats if not present
+                    const initialStats = {
+                        correctAccusations: 0,
+                        gamesPlayed: 0,
+                        totalSpacesMoved: 0
+                };
+                await setDoc(userDocRef, { stats: initialStats });
+                setUserStats({
+                    ...userStats,
+                    ...initialStats,
+                });
+                }
+            };
+            
+            fetchStats().catch(console.error);
         }
     }, [user]);
 
@@ -80,7 +121,8 @@ function App() {
                             name: email,
                             id: socket.id,
                         });
-                        setUser({ name: email, id: socket.id });
+                        const authUser = userCredential.user;
+                        setUser({ name: email, id: socket.id, uid: authUser.uid });
                         navigate("/");
                         return true;
                     } else {
@@ -124,7 +166,8 @@ function App() {
                                 name: email,
                                 id: socket.id,
                             });
-                            setUser({ name: email, id: socket.id });
+                            const authUser = userCredential.user;
+                            setUser({ name: email, id: socket.id, uid: authUser.uid });
                             navigate("/"); // Navigate to home after successful signup
                         } else {
                             console.error("Registration failed on backend:", data.message);
@@ -196,6 +239,9 @@ function App() {
     function handleRollComplete(rollResult) {
         // Close the popup
         setIsDicePopupOpen(false);
+
+        // Add roll result to total spaces moved
+        setGameSpacesMoved(gameSpacesMoved + rollResult)
         
         // Send the result to the server
         socket.emit('roll-dice', ({id: user.id, number: rollResult}));
@@ -305,6 +351,8 @@ function App() {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
+            setGameSpacesMoved(0)
+            setStatsUpdated(false)
         })
 
         socket.on('gamestate-update', ({playerPositions, currentPlayer, spacesToMove}) => {
@@ -401,6 +449,11 @@ function App() {
 
         // Ending the game
         socket.on('game-end', ({winner, guess}) => {
+            if (!statsUpdatedRef.current) {
+                updateUserStats({ madeCorrectAccusation: roleRef.current == winner.role, spacesMoved: spacesMovedRef.current });
+                setStatsUpdated(true)
+            }      
+
             setEndgamePopupState({
                 ...endgamePopupState,
                 type: 'correct',
@@ -410,7 +463,13 @@ function App() {
             })
         })
 
+        // Game continues but a player is out of the game
         socket.on('player-loss', ({loser, guess}) => {
+            if (roleRef.current == loser.role && !statsUpdatedRef.current) {
+                updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesMovedRef.current });
+                setStatsUpdated(true)
+            }
+
             setEndgamePopupState({
                 ...endgamePopupState,
                 type: 'incorrect',
@@ -439,19 +498,15 @@ function App() {
         };
     }, [user]); // Add user as dependency to ensure correct behavior when user changes
 
-    // Updated user stats update function - can be called after games
-    function updateUserStats(gameStats) {
-        const updatedStats = {
-            correctAccusations: userStats.correctAccusations + (gameStats.madeCorrectAccusation ? 1 : 0),
-            gamesPlayed: userStats.gamesPlayed + 1,
-            totalSpacesMoved: userStats.totalSpacesMoved + (gameStats.spacesMoved || 0)
-        };
-        
-        // Save to localStorage
-        localStorage.setItem(`userStats_${user.id}`, JSON.stringify(updatedStats));
-        setUserStats({...userStats, ...updatedStats});
-        
-        return updatedStats;
+    async function updateUserStats({ madeCorrectAccusation, spacesMoved }) {
+        // server‐side atomic increments
+        const uid = getAuth().currentUser?.uid;
+        const userDocRef = doc(db, "users", uid);
+        await updateDoc(userDocRef, {
+          'stats.correctAccusations': increment(madeCorrectAccusation ? 1 : 0),
+          'stats.gamesPlayed':       increment(1),
+          'stats.totalSpacesMoved':  increment(spacesMoved)
+        });
     }
 
     if (user) {
