@@ -103,7 +103,7 @@ const GameState = ({ user, playerPositions, movePlayerToPlace, movePlayerToCell,
         <div className={styles.topRight}>
           <Controls buttons={buttons} spacesToMove={spacesToMove} isUserTurn={role == currentPlayer} suggestState={suggestState} />
           {cards.map(card => (
-            <img src={`./src/assets/${card.type}Cards/${card.id}.svg`} key={card.id} height={"160px"}/>
+            <img src={`./src/assets/${card.type}Cards/${card.id}.svg`} key={card.id} height={"160px"} alt={`${card.type} card: ${card.id}`}/>
           ))}
           <CurrentPlayer currentPlayer={currentPlayer} role={role} />
         </div>

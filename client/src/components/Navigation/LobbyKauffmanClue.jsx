@@ -104,7 +104,7 @@ export default function LobbyKauffmanClue({ backgroundImage, setNavState }) {
             <button
               className="btn-yellow"
               style={{
-                backgroundColor: '#d4a017',
+                backgroundColor: '#8E6F10',
                 border: '2px solid white',
                 borderRadius: '10px',
                 height: '100px',

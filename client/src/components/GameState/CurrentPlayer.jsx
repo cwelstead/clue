@@ -22,7 +22,8 @@ const CurrentPlayer = ({ currentPlayer, role }) => {
               margin: '0 5%',
               height: '150%',
             }}
-            src={`./src/assets/pieceIcons/piece-${roleColors.get(currentPlayer)}.png`}>
+            src={`./src/assets/pieceIcons/piece-${roleColors.get(currentPlayer)}.png`}
+            alt={`${roleColors.get(currentPlayer)} game piece indicating current player`}>
           </img>
       </button>
       }
@@ -34,7 +35,8 @@ const CurrentPlayer = ({ currentPlayer, role }) => {
               margin: '0 5%',
               height: '150%',
             }}
-            src={`./src/assets/pieceIcons/piece-${roleColors.get(currentPlayer)}.png`}>
+            src={`./src/assets/pieceIcons/piece-${roleColors.get(currentPlayer)}.png`}
+            alt={`${roleColors.get(currentPlayer)} game piece indicating current player`}>
           </img>
         </button>
       }

@@ -14,7 +14,7 @@ const roleColors = new Map([
 const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => {
   const placeOffsetLeft = 1.8
   const placeOffsetTop = 1.8
-
+  
   return (
     <div className={styles.gameBoard} style={{display: 'flex', position: 'relative', flex: '1', aspectRatio: '1'}}>
       {/* Grid */}
@@ -41,8 +41,9 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
                 e.preventDefault()
                 movePlayerToPlace(place.key)
               }}
+              alt={place.key}
             ></img>
-            
+                     
             {/* List of tokens in a room (just the player for now) */}
             {Array.from(playerPositions, ([role, position]) =>  (
               position.place === place.key &&
@@ -52,7 +53,8 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
                   position: "relative",
                   margin: 'auto',
                 }}
-                src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}>
+                src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}
+                alt={`${role} player piece`}>
               </img>
             ))}
           </div>
@@ -88,9 +90,9 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
                         alignSelf: 'center',
                         margin: '0',
                         flex: '1',
-                        
                       }}
-                      src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}>
+                      src={`./src/assets/pieceIcons/piece-${roleColors.get(role)}.png`}
+                      alt={`${role} player piece at position ${colKey},${rowKey}`}>
                     </img>
                   ))}
                 </div>
@@ -101,8 +103,6 @@ const GameBoard = ({ playerPositions, movePlayerToPlace, movePlayerToCell }) => 
       </div>
     </div>
   );
-};
-
-export default GameBoard;
-
-
+ };
+ 
+ export default GameBoard;

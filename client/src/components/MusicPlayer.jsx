@@ -24,8 +24,8 @@ export function MusicPlayer() {
             </audio>
 
             {/* Toggle Music Button */}
-            <button onClick={toggleMusic} style={{ position: "absolute", top: 10, right: 10 }}>
-                {isPlaying ? "Pause Music" : "Play Music"}
+            <button onClick={toggleMusic} style={{ backgroundColor: '#c19a6b', position: "absolute", top: 10, right: 10, fontFamily: 'Courier New', color: "#fff" }}>
+                {isPlaying ? "⏸" : "▶"}
             </button>
         </>
     );
