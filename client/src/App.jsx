@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 import './index.css'
 import { SelectLobby } from './components/SelectLobby.jsx'
@@ -26,11 +26,15 @@ function App() {
     const [user, setUser] = useState("")
     const [lobby, setLobby] = useState({})
     const [joinFail, setJoinFail] = useState(false)
+
     const [playerPositions, setPlayerPositions] = useState(null)
     const [cards, setCards] = useState([])
     const [currentPlayer, setCurrentPlayer] = useState("")
     const [spacesToMove, setSpacesToMove] = useState(0)
     const [role, setRole] = useState("")
+    const roleRef = useRef()
+    roleRef.current = role
+
     const [isDicePopupOpen, setIsDicePopupOpen] = useState(false);
     const [suggestState, setSuggestState] = useState({type: ""})
     const [endgamePopupState, setEndgamePopupState] = useState({type: ""})
@@ -43,6 +47,12 @@ function App() {
         gamesPlayed: 0,
         totalSpacesMoved: 0
     })
+    const [gameSpacesMoved, setGameSpacesMoved] = useState(0)
+    const spacesMovedRef = useRef()
+    spacesMovedRef.current = gameSpacesMoved
+    const [statsUpdated, setStatsUpdated] = useState(false)
+    const statsUpdatedRef = useRef()
+    statsUpdatedRef.current = statsUpdated
 
     // Load user stats when component mounts or user changes
     useEffect(() => {
@@ -61,7 +71,10 @@ function App() {
                 const docSnap = await getDoc(userDocRef);
             
                 if (docSnap.exists()) {
-                    setUserStats(docSnap.data().stats);
+                    setUserStats({
+                        ...userStats,
+                        ...docSnap.data().stats
+                    });
                 } else {
                     // Create initial stats if not present
                     const initialStats = {
@@ -70,7 +83,10 @@ function App() {
                         totalSpacesMoved: 0
                 };
                 await setDoc(userDocRef, { stats: initialStats });
-                setUserStats(initialStats);
+                setUserStats({
+                    ...userStats,
+                    ...initialStats,
+                });
                 }
             };
             
@@ -223,6 +239,9 @@ function App() {
     function handleRollComplete(rollResult) {
         // Close the popup
         setIsDicePopupOpen(false);
+
+        // Add roll result to total spaces moved
+        setGameSpacesMoved(gameSpacesMoved + rollResult)
         
         // Send the result to the server
         socket.emit('roll-dice', ({id: user.id, number: rollResult}));
@@ -332,6 +351,8 @@ function App() {
             setPlayerPositions(new Map(JSON.parse(playerPositions)))
             setCurrentPlayer(currentPlayer)
             setSpacesToMove(spacesToMove)
+            setGameSpacesMoved(0)
+            setStatsUpdated(false)
         })
 
         socket.on('gamestate-update', ({playerPositions, currentPlayer, spacesToMove}) => {
@@ -428,7 +449,10 @@ function App() {
 
         // Ending the game
         socket.on('game-end', ({winner, guess}) => {
-            updateUserStats({ madeCorrectAccusation: true, spacesMoved: spacesToMove });        
+            if (!statsUpdatedRef.current) {
+                updateUserStats({ madeCorrectAccusation: roleRef.current == winner.role, spacesMoved: spacesMovedRef.current });
+                setStatsUpdated(true)
+            }      
 
             setEndgamePopupState({
                 ...endgamePopupState,
@@ -439,8 +463,12 @@ function App() {
             })
         })
 
+        // Game continues but a player is out of the game
         socket.on('player-loss', ({loser, guess}) => {
-            updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesToMove });        
+            if (roleRef.current == loser.role && !statsUpdatedRef.current) {
+                updateUserStats({ madeCorrectAccusation: false, spacesMoved: spacesMovedRef.current });
+                setStatsUpdated(true)
+            }
 
             setEndgamePopupState({
                 ...endgamePopupState,
