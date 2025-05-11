@@ -1,4 +1,3 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
 import styles from './GameBoard.module.css';
 import Board from '../../../../classes/Board.js';
 

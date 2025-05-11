@@ -1,4 +1,3 @@
-// import 'LoginPage.css'
 import { useEffect } from 'react';
 import React from 'react';
 import { Login } from './Login';

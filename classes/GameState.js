@@ -45,6 +45,7 @@ export class GameState {
 
     // Removes the current player from the turn order.
     // They can still prove others wrong, but they cannot move or suggest.
+    // NOTE: This was a stretch goal we reached!
     removeCurrentPlayer() {
         const playerID = this.getCurrentPlayer()
 

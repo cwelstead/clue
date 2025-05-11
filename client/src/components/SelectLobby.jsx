@@ -39,7 +39,7 @@ export function SelectLobby({ onLobbyJoin, setNavState, joinFail, setJoinFail })
                 }}
             >
                 <img 
-                    src="/src/assets/KauffmanLobby.png"
+                    src="/src/assets/lobby.png"
                     alt="background"
                     style={{
                         width: '100%',

@@ -1,3 +1,4 @@
+// NOTE: Rolling dice animation was a stretch goal that we reached!
 import { useState, useEffect } from 'react';
 
 // This component will be triggered by the existing ROLL button

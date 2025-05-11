@@ -277,8 +277,8 @@ export function SignUpPage({ handleSignUp }) {
                 width: '171.76px',
                 height: '171.76px',
                 position: 'absolute',
-                bottom: '100px',
-                right: '200px',
+                bottom: '150px',
+                right: '450px',
                 zIndex: 1,
                 }}
             />

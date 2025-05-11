@@ -1,4 +1,3 @@
-// AlertPopup.jsx
 import React, { useEffect } from "react";
 
 /**
@@ -7,8 +6,6 @@ import React, { useEffect } from "react";
  * • onConfirm : () => void             — OK‑button handler
  * • refuter   : { role:string } | null — player who showed a card (null ⇒ nobody)
  * • cardImage : string | undefined     — ONLY sent to the suggesting player
- * • sourceID  : string                 — id of the player who made the suggestion
- * • myID      : string                 — id for *this* client
  */
 const AlertPopup = ({
   onConfirm,
@@ -86,8 +83,6 @@ const AlertPopup = ({
     objectFit: "contain"
   };
 
-  console.log("Card image path:", cardImage); // For debugging
-  console.log("Is source player:", isSource); // For debugging
 
   if (isSource) {
     console.log("%cSHOW CARD", "color:limegreen", { cardImage });

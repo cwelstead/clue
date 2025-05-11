@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import './App.css'
 import './index.css'
-import { SelectLobby } from './components/SelectLobby.jsx'
 import { InLobby } from './components/InLobby.jsx'
 import { socket } from './socket.js'
 import { useEffect } from 'react'

@@ -6,17 +6,6 @@ export function InLobby({ lobby, onReadyToggle, onSwitchRole, onLeave, onGo }) {
     const [isPlaying, setIsPlaying] = useState(false); // State to track if music is playing
     const audioRef = useRef(null); // Reference to the audio element
 
-    const toggleMusic = () => {
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-            } else {
-                audioRef.current.play().catch(error => console.log("Playback error:", error));
-            }
-            setIsPlaying(!isPlaying);
-        }
-    };
-
     return (
         <>
             {/* Music Player Button - Positioned at the top right */}

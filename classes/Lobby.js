@@ -60,7 +60,7 @@ export class Lobby {
     }
 
     readyToStart() {
-        if (this._players.size < 1) return false
+        if (this._players.size < 3) return false
 
         let allPlayersReady = true
         this._players.forEach(player => {
