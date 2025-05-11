@@ -34,10 +34,10 @@ All code pertaining to what the user sees when they open the Kauffman Clue webpa
 - client/public: Miscellanous fonts that are used as well as the music that can be heard in the lobby.
 - client/src: Contains the base of client code and the connection to Firebase, our authentication system.
     - client/src/assets: All images and visual aspects used, from cards to background images. Organized into folders for convenience.
-    - client/src/components: Every .jsx file that isn't our main App. Some are organized into files for a less messy navigation experience.
+    - client/src/components: Every .jsx file that isn't our main App. The most important categories are organized into folders for a less messy navigation experience.
 
 ### server
-All code pertaining to the backend. Communication between client and server is done through socket.io, which is all handled in the index.js file. It can feel unwieldy looking through it for the first time, but all functions are generally organized well by their purpose. The main categories include abstrations for convenience (which all have individual comments on them), code for lobbies, and code for in-game. 
+All code pertaining to the backend. Communication between client and server is done through socket.io, which is all handled in the index.js file. It can feel unwieldy looking through it for the first time, but all functions are organized well by their purpose. The main categories include abstrations for convenience (which all have individual comments on them), code for lobbies, and code for in-game. 
 
 ### tests
 Tests created for some of the files in our /classes folder. Run `npm run test` from the source directory to run these tests.
